@@ -25,15 +25,15 @@
             <tr>
               <th scope="row"><label for="appname">App Name</label></th>
               <td>
-                <input type="text" id="crwp-appname"="app_name" placeholder="e.g. my-email-app" />
-                <p class="description" id="tagline-description">The name of your React app.</p>
+                <input id="crwp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
+                <p class="description" id="tagline-description">The name of your React app. Must be unique.</p>
               </td>
             </tr>
             <tr>
               <th scope="row"><label for="page_slug">Page Slug</label></th>
               <td>
-                <input type="text" id="crwp-pageslug" name=" page_slug" placeholder="e.g. inbox" />
-                <p class="description" id="tagline-description">The slug of page where your app should be displayed.</p>
+                <input id="crwp-pageslug" name=" page_slug" placeholder="e.g. inbox" required type="text" />
+                <p class="description" id="tagline-description">The slug of page where your app should be displayed. Must be unique.</p>
               </td>
             </tr>
           </tbody>

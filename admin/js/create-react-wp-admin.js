@@ -10,6 +10,8 @@
 
     // console.log({ AJAXURL, APPS })
     // TODO onchange form input
+    $('#crwp-create-form').validate()
+
     // processing event on button click
     $(document).on('submit', '#crwp-create-form', () => {
       console.log('submit')

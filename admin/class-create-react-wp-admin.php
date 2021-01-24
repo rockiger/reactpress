@@ -61,11 +61,12 @@ class Create_React_Wp_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 */
+		$valid_pages = ['create-react-wp'];
+		$page = $_REQUEST['page'] ?? "";
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/create-react-wp-admin.css', array(), $this->version, 'all');
+		if (in_array($page, $valid_pages)) {
+			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/create-react-wp-admin.css', array(), $this->version, 'all');
+		}
 	}
 
 	/**
@@ -79,6 +80,8 @@ class Create_React_Wp_Admin {
 		$page = $_REQUEST['page'] ?? "";
 
 		if (in_array($page, $valid_pages)) {
+			wp_enqueue_script('crwp-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
+
 			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/create-react-wp-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "crwp", array(
