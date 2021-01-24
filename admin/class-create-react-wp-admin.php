@@ -108,7 +108,20 @@ class Create_React_Wp_Admin {
 		);
 	}
 
-	public function handle_crwp_admin_ajax_request() {
+	/**
+	 * Add page template.
+	 *
+	 * @param  array  $templates  The list of page templates
+	 * @return array  $templates  The modified list of page templates* 
+	 * @since 1.0.0
+	 */
+	public function crwp_add_page_template($templates) {
+		$templates[CRWP_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From Create React WP', 'text-domain');
+
+		return $templates;
+	}
+
+	public function crwp_handle_admin_ajax_request() {
 		$param = $_REQUEST['param'] ?? "";
 		$crwp_apps = get_option('crwp_apps');
 
@@ -195,7 +208,9 @@ class Create_React_Wp_Admin {
 					'post_status' => 'publish',
 					'post_author' => '1',
 					'post_content' => CRWP_REACT_ROOT_TAG,
-					'post_type' => "page"
+					'post_type' => "page",
+					// Assign page template
+					'page_template'  => CRWP_PLUGIN_PATH . 'templates/react-page-template.php',
 				)
 			);
 			if ($result) {

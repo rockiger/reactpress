@@ -96,4 +96,25 @@ class Create_React_Wp_Public {
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/create-react-wp-public.js', array('jquery'), $this->version, false);
 	}
+
+
+	/**
+	 * Change the page template to the our template on the dropdown if selected
+	 * 
+	 * @param $template
+	 *
+	 * @return mixed
+	 * @since 1.0.0
+	 */
+	public function crwp_change_page_template($template) {
+		if (is_page()) {
+			$meta = get_post_meta(get_the_ID());
+
+			if (!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template) {
+				$template = $meta['_wp_page_template'][0];
+			}
+		}
+
+		return $template;
+	}
 }

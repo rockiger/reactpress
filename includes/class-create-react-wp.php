@@ -67,8 +67,6 @@ class Create_React_Wp {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		// TODO filter for page template; 
-		// https://www.wpexplorer.com/wordpress-page-templates-plugin/
 		if (defined('CRWP_VERSION')) {
 			$this->version = CRWP_VERSION;
 		} else {
@@ -158,8 +156,12 @@ class Create_React_Wp {
 
 		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
 
-		$this->loader->add_action('wp_ajax_crwp_admin_ajax_request', $plugin_admin, 'handle_crwp_admin_ajax_request');
+		$this->loader->add_action('wp_ajax_crwp_admin_ajax_request', $plugin_admin, 'crwp_handle_admin_ajax_request');
+
+		// Add our custom template to the admin's templates dropdown
+		$this->loader->add_filter('theme_page_templates', $plugin_admin, 'crwp_add_page_template');
 	}
+
 
 	/**
 	 * Register all of the hooks related to the public-facing functionality
@@ -174,6 +176,7 @@ class Create_React_Wp {
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+		$this->loader->add_filter('template_include', $plugin_public, 'crwp_change_page_template', 99);
 	}
 
 	/**
