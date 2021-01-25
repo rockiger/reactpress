@@ -34,7 +34,7 @@
               <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
               <p class="grow1 mb1"><b>URL Slug: </b><?= $app['pageslug'] ?></p>
               <div class="flex">
-                <button class="button">Start</button>
+                <button class="button button-start">Start</button>
                 <div class="grow1"></div>
                 <button class="button">Stop</button>
               </div>
@@ -77,6 +77,7 @@
     </div>
   </div>
 </div>
+<div id="crwp-snackbar" class="crwp-snackbar">Test</div>
 <pre>
   <?php
   //delete_option('crwp_apps');

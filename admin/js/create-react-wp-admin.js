@@ -36,6 +36,17 @@
       })
     })
 
+    $('.button-start').click(() => {
+      console.log('.button-start')
+      showSnackbar('React app started.')
+    })
+
+    function showSnackbar(message = '') {
+      $('#crwp-snackbar').addClass('show').text(message)
+
+      setTimeout(() => $('#crwp-snackbar').removeClass('show').text(''), 5000)
+    }
+
     /*******
      * END *
      *******/
