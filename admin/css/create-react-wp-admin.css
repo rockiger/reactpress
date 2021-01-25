@@ -3,7 +3,173 @@
  * included in this file.
  */
 
+/************
+ * Elements *
+ ************/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+/*******************
+ * Utility classes *
+ *******************/
+
+.align-center {
+  align-items: center;
+}
+
+.bd-green {
+  border-color: #46b450 !important;
+}
+
+.bd-orange {
+  border-color: #f56e28 !important;
+}
+
+.bd-red {
+  border-color: #dc3232 !important;
+}
+.bg-green {
+  background-color: #46b450 !important;
+}
+
+.bg-orange {
+  background-color: #f56e28 !important;
+}
+
+.bg-red {
+  background-color: #dc3232 !important;
+}
+.col {
+  flex-direction: column;
+}
+
+.fg-green {
+  color: #46b450 !important;
+}
+
+.fg-orange {
+  color: #f56e28 !important;
+}
+
+.fg-red {
+  color: #dc3232 !important;
+}
+.fg-white {
+  color: white !important;
+}
+.flex {
+  display: flex;
+}
+
+.fullwidth {
+  width: 100%;
+  max-width: none;
+}
+.gap {
+  gap: 1rem;
+}
+.grow1 {
+  flex-grow: 1;
+}
+
+.maxWidth80 {
+  max-width: 80rem;
+}
+
+.m0 {
+  margin: 0;
+}
+
+.m0auto {
+  margin: 0 auto;
+}
+
+.mb075 {
+  margin-bottom: 0.75rem;
+}
+
+.mb1 {
+  margin-bottom: 1rem;
+}
+
+.p0 {
+  padding: 0;
+}
+.p1 {
+  padding: 1rem;
+}
+.p1_5 {
+  padding: 1.5rem;
+}
+.p2 {
+  padding: 2rem;
+}
+
+.pb1 {
+  padding-bottom: 1rem;
+}
+.pt1 {
+  padding-top: 1rem;
+}
+.row {
+  flex-direction: row;
+}
+.half {
+  width: calc(50% - 1rem);
+}
+.flexwrap {
+  flex-wrap: wrap;
+}
+
+/***************************
+ * Components / Overwrites *
+ ***************************/
+
+.card {
+  margin-top: 0;
+}
+.card_horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.head {
+  border-bottom: 1px solid #ccd0d4;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  background: #fff;
+}
 label.error {
   margin-left: 10px;
   color: #dc3232;
+}
+
+svg.logo {
+  height: 32px;
+  width: 32px;
+  margin: 0 0.5rem 0 -0.1rem;
+}
+svg.react {
+  height: 24px;
+  width: 24px;
+  margin-left: -0.15rem;
+  margin-right: 0.25rem;
+}
+svg.react > * {
+  fill: black important!;
+}
+
+#wpcontent {
+  padding-left: 0;
+}
+.crwp-content > * {
+  box-sizing: border-box;
 }
