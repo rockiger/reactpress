@@ -122,29 +122,56 @@ class Create_React_Wp_Admin {
 	}
 
 	public function crwp_handle_admin_ajax_request() {
-		$param = $_REQUEST['param'] ?? "";
+		$appname = $_POST['appname'] ?? '';
 		$crwp_apps = get_option('crwp_apps');
+		$pageslug = $_POST['pageslug'] ?? '';
+		$param = $_REQUEST['param'] ?? "";
 
-		if (!empty($param)) {
-			if ($param === "create_react_app") {
+		try {
+			if (!empty($param)) {
+				if ($param === "create_react_app" && $appname && $pageslug) {
 
-				$appname = $_POST['appname'] ?? '';
-				$pageslug = $_POST['pageslug'] ?? '';
-				// TODO create fold function for functional programming
-				// TODO function that checks, if all conditions for a new app are present
-				$this->create_new_app($crwp_apps, $appname, $pageslug);
-				$this->insert_react_page($appname, $pageslug);
-				$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+					// TODO create fold function for functional programming
+					// TODO function that checks, if all conditions for a new app are present
+					$this->create_new_app($crwp_apps, $appname, $pageslug);
+					$this->insert_react_page($appname, $pageslug);
+					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 
-				echo json_encode([
-					'status' => 1,
-					'message' => "React app created.",
-				]);
-			} else {
-				echo (json_encode($_REQUEST));
+					echo json_encode([
+						'status' => 1,
+						'message' => "React app created.",
+					]);
+				} elseif ($param === "start_react_app" && $appname && $pageslug) {
+					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+					$parts = $this->start_react_app($appname);
+
+					if (empty($parts)) {
+						echo json_encode(['status' => 0, 'message' => "Couldn't load app."]);
+					} else {
+						echo json_encode([
+							'status' => 1,
+							'ip' => substr($parts[1], 2),
+							'message' => 'App loaded.',
+							'port' => $parts[2],
+							'protocol' => $parts[0],
+						]);
+					}
+				} else {
+					echo json_encode($_REQUEST);
+				}
 			}
+		} catch (Exception $e) {
+			echo (json_encode([
+				'status' => 0,
+				'message' => $e->getMessage(),
+				'code' => $e->getCode(), // User-defined Exception code
+				'filename' => $e->getFile(), // Source filename
+				'line' => $e->getLine(), // Source line
+				'trace' => $e->getTraceAsString(), // Formated string of trace
+			]));
+		} finally {
+			wp_die();
 		}
-		wp_die();
 	}
 
 	public function get_index_html_content(string $pageslug) {
@@ -182,6 +209,26 @@ class Create_React_Wp_Admin {
 		return end($output) === 'Happy hacking!' ? true : false;
 	}
 
+	function start_react_app($appname) {
+		chdir(escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}"));
+		shell_exec("yarn start > out.log 2>&1 & echo $! >> pid.log");
+
+		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
+		$matches = [];
+		$trys = 0;
+		while (empty($matches) && $trys < 10) {
+			$file_content = file_get_contents('./out.log');
+			preg_match($regex, $file_content, $matches);
+			$trys += 1;
+			sleep(1);
+		}
+		if (empty($matches)) {
+			return [];
+		} else {
+			return explode(':', $matches[0]);
+		}
+	}
+
 	function array_add(array $array, $entry) {
 		return array_merge($array, [$entry]);
 	}
@@ -200,7 +247,7 @@ class Create_React_Wp_Admin {
 			// alreade we have data with this post name
 			return ['status' => 'false', 'message' => 'Page already exists.'];
 		} else {
-			// TODO Use real wp errors
+			// TODO1.0.1 Use real wp errors
 			$result = wp_insert_post(
 				array(
 					'post_title' => $appname,
@@ -220,6 +267,10 @@ class Create_React_Wp_Admin {
 			}
 		}
 	}
+}
+
+function crwp_response(mixed $value, int $options = 0, int $depth = 512) {
+	echo (json_encode($value, $options, $depth));
 }
 
 define("CRWP_REACT_ROOT_TAG", "<!-- wp:html -->\n<!-- Please don't change. Block is needed for React app. -->\n<noscript>You need to enable JavaScript to run this app.</noscript>\n<div id=\"root\"></div>\n<!-- /wp:html -->");

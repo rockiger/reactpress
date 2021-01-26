@@ -32,11 +32,14 @@
           <?php foreach ($crwp_apps as $app) : ?>
             <div class="card col flex half m0 p1_5">
               <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
-              <p class="grow1 mb1"><b>URL Slug: </b><?= $app['pageslug'] ?></p>
-              <div class="flex">
-                <button class="button button-start">Start</button>
+              <div class="grow1 mb1">
+                <p><b>URL Slug: </b><?= $app['pageslug'] ?></p>
+                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-red">Stopped</b>
+              </div>
+              <div class=" flex">
+                <button class="button button-start" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Start</button>
+                <span id="crwp-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
-                <button class="button">Stop</button>
               </div>
             </div>
           <?php endforeach; ?>
@@ -68,7 +71,7 @@
               </table>
               <div>
                 <input type="submit" name="submit" id="submit" class="button button-primary" value="Create React App" />
-                <span id="crwp-spinner" class="spinner" style="float: none;margin-top: 5px; vertical-align: top;"></span>
+                <span id="crwp-spinner" class="crpw-button-spinner spinner"></span>
               </div>
             </fieldset>
           </form>
