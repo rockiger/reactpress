@@ -151,11 +151,18 @@ class Create_React_Wp_Admin {
 						echo json_encode([
 							'status' => 1,
 							'ip' => substr($parts[1], 2),
-							'message' => 'App loaded.',
+							'message' => 'App started.',
 							'port' => $parts[2],
 							'protocol' => $parts[0],
 						]);
 					}
+				} elseif ($param === 'stop_react_app' && $appname) {
+
+					$this->stop_react_app($appname);
+					echo json_encode([
+						'status' => 1,
+						'message' => 'App stopped.',
+					]);
 				} else {
 					echo json_encode($_REQUEST);
 				}
@@ -211,7 +218,7 @@ class Create_React_Wp_Admin {
 
 	function start_react_app($appname) {
 		chdir(escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}"));
-		shell_exec("yarn start > out.log 2>&1 & echo $! >> pid.log");
+		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
 
 		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
 		$matches = [];
@@ -227,6 +234,25 @@ class Create_React_Wp_Admin {
 		} else {
 			return explode(':', $matches[0]);
 		}
+	}
+
+	function stop_react_app($appname) {
+		// end node processes based on the app path
+		$SIGHUP = 1;
+		$apppath = CRWP_PLUGIN_PATH . "apps/{$appname}/";
+		$command = "ps aux  | grep {$apppath} | grep -v grep";
+		$output = [];
+		exec($command, $output);
+		foreach ($output as $process) {
+			$process_attributes = preg_split("/\ + /", $process);
+			$pid = $process_attributes[1];
+			posix_kill($pid, $SIGHUP);
+		}
+		// cancel yarn start
+		posix_kill(file_get_contents("{$apppath}/pid.log"), $SIGHUP);
+		// cleanup remove out.log and pid.log
+		unlink("{$apppath}/pid.log");
+		unlink("{$apppath}/out.log");
 	}
 
 	function array_add(array $array, $entry) {

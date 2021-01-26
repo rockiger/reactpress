@@ -37,7 +37,7 @@
                 <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-red">Stopped</b>
               </div>
               <div class=" flex">
-                <button class="button button-start" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Start</button>
+                <button class="button button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Start</button>
                 <span id="crwp-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
               </div>
@@ -84,5 +84,8 @@
 <pre>
   <?php
   //delete_option('crwp_apps');
+  echo (file_get_contents(CRWP_PLUGIN_PATH . "apps/app1/pid.log"));
+  echo ('<br />');
+  echo ('<br />');
   print_r($crwp_apps);
   ?>
