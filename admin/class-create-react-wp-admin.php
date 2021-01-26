@@ -216,18 +216,27 @@ class Create_React_Wp_Admin {
 		return end($output) === 'Happy hacking!' ? true : false;
 	}
 
-	function start_react_app($appname) {
-		chdir(escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}"));
-		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
-
+	/**
+	 * Reads the React app uri out of the out.log file of the
+	 * app. Which is a splash screen of create-react-app.
+	 *
+	 * @param string $apppath the directory path of the app
+	 * @param integer $max_trys the number of trys to read the uri.
+	 * Important when out.log file is still being created.
+	 * @return array contains the protocol, the ip and the 
+	 * port of the uri.
+	 */
+	function get_app_uri(string $apppath, int $max_trys = 1) {
 		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
 		$matches = [];
 		$trys = 0;
-		while (empty($matches) && $trys < 10) {
-			$file_content = file_get_contents('./out.log');
+		while (empty($matches) && $trys < $max_trys) {
+			$file_content = file_get_contents("{$apppath}/out.log");
 			preg_match($regex, $file_content, $matches);
 			$trys += 1;
-			sleep(1);
+			if ($trys < $max_trys) {
+				sleep(1);
+			}
 		}
 		if (empty($matches)) {
 			return [];
@@ -236,20 +245,44 @@ class Create_React_Wp_Admin {
 		}
 	}
 
+	/**
+	 * Get the pid of the processes start by yarn start.
+	 *
+	 * @param string $apppath
+	 * @return array of the pids
+	 */
+	function get_node_pids($apppath) {
+		$command = "ps aux  | grep {$apppath} | grep -v grep";
+		$processes = [];
+		exec($command, $processes);
+		return array_map(fn ($el) => preg_split("/\ + /", $el)[1], $processes);
+	}
+
+	function is_react_app_running(string $appname) {
+		return $this->get_app_uri($this->app_path($appname), 1);
+	}
+
+	function app_path(string $appname) {
+		return escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
+	}
+
+	function start_react_app($appname) {
+		$apppath = $this->app_path($appname);
+		chdir($apppath);
+		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
+		return $this->get_app_uri($apppath, 10);
+	}
+
 	function stop_react_app($appname) {
 		// end node processes based on the app path
 		$SIGHUP = 1;
-		$apppath = CRWP_PLUGIN_PATH . "apps/{$appname}/";
-		$command = "ps aux  | grep {$apppath} | grep -v grep";
-		$output = [];
-		exec($command, $output);
-		foreach ($output as $process) {
-			$process_attributes = preg_split("/\ + /", $process);
-			$pid = $process_attributes[1];
-			posix_kill($pid, $SIGHUP);
+		$apppath = $this->app_path($appname);
+		foreach ($this->get_node_pids($apppath) as $pid) {
+			posix_kill((int)$pid, $SIGHUP);
 		}
 		// cancel yarn start
-		posix_kill(file_get_contents("{$apppath}/pid.log"), $SIGHUP);
+		$yarn_pid = file_get_contents("{$apppath}/pid.log");
+		posix_kill((int)$yarn_pid, $SIGHUP);
 		// cleanup remove out.log and pid.log
 		unlink("{$apppath}/pid.log");
 		unlink("{$apppath}/out.log");
@@ -297,6 +330,22 @@ class Create_React_Wp_Admin {
 
 function crwp_response(mixed $value, int $options = 0, int $depth = 512) {
 	echo (json_encode($value, $options, $depth));
+}
+
+/**
+ * Write error to a log file named debug.log in wp-content.
+ * 
+ * @param mixed $log The thing you want to log.
+ */
+function crwp_log($log) {
+	if (true === WP_DEBUG) {
+		if (is_array($log) || is_object($log)) {
+			error_log(print_r($log, true));
+		} else {
+			error_log($log);
+		}
+	}
+	return $log;
 }
 
 define("CRWP_REACT_ROOT_TAG", "<!-- wp:html -->\n<!-- Please don't change. Block is needed for React app. -->\n<noscript>You need to enable JavaScript to run this app.</noscript>\n<div id=\"root\"></div>\n<!-- /wp:html -->");
