@@ -18,7 +18,7 @@
 <?php $crwp_apps = get_option('crwp_apps'); ?>
 <div class="crwp-content">
   <div class='head'>
-    <div class='head--inner align-center flex maxWidth80 p2 pb1 pt1'>
+    <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
       <?= LOGO ?>
       <h1 style="color: #82878C;">Create React WP</h1>
     </div>
@@ -29,15 +29,18 @@
     <div class="flex gap row">
       <div class="col flex grow1 half">
         <div class="flex flexwrap gap row">
-          <?php foreach ($crwp_apps as $app) : ?>
-            <div class="card col flex half m0 p1_5">
+          <?php foreach ($crwp_apps as $app) :
+            $is_running = $this->is_react_app_running($app['appname']);
+            [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($app['appname']), 1) : ['', '', ''];
+          ?>
+            <div id="<?= $app['appname'] ?>" class="card col flex half m0 p1_5">
               <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
               <div class="grow1 mb1">
                 <p><b>URL Slug: </b><?= $app['pageslug'] ?></p>
-                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-red">Stopped</b>
+                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a class=\"button-link\" href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b>
               </div>
               <div class=" flex">
-                <button class="button button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Start</button>
+                <button class="button button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
                 <span id="crwp-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
               </div>
@@ -84,7 +87,7 @@
 <pre>
   <?php
   //delete_option('crwp_apps');
-  echo (file_get_contents(CRWP_PLUGIN_PATH . "apps/app1/pid.log"));
+  // print_r($this->get_app_uri($this->app_path('app1'), 1));
   echo ('<br />');
   echo ('<br />');
   print_r($crwp_apps);

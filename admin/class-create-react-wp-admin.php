@@ -131,8 +131,6 @@ class Create_React_Wp_Admin {
 			if (!empty($param)) {
 				if ($param === "create_react_app" && $appname && $pageslug) {
 
-					// TODO create fold function for functional programming
-					// TODO function that checks, if all conditions for a new app are present
 					$this->create_new_app($crwp_apps, $appname, $pageslug);
 					$this->insert_react_page($appname, $pageslug);
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
@@ -163,6 +161,22 @@ class Create_React_Wp_Admin {
 						'status' => 1,
 						'message' => 'App stopped.',
 					]);
+				} elseif ($param === 'is_react_app_running' && $appname) {
+					if ($this->is_react_app_running($appname)) {
+						$parts = $this->get_app_uri($this->app_path($appname), 1);
+						echo json_encode([
+							'status' => 1,
+							'ip' => substr($parts[1], 2),
+							'message' => 'App is running.',
+							'port' => $parts[2],
+							'protocol' => $parts[0],
+						]);
+					} else {
+						echo json_encode([
+							'status' => 0,
+							'message' => 'App not running.',
+						]);
+					}
 				} else {
 					echo json_encode($_REQUEST);
 				}
@@ -231,7 +245,11 @@ class Create_React_Wp_Admin {
 		$matches = [];
 		$trys = 0;
 		while (empty($matches) && $trys < $max_trys) {
-			$file_content = file_get_contents("{$apppath}/out.log");
+			try {
+				$file_content = file_get_contents("{$apppath}/out.log");
+			} catch (Exception $e) {
+				return [];
+			}
 			preg_match($regex, $file_content, $matches);
 			$trys += 1;
 			if ($trys < $max_trys) {
@@ -248,10 +266,11 @@ class Create_React_Wp_Admin {
 	/**
 	 * Get the pid of the processes start by yarn start.
 	 *
-	 * @param string $apppath
+	 * @param string $appname
 	 * @return array of the pids
 	 */
-	function get_node_pids($apppath) {
+	function get_node_pids($appname) {
+		$apppath = $this->app_path($appname);
 		$command = "ps aux  | grep {$apppath} | grep -v grep";
 		$processes = [];
 		exec($command, $processes);
@@ -259,11 +278,11 @@ class Create_React_Wp_Admin {
 	}
 
 	function is_react_app_running(string $appname) {
-		return $this->get_app_uri($this->app_path($appname), 1);
+		return !empty($this->get_node_pids($appname));
 	}
 
 	function app_path(string $appname) {
-		return escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
+		return escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}");
 	}
 
 	function start_react_app($appname) {
@@ -277,7 +296,7 @@ class Create_React_Wp_Admin {
 		// end node processes based on the app path
 		$SIGHUP = 1;
 		$apppath = $this->app_path($appname);
-		foreach ($this->get_node_pids($apppath) as $pid) {
+		foreach ($this->get_node_pids($appname) as $pid) {
 			posix_kill((int)$pid, $SIGHUP);
 		}
 		// cancel yarn start
@@ -306,7 +325,6 @@ class Create_React_Wp_Admin {
 			// alreade we have data with this post name
 			return ['status' => 'false', 'message' => 'Page already exists.'];
 		} else {
-			// TODO1.0.1 Use real wp errors
 			$result = wp_insert_post(
 				array(
 					'post_title' => $appname,
