@@ -26,7 +26,11 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-// TODO Delete options if uninstall
 if (!defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
+}
+
+$role = get_role('administrator');
+if (!empty($role)) {
+	delete_option('crwp_apps');
 }
