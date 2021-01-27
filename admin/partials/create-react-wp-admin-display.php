@@ -49,6 +49,7 @@
             </div>
           <?php endforeach; ?>
         </div>
+        <p class="pt1">You cant find all app sources in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code></p>
       </div>
       <div class=" flex col half">
         <div class="card fullwidth p2">
