@@ -11,50 +11,46 @@
     $('#crwp-create-form').validate()
 
     // processing event on button click
-    $(document).on('submit', '#crwp-create-form', () => {
-      const appnameField = $('#crwp-appname')
-      const appname = appnameField.val()
-      const fieldset = $('#crwp-create-fieldset')
-      const pageslugField = $('#crwp-pageslug')
-      const pageslug = pageslugField.val()
-      const spinner = $('#crwp-spinner')
-      const templateSelect = $('#crwp-template-select')
-      const template = templateSelect.val()
-      const postdata = `action=crwp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}`
-
-      fieldset.prop('disabled', true)
-      spinner.addClass('is-active')
-      $.post(AJAXURL, postdata, (response) => {
-        const result = JSON.parse(response)
-        if (result.status) {
-          appnameField.val('')
-          fieldset.prop('disabled', false)
-          pageslugField.val('')
-          $('#crwp-template-select > option:first-child').prop('selected', true)
-          spinner.removeClass('is-active')
-          $('#existing-apps').append(appCardTemplate(appname, pageslug))
-          $(`#${appname} .button-start-stop`).click(handleStartStopButton)
-          $(`#${appname} .button-delete`).click(handleDeleteButton)
-        }
-      })
-    })
-
+    $(document).on('submit', '#crwp-create-form', handleSubmit)
+    $('.button-build').click(handleBuildButton)
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
 
-    // TODO v1.0.0 Deploy app
+    // TODO v1.0.0 Build and Deploy app
+    /**
+     *
+     * parse asset-manifest.json
+     * set react app to load in our page
+     *
+     *
+     */
     // TODO v1.0.0 Deploy app to production
     // TODO v1.0.0 Publish wordpress plugin
 
+    // TODO v1.x.0 Swap file_get_contents for wp_remote_get.
     // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
     // TODO v1.x.0 Check if windows version can be implemented
 
     // DONE v1.0.0 Add TypeScript/template support
     // DONE v1.0.0 Delete app
 
-    function handleDeleteButton(ev) {
+    function handleBuildButton(ev) {
+      console.log('handleDeleteButton')
       const buttonNode = $(ev.target)
       const { appname = null, pageslug = null } = buttonNode.data()
+      const postdata = `action=crwp_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
+
+      $.post(AJAXURL, postdata, (response) => {
+        const result = JSON.parse(response)
+        console.log({ result })
+        if (result.status) {
+        }
+        showSnackbar(result.message)
+      })
+    }
+    function handleDeleteButton(ev) {
+      const buttonNode = $(ev.target)
+      const { appname = null } = buttonNode.data()
       const is_delete = window.confirm(
         `Do you really want to delete app ${appname}? This will delete all files and cant\'t be undone!`
       )
@@ -101,6 +97,34 @@
         buttonNode.prop('disabled', false)
         spinnerNode.removeClass('is-active')
         showSnackbar(result.message)
+      })
+    }
+
+    function handleSubmit() {
+      const appnameField = $('#crwp-appname')
+      const appname = appnameField.val()
+      const fieldset = $('#crwp-create-fieldset')
+      const pageslugField = $('#crwp-pageslug')
+      const pageslug = pageslugField.val()
+      const spinner = $('#crwp-spinner')
+      const templateSelect = $('#crwp-template-select')
+      const template = templateSelect.val()
+      const postdata = `action=crwp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}`
+
+      fieldset.prop('disabled', true)
+      spinner.addClass('is-active')
+      $.post(AJAXURL, postdata, (response) => {
+        const result = JSON.parse(response)
+        if (result.status) {
+          appnameField.val('')
+          fieldset.prop('disabled', false)
+          pageslugField.val('')
+          $('#crwp-template-select > option:first-child').prop('selected', true)
+          spinner.removeClass('is-active')
+          $('#existing-apps').append(appCardTemplate(appname, pageslug))
+          $(`#${appname} .button-start-stop`).click(handleStartStopButton)
+          $(`#${appname} .button-delete`).click(handleDeleteButton)
+        }
       })
     }
 

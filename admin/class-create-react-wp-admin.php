@@ -205,6 +205,38 @@ class Create_React_Wp_Admin {
 							'message' => 'App not running.',
 						]);
 					}
+				} elseif ($param === "build_react_app" && $appname && $pageslug) {
+
+					$apppath = $this->app_path($appname);
+					$relative_apppath = explode(get_home_path(), $apppath)[1];
+					$homepage = "/{$relative_apppath}/build";
+					$path_package_json = "{$apppath}/package.json";
+					$package_json_contents = file_get_contents($path_package_json);
+					$package_json_arr_VAR = explode(PHP_EOL, $package_json_contents);
+					array_splice(
+						$package_json_arr_VAR,
+						1,
+						0,
+						'  "homepage": "' . $homepage . '",'
+					);
+					file_put_contents(
+						$path_package_json,
+						implode(PHP_EOL, $package_json_arr_VAR)
+					);
+
+					sleep(2); // simulate yarn build
+					//chdir($apppath);
+					//shell_exec("yarn build");
+					array_splice($package_json_arr_VAR, 1, 1);
+					file_put_contents(
+						$path_package_json,
+						implode(PHP_EOL, $package_json_arr_VAR)
+					);
+
+					echo json_encode([
+						'status' => 0,
+						'message' => $homepage,
+					]);
 				} else {
 					echo json_encode($_REQUEST);
 				}
