@@ -28,7 +28,7 @@
     <h2 class="mb075">React Apps</h2>
     <div class="flex gap row">
       <div class="col flex grow1 half">
-        <div class="flex flexwrap gap row">
+        <div id="existing-apps" class="flex flexwrap gap row">
           <?php foreach ($crwp_apps as $app) :
             $is_running = $this->is_react_app_running($app['appname']);
             [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($app['appname']), 1) : ['', '', ''];
