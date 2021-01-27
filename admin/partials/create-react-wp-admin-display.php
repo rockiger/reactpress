@@ -40,15 +40,17 @@
                 <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a class=\"button-link\" href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b>
               </div>
               <div class=" flex">
-                <button class="button button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
+                <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
                 <span id="crwp-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
+                <button class="button button-build ml025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
+                <button class="button-link button-delete ml025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
               </div>
             </div>
           <?php endforeach; ?>
         </div>
       </div>
-      <div class="flex col half">
+      <div class=" flex col half">
         <div class="card fullwidth p2">
           <h2>Create new React app.</h2>
           <form id="crwp-create-form" method="post" action="javascript:void(0)">

@@ -99,7 +99,8 @@ class Create_React_Wp_Public {
 
 
 	/**
-	 * Change the page template to the our template on the dropdown if selected
+	 * Change the page template to the our template on the dropdown if selected.
+	 * (C) PRADIP DEBNATH https://bit.ly/3iSRjpu
 	 * 
 	 * @param $template
 	 *

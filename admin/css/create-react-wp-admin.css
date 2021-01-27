@@ -101,6 +101,12 @@ p {
   margin-bottom: 1rem;
 }
 
+.ml025,
+.wp-core-ui .button.ml025,
+.wp-core-ui .button-link.ml025 {
+  margin-left: 0.25rem;
+}
+
 .p0 {
   padding: 0;
 }
@@ -114,8 +120,17 @@ p {
   padding: 2rem;
 }
 
+.pb0 {
+  padding-bottom: 0;
+}
 .pb1 {
   padding-bottom: 1rem;
+}
+
+.pl025,
+.wp-core-ui .button.pl025,
+.wp-core-ui .button-link.pl025 {
+  padding-left: 0.25rem;
 }
 .pt1 {
   padding-top: 1rem;
@@ -170,7 +185,8 @@ svg.react > * {
 #wpcontent {
   padding-left: 0;
 }
-.crwp-content > * {
+
+.crwp-content * {
   box-sizing: border-box;
 }
 

@@ -110,7 +110,7 @@ class Create_React_Wp_Admin {
 
 	/**
 	 * Add page template.
-	 *
+	 * (C) https://bit.ly/3iSRjpu
 	 * @param  array  $templates  The list of page templates
 	 * @return array  $templates  The modified list of page templates* 
 	 * @since 1.0.0
@@ -155,7 +155,6 @@ class Create_React_Wp_Admin {
 						]);
 					}
 				} elseif ($param === 'stop_react_app' && $appname) {
-
 					$this->stop_react_app($appname);
 					echo json_encode([
 						'status' => 1,
@@ -170,6 +169,34 @@ class Create_React_Wp_Admin {
 							'message' => 'App is running.',
 							'port' => $parts[2],
 							'protocol' => $parts[0],
+						]);
+					}
+				} elseif ($param === 'delete_react_app' && $appname) {
+
+					if ($this->is_react_app_running($appname)) {
+						$this->stop_react_app($appname);
+					}
+					$options = get_option('crwp_apps');
+					$is_option_deleted = update_option('crwp_apps', array_filter(
+						$options,
+						fn ($el) => $el['appname'] !== $appname
+					));
+					$is_appdir_removed = crwp_delete_directory($this->app_path($appname));
+					crwp_log($is_appdir_removed);
+					if ($is_option_deleted && $is_option_deleted) {
+						echo json_encode([
+							'status' => 1,
+							'message' => 'App deleted.',
+						]);
+					} elseif ($is_option_deleted) {
+						echo json_encode([
+							'status' => 1,
+							'message' => "Couldn't remove files. Please remove directory by hand.",
+						]);
+					} elseif ($is_appdir_removed) {
+						echo json_encode([
+							'status' => 0,
+							'message' => "Couldn't remove app from database. Please try again later.",
 						]);
 					} else {
 						echo json_encode([
@@ -344,6 +371,29 @@ class Create_React_Wp_Admin {
 			}
 		}
 	}
+}
+
+/**
+ * Deletes directory recursively
+ * (C) Paulund https://bit.ly/2KTq8yb
+ * @param string $dirname
+ * @return bool true if directory deleted
+ */
+function crwp_delete_directory(string $dirname): bool {
+	if (is_dir($dirname))
+		$dir_handle = opendir($dirname);
+	if (!$dir_handle)
+		return false;
+	while ($file = readdir($dir_handle)) {
+		if ($file != "." && $file != "..") {
+			if (!is_dir($dirname . "/" . $file))
+				unlink($dirname . "/" . $file);
+			else
+				crwp_delete_directory($dirname . '/' . $file);
+		}
+	}
+	closedir($dir_handle);
+	return rmdir($dirname);
 }
 
 function crwp_response(mixed $value, int $options = 0, int $depth = 512) {

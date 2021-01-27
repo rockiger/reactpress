@@ -176,6 +176,7 @@ class Create_React_Wp {
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+		// Add template 
 		$this->loader->add_filter('template_include', $plugin_public, 'crwp_change_page_template', 99);
 	}
 

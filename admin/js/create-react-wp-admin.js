@@ -8,8 +8,7 @@
     const AJAXURL = crwp.ajaxurl
     const APPS = crwp.apps
 
-    // console.log({ AJAXURL, APPS })
-    // TODO1.0.1 onchange form input
+    // TODO v1.0.1 onchange form input
     $('#crwp-create-form').validate()
 
     // processing event on button click
@@ -74,7 +73,34 @@
       })
     })
 
-    // TODO Check if servers are running every 10 seconds
+    // TODO v1.0.0 Delete app
+    $('.button-delete').click((ev) => {
+      const buttonNode = $(ev.target)
+      const { appname = null, pageslug = null } = buttonNode.data()
+      const is_delete = window.confirm(
+        `Do you really want to delete app ${appname}? This will delete all files and cant\'t be undone!`
+      )
+      const postdata = `action=crwp_admin_ajax_request&param=delete_react_app&appname=${appname}`
+      console.log({ postdata })
+      if (is_delete) {
+        $.post(AJAXURL, postdata, (response) => {
+          const result = JSON.parse(response)
+          if (result.status) {
+            $(`#${appname}`).remove()
+          }
+          showSnackbar(result.message)
+          console.log(result)
+        })
+      }
+    })
+
+    // TODO v1.0.0 Deploy app
+    // TODO v1.0.0 Add TypeScript/template support
+    // TODO v1.0.0 Publish plugin
+    // TODO v1.0.0 Deploy app to production
+
+    // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
+    // TODO v1.x.0 Check if windows version can be implemented
 
     function showSnackbar(message = '') {
       $('#crwp-snackbar').addClass('show').text(message)
