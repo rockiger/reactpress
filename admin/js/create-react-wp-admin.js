@@ -6,21 +6,21 @@
      *********/
 
     const AJAXURL = crwp.ajaxurl
-    const APPS = crwp.apps
 
     // TODO v1.0.1 onchange form input
     $('#crwp-create-form').validate()
 
     // processing event on button click
     $(document).on('submit', '#crwp-create-form', () => {
-      console.log('submit')
       const appnameField = $('#crwp-appname')
       const appname = appnameField.val()
       const fieldset = $('#crwp-create-fieldset')
       const pageslugField = $('#crwp-pageslug')
       const pageslug = pageslugField.val()
       const spinner = $('#crwp-spinner')
-      const postdata = `action=crwp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}`
+      const templateSelect = $('#crwp-template-select')
+      const template = templateSelect.val()
+      const postdata = `action=crwp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}`
 
       fieldset.prop('disabled', true)
       spinner.addClass('is-active')
@@ -30,27 +30,27 @@
           appnameField.val('')
           fieldset.prop('disabled', false)
           pageslugField.val('')
+          $('#crwp-template-select > option:first-child').prop('selected', true)
           spinner.removeClass('is-active')
           $('#existing-apps').append(appCardTemplate(appname, pageslug))
           $(`#${appname} .button-start-stop`).click(handleStartStopButton)
           $(`#${appname} .button-delete`).click(handleDeleteButton)
         }
-        console.log({ result })
       })
     })
 
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
 
-    // DONE v1.0.0 Delete app
-
     // TODO v1.0.0 Deploy app
-    // TODO v1.0.0 Add TypeScript/template support
-    // TODO v1.0.0 Publish plugin
     // TODO v1.0.0 Deploy app to production
+    // TODO v1.0.0 Publish wordpress plugin
 
     // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
     // TODO v1.x.0 Check if windows version can be implemented
+
+    // DONE v1.0.0 Add TypeScript/template support
+    // DONE v1.0.0 Delete app
 
     function handleDeleteButton(ev) {
       const buttonNode = $(ev.target)
@@ -59,7 +59,6 @@
         `Do you really want to delete app ${appname}? This will delete all files and cant\'t be undone!`
       )
       const postdata = `action=crwp_admin_ajax_request&param=delete_react_app&appname=${appname}`
-      console.log({ postdata })
       if (is_delete) {
         $.post(AJAXURL, postdata, (response) => {
           const result = JSON.parse(response)
@@ -67,14 +66,11 @@
             $(`#${appname}`).remove()
           }
           showSnackbar(result.message)
-          console.log(result)
         })
       }
     }
 
     function handleStartStopButton(ev) {
-      console.log('.button-start')
-      console.log($(ev.target).data())
       const buttonNode = $(ev.target)
       const buttonState = buttonNode.text()
       const { appname = null, pageslug = null } = buttonNode.data()
@@ -105,8 +101,6 @@
         buttonNode.prop('disabled', false)
         spinnerNode.removeClass('is-active')
         showSnackbar(result.message)
-        console.log({ result })
-        console.log(response)
       })
     }
 

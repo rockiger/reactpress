@@ -49,7 +49,7 @@
             </div>
           <?php endforeach; ?>
         </div>
-        <p class="pt1">You cant find all app sources in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code></p>
+        <p class="pt1">You can find all app sources in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code></p>
       </div>
       <div class=" flex col half">
         <div class="card fullwidth p2">
@@ -63,14 +63,26 @@
                     <th scope="row"><label for="appname">App Name</label></th>
                     <td>
                       <input id="crwp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
-                      <p class="description" id="tagline-description">The name of your React app. Must be unique.</p>
+                      <p class="description" id="tagline-description">The name of your React app. Must be one word, lowercase and unique.</p>
                     </td>
                   </tr>
                   <tr>
                     <th scope="row"><label for="page_slug">Page Slug</label></th>
                     <td>
-                      <input id="crwp-pageslug" name=" page_slug" placeholder="e.g. inbox" required type="text" />
+                      <input id="crwp-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
                       <p class="description" id="tagline-description">The slug of page where your app should be displayed. Must be unique.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><label for="template">Page Slug</label></th>
+                    <td>
+                      <select name="template" id="crwp-template-select">
+                        <option selected="selected" value="">Default</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="redux">Redux</option>
+                        <option value="cra-template-rb">React Boilerplate</option>
+                      </select>
+                      <p class="description" id="tagline-description">The create-react-app you want to choose.</p>
                     </td>
                   </tr>
                 </tbody>
@@ -91,7 +103,5 @@
   <?php
   //delete_option('crwp_apps');
   // print_r($this->get_app_uri($this->app_path('app1'), 1));
-  echo ('<br />');
-  echo ('<br />');
-  print_r($crwp_apps);
+
   ?>

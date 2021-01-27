@@ -126,12 +126,13 @@ class Create_React_Wp_Admin {
 		$crwp_apps = get_option('crwp_apps');
 		$pageslug = $_POST['pageslug'] ?? '';
 		$param = $_REQUEST['param'] ?? "";
+		$template = $_POST['template'] ?? '';
 
 		try {
 			if (!empty($param)) {
 				if ($param === "create_react_app" && $appname && $pageslug) {
 
-					$this->create_new_app($crwp_apps, $appname, $pageslug);
+					$this->create_new_app($crwp_apps, $appname, $pageslug, $template);
 					$this->insert_react_page($appname, $pageslug);
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 
@@ -142,7 +143,7 @@ class Create_React_Wp_Admin {
 				} elseif ($param === "start_react_app" && $appname && $pageslug) {
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 					$parts = $this->start_react_app($appname);
-
+					$parts;
 					if (empty($parts)) {
 						echo json_encode(['status' => 0, 'message' => "Couldn't load app."]);
 					} else {
@@ -231,7 +232,12 @@ class Create_React_Wp_Admin {
 		return file_put_contents($index_html_path, $content);
 	}
 
-	function create_new_app($crwp_apps, string $appname, string $pageslug) {
+	function create_new_app(
+		$crwp_apps,
+		string $appname,
+		string $pageslug,
+		string $template
+	) {
 		if (!is_array($crwp_apps) && $appname && $pageslug) {
 			add_option('crwp_apps', [[
 				'appname' => $appname,
@@ -245,15 +251,16 @@ class Create_React_Wp_Admin {
 		}
 
 		if ($appname && $pageslug) {
-			return $this->create_react_app($appname, $pageslug);
+			return $this->create_react_app($appname, $template);
 		}
 	}
 
-	function create_react_app(string $appname, string $pageslug) {
+	function create_react_app(string $appname, string $template = '') {
 		$output = '';
 		$retval = '';
+		$template_option = $template ? " --template {$template}" : '';
 		chdir(CRWP_PLUGIN_PATH);
-		exec(escapeshellcmd("npx create-react-app apps/{$appname}"), $output, $retval);
+		exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
 		return end($output) === 'Happy hacking!' ? true : false;
 	}
 
@@ -316,7 +323,7 @@ class Create_React_Wp_Admin {
 		$apppath = $this->app_path($appname);
 		chdir($apppath);
 		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
-		return $this->get_app_uri($apppath, 10);
+		return $this->get_app_uri($apppath, 100);
 	}
 
 	function stop_react_app($appname) {
