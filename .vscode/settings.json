@@ -1,0 +1,8 @@
+{
+  "logViewer.watch": [
+    {
+      "title": "Wordpress",
+      "pattern": "/home/macco/macco/websites/dev/bitnami/apps/wordpress/htdocs/wp-content/debug.log"
+    }
+  ]
+}
