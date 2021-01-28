@@ -165,20 +165,13 @@ class Create_React_Wp_Public {
 
 			// Load css files.
 			foreach ($css_files as $index => $css_file) {
-				wp_enqueue_style('react-plugin-' . $index, $relative_apppath . 'build/' . $css_file);
+				wp_enqueue_style('crwp-react-app-asset-' . $index, $relative_apppath . 'build/' . $css_file);
 			}
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('react-plugin-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
+				wp_enqueue_script('crwp-react-app-asset-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
 			}
-
-			// Variables for app use.
-			wp_localize_script(
-				'react-plugin-0',
-				'rpReactPlugin',
-				array('appSelector' => '#site-footer')
-			);
 		}
 	}
 }

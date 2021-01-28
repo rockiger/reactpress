@@ -16,7 +16,6 @@
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
 
-    //      De-chunk page for development
     // TODO v1.0.0 Deploy app to production
     // TODO v1.0.0 Publish wordpress plugin
 

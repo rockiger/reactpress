@@ -183,7 +183,6 @@ class Create_React_Wp_Admin {
 						fn ($el) => $el['appname'] !== $appname
 					));
 					$is_appdir_removed = crwp_delete_directory($this->app_path($appname));
-					crwp_log($is_appdir_removed);
 					if ($is_option_deleted && $is_option_deleted) {
 						echo json_encode([
 							'status' => 1,
@@ -237,7 +236,13 @@ class Create_React_Wp_Admin {
 	}
 
 	public function get_index_html_content(string $pageslug) {
-		return file_get_contents(site_url() . '/' . $pageslug);
+		$file_contents =	file_get_contents(site_url() . '/' . $pageslug);
+		$file_contents_arr = explode(PHP_EOL, $file_contents);
+		// filter all build assets out of the file, that they don't conflict
+		// with the dev assets.
+		$filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='crwp-react-app-asset-"));
+		$filtered_contents =  implode(PHP_EOL, $filtered_arr);
+		return $filtered_contents;
 	}
 
 	public function write_index_html(string $appname, $content) {
