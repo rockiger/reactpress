@@ -81,20 +81,9 @@ class Create_React_Wp_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Create_React_Wp_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Create_React_Wp_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/create-react-wp-public.js', array('jquery'), $this->version, false);
+
+		$this->crwp_load_react_app();
 	}
 
 
@@ -117,5 +106,79 @@ class Create_React_Wp_Public {
 		}
 
 		return $template;
+	}
+
+	/**
+	 * Load react app files in WordPress admin.
+	 * (C) Ben Broide https://bit.ly/3iQXsCi
+	 * @return bool|void
+	 * @since 1.0.0
+	 * 
+	 */
+	function crwp_load_react_app() {
+		// Only load react app scripts in site front end home page.
+		// TODO only on pages that contain our apps
+		global $post;
+		$crwp_apps = get_option('crwp_apps');
+		$valid_pages = array_map(fn ($el) => $el['pageslug'], $crwp_apps);
+
+		if (is_page() && in_array($post->post_name, $valid_pages)) {
+
+			// Setting path variables.
+			$appname = 'app1';
+			$plugin_app_dir_url = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
+			$relative_apppath = '/' . explode(
+				get_home_path(),
+				$plugin_app_dir_url
+			)[1];
+
+			$react_app_build = $plugin_app_dir_url . 'build/';
+			$manifest_url = $react_app_build . 'asset-manifest.json';
+
+			// Request manifest file.
+			$request = file_get_contents($manifest_url);
+
+			// If the remote request fails, return.
+			if (!$request)
+				return false;
+
+			// Convert json to php array.
+			$files_data = json_decode($request);
+			if ($files_data === null)
+				return;
+
+
+			if (!property_exists($files_data, 'entrypoints'))
+				return false;
+
+			// Get assets links.
+			$assets_files = $files_data->entrypoints;
+
+			$js_files = array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+			);
+			$css_files = array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+			);
+
+			// Load css files.
+			foreach ($css_files as $index => $css_file) {
+				wp_enqueue_style('react-plugin-' . $index, $relative_apppath . 'build/' . $css_file);
+			}
+
+			// Load js files.
+			foreach ($js_files as $index => $js_file) {
+				wp_enqueue_script('react-plugin-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
+			}
+
+			// Variables for app use.
+			wp_localize_script(
+				'react-plugin-0',
+				'rpReactPlugin',
+				array('appSelector' => '#site-footer')
+			);
+		}
 	}
 }
