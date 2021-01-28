@@ -207,36 +207,17 @@ class Create_React_Wp_Admin {
 					}
 				} elseif ($param === "build_react_app" && $appname && $pageslug) {
 
-					$apppath = $this->app_path($appname);
-					$relative_apppath = explode(get_home_path(), $apppath)[1];
-					$homepage = "/{$relative_apppath}/build";
-					$path_package_json = "{$apppath}/package.json";
-					$package_json_contents = file_get_contents($path_package_json);
-					$package_json_arr_VAR = explode(PHP_EOL, $package_json_contents);
-					array_splice(
-						$package_json_arr_VAR,
-						1,
-						0,
-						'  "homepage": "' . $homepage . '",'
-					);
-					file_put_contents(
-						$path_package_json,
-						implode(PHP_EOL, $package_json_arr_VAR)
-					);
-
-					sleep(2); // simulate yarn build
-					//chdir($apppath);
-					//shell_exec("yarn build");
-					array_splice($package_json_arr_VAR, 1, 1);
-					file_put_contents(
-						$path_package_json,
-						implode(PHP_EOL, $package_json_arr_VAR)
-					);
-
-					echo json_encode([
-						'status' => 0,
-						'message' => $homepage,
-					]);
+					if ($this->build_react_app($appname)) {
+						echo json_encode([
+							'status' => 1,
+							'message' => "App {$appname} build. View",
+						]);
+					} else {
+						echo json_encode([
+							'status' => 0,
+							'message' => "Build failed.",
+						]);
+					}
 				} else {
 					echo json_encode($_REQUEST);
 				}
@@ -329,6 +310,35 @@ class Create_React_Wp_Admin {
 		}
 	}
 
+	function build_react_app($appname) {
+		$apppath = $this->app_path($appname);
+		// We need the relative path, that we can deploy our
+		// build app to another server later.
+		$relative_apppath = $this->app_path($appname, true);
+		$homepage = "{$relative_apppath}/build";
+		$path_package_json = "{$apppath}/package.json";
+		$package_json_contents = file_get_contents($path_package_json);
+		$package_json_arr_VAR = explode(PHP_EOL, $package_json_contents);
+
+		// Add a homepage attribute during the build process and remove it again, 
+		// that the developer can build with the public/index.html without WP.
+		array_splice($package_json_arr_VAR, 1, 0, '  "homepage": "' . $homepage . '",');
+		file_put_contents(
+			$path_package_json,
+			implode(PHP_EOL, $package_json_arr_VAR)
+		);
+
+		chdir($apppath);
+		shell_exec("yarn build");
+
+		array_splice($package_json_arr_VAR, 1, 1);
+		file_put_contents(
+			$path_package_json,
+			implode(PHP_EOL, $package_json_arr_VAR)
+		);
+		return true;
+	}
+
 	/**
 	 * Get the pid of the processes start by yarn start.
 	 *
@@ -347,8 +357,14 @@ class Create_React_Wp_Admin {
 		return !empty($this->get_node_pids($appname));
 	}
 
-	function app_path(string $appname) {
-		return escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}");
+	function app_path(string $appname, $relative_to_home_path = false) {
+
+		$apppath = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}");
+		if ($relative_to_home_path) {
+			return '/' . explode(get_home_path(), $apppath)[1];
+		} else {
+			return $apppath;
+		}
 	}
 
 	function start_react_app($appname) {

@@ -36,14 +36,15 @@
             <div id="<?= $app['appname'] ?>" class="card col flex half m0 p1_5">
               <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
               <div class="grow1 mb1">
-                <p><b>URL Slug: </b><?= $app['pageslug'] ?></p>
-                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a class=\"button-link\" href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b>
+                <p><b>URL Slug: </b><a href="<?= $app['pageslug'] ?>"><?= $app['pageslug'] ?></a></p>
+                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b>
               </div>
               <div class=" flex">
                 <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
-                <span id="crwp-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                <span id="crwp-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
-                <button class="button button-build ml025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
+                <span id="crwp-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                <button class="button button-build" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
                 <button class="button-link button-delete ml025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
               </div>
             </div>

@@ -16,14 +16,7 @@
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
 
-    // TODO v1.0.0 Build and Deploy app
-    /**
-     *
-     * parse asset-manifest.json
-     * set react app to load in our page
-     *
-     *
-     */
+    //      De-chunk page for development
     // TODO v1.0.0 Deploy app to production
     // TODO v1.0.0 Publish wordpress plugin
 
@@ -33,18 +26,22 @@
 
     // DONE v1.0.0 Add TypeScript/template support
     // DONE v1.0.0 Delete app
+    // DONE v1.0.0 Build app
 
     function handleBuildButton(ev) {
       console.log('handleDeleteButton')
       const buttonNode = $(ev.target)
       const { appname = null, pageslug = null } = buttonNode.data()
       const postdata = `action=crwp_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
+      const spinnerNode = $(`#crwp-build-spinner-${appname}`)
 
+      buttonNode.prop('disabled', true)
+      spinnerNode.addClass('is-active')
       $.post(AJAXURL, postdata, (response) => {
         const result = JSON.parse(response)
         console.log({ result })
-        if (result.status) {
-        }
+        buttonNode.prop('disabled', false)
+        spinnerNode.removeClass('is-active')
         showSnackbar(result.message)
       })
     }
@@ -73,7 +70,7 @@
       const postdata = `action=crwp_admin_ajax_request&param=${
         buttonState === 'Stop' ? 'stop' : 'start'
       }_react_app&appname=${appname}&pageslug=${pageslug}`
-      const spinnerNode = $(`#crwp-spinner-${appname}`)
+      const spinnerNode = $(`#crwp-start-spinner-${appname}`)
 
       buttonNode.prop('disabled', true)
       spinnerNode.addClass('is-active')
@@ -85,7 +82,7 @@
           statusNode.removeClass('fg-red')
           statusNode.addClass('fg-green')
           statusNode.html(
-            `Running at port: <a class="button-link" href="${protocol}://${ip}:${port}" rel="noopener" target="_blank">${port}<i class="external-link"></i></a>`
+            `Running at port: <a href="${protocol}://${ip}:${port}" rel="noopener" target="_blank">${port}<i class="external-link"></i></a>`
           )
           buttonNode.text('Stop')
         } else if (result.status && buttonState === 'Stop') {
@@ -142,9 +139,10 @@
               </p></div>
               <div class=" flex">
                 <button class="button button-primary button-start-stop" data-appname="${appname}" data-pageslug="${pageslug}">Start</button>
-                <span id="crwp-spinner-${appname}" class="crpw-button-spinner spinner"></span>
+                <span id="crwp-start-spinner-${appname}" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
-                <button class="button button-build ml025" data-appname="${appname}" data-pageslug="${pageslug}">Build</button>
+                <span id="crwp-build-spinner-${appname}" class="crpw-button-spinner spinner"></span>
+                <button class="button button-build" data-appname="${appname}" data-pageslug="${pageslug}">Build</button>
                 <button class="button-link button-delete ml025" data-appname="${appname}" data-pageslug="${pageslug}">Delete</button>
               </div>
             </div>`
