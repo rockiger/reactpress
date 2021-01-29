@@ -442,10 +442,10 @@ class Create_React_Wp_Admin {
 	 *
 	 * @param string $appname
 	 * @param boolean $relative_to_home_path
-	 * @return void
+	 * @return string
 	 * @since 1.0.0
 	 */
-	function app_path(string $appname, $relative_to_home_path = false) {
+	function app_path(string $appname, $relative_to_home_path = false): string {
 		$apppath = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}");
 		if ($relative_to_home_path) {
 			return '/' . explode(get_home_path(), $apppath)[1];
