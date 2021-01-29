@@ -17,7 +17,6 @@
     $('.button-delete').click(handleDeleteButton)
 
     // TODO v1.0.0 Publish wordpress plugin
-    // // TODO Make sure people have the right php ersion: 7.4+
 
     // TODO v1.x.0 Swap file_get_contents for wp_remote_get.
     // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
