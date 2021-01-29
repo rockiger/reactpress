@@ -127,15 +127,17 @@ class Create_React_Wp_Admin {
 		$pageslug = $_POST['pageslug'] ?? '';
 		$param = $_REQUEST['param'] ?? "";
 		$template = $_POST['template'] ?? '';
+		$type = $_POST['type'] ?? 'development';
 
 		try {
 			if (!empty($param)) {
 				if ($param === "create_react_app" && $appname && $pageslug) {
 
-					$this->create_new_app($crwp_apps, $appname, $pageslug, $template);
+					$this->create_new_app($crwp_apps, $appname, $pageslug, $template, $type);
 					$this->insert_react_page($appname, $pageslug);
-					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
-
+					if ($type === 'development') {
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+					}
 					echo json_encode([
 						'status' => 1,
 						'message' => "React app created.",
@@ -254,32 +256,41 @@ class Create_React_Wp_Admin {
 		$crwp_apps,
 		string $appname,
 		string $pageslug,
-		string $template
+		string $template,
+		string $type
 	) {
-		if (!is_array($crwp_apps) && $appname && $pageslug) {
+		if (!is_array($crwp_apps) && $appname && $pageslug && $type) {
 			add_option('crwp_apps', [[
 				'appname' => $appname,
 				'pageslug' => $pageslug,
+				'type' => $type,
 			]]);
 		} elseif ($appname && $pageslug) {
 			update_option('crwp_apps', $this->array_add($crwp_apps, [
 				'appname' => $appname,
-				'pageslug' => $pageslug
+				'pageslug' => $pageslug,
+				'type' => $type,
 			]));
 		}
 
-		if ($appname && $pageslug) {
-			return $this->create_react_app($appname, $template);
+		if ($appname && $pageslug && $type) {
+			return $this->create_react_app($appname, $type, $template,);
+		} else {
+			return true;
 		}
 	}
 
-	function create_react_app(string $appname, string $template = '') {
+	function create_react_app(string $appname, string $type, string $template = '') {
 		$output = '';
 		$retval = '';
 		$template_option = $template ? " --template {$template}" : '';
 		chdir(CRWP_PLUGIN_PATH);
-		exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
-		return end($output) === 'Happy hacking!' ? true : false;
+		if ($type === 'deployment') {
+			return mkdir("apps/{$appname}");
+		} else {
+			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
+			return end($output) === 'Happy hacking!' ? true : false;
+		}
 	}
 
 	/**

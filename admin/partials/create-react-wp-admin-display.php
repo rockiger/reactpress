@@ -15,7 +15,10 @@
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
-<?php $crwp_apps = get_option('crwp_apps'); ?>
+<?php
+$crwp_apps = get_option('crwp_apps') ?? [];
+$apps = $crwp_apps ? $crwp_apps : [];
+?>
 <div class="crwp-content">
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
@@ -29,28 +32,34 @@
     <div class="flex gap row">
       <div class="col flex grow1 half">
         <div id="existing-apps" class="flex flexwrap gap row">
-          <?php foreach ($crwp_apps as $app) :
-            $is_running = $this->is_react_app_running($app['appname']);
+          <?php foreach ($apps as $app) :
+            $is_running = $app['type'] === 'deployment' ? false : $this->is_react_app_running($app['appname']);
             [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($app['appname']), 1) : ['', '', ''];
           ?>
             <div id="<?= $app['appname'] ?>" class="card col flex half m0 p1_5">
               <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
               <div class="grow1 mb1">
                 <p><b>URL Slug: </b><a href="<?= $app['pageslug'] ?>"><?= $app['pageslug'] ?></a></p>
-                <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b>
+                <?php if ($app['type'] === 'development') : ?>
+                  <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b></p>
+                <?php endif; ?>
+                <p><b>Type:</b> <span style="text-transform: capitalize;"> <?= $app['type'] ?></p>
               </div>
-              <div class=" flex">
-                <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
-                <span id="crwp-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
-                <div class="grow1"></div>
-                <span id="crwp-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
-                <button class="button button-build" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
-                <button class="button-link button-delete ml025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
+              <div class="flex">
+                <?php if ($app['type'] === 'development') : ?>
+                  <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
+                  <span id="crwp-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                  <div class="grow1"></div>
+                  <span id="crwp-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                  <button class="button button-build mr025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
+                <?php endif; ?>
+                <button class="button-link button-delete" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
               </div>
             </div>
           <?php endforeach; ?>
         </div>
-        <p class="pt1">You can find all app sources in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code></p>
+        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code>.</p>
+        <p class="pt1"><b>For deployments</b> to work, make sure, that you upload the build folder of your React app into the app directory.</p>
       </div>
       <div class=" flex col half">
         <div class="card fullwidth p2">
@@ -61,21 +70,39 @@
               <table class="form-table" role="presentation">
                 <tbody>
                   <tr>
-                    <th scope="row"><label for="appname">App Name</label></th>
+                    <th scope="row">App Name</th>
                     <td>
                       <input id="crwp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
-                      <p class="description" id="tagline-description">The name of your React app. Must be one word, lowercase and unique.</p>
+                      <p class="description">The name of your React app. Must be one word, lowercase and unique.</p>
                     </td>
                   </tr>
                   <tr>
-                    <th scope="row"><label for="page_slug">Page Slug</label></th>
+                    <th scope="row">Page Slug</th>
                     <td>
                       <input id="crwp-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
-                      <p class="description" id="tagline-description">The slug of page where your app should be displayed. Must be unique.</p>
+                      <p class="description">The slug of page where your app should be displayed. Must be unique.</p>
                     </td>
                   </tr>
                   <tr>
-                    <th scope="row"><label for="template">Page Slug</label></th>
+                    <th scope="row">Type</th>
+                    <td>
+                      <div class="mb025">
+                        <label>
+                          <input id="crwp-type-development" type="radio" name="type" value="development" checked />
+                          <span>Develop a new app (Usually on a local machine).</span>
+                        </label>
+                      </div>
+                      <div class="mb025">
+                        <label>
+                          <input type="radio" name="type" value="deployment" />
+                          <span>Deploy an allready build app (Usually on a server).</span>
+                        </label>
+                      </div>
+                      <p class="description">If you want to deploy an app, you must choose the same name and slug as on your development version.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Template</th>
                     <td>
                       <select name="template" id="crwp-template-select">
                         <option selected="selected" value="">Default</option>
@@ -83,7 +110,7 @@
                         <option value="redux">Redux</option>
                         <option value="cra-template-rb">React Boilerplate</option>
                       </select>
-                      <p class="description" id="tagline-description">The create-react-app you want to choose.</p>
+                      <p class="description">The create-react-app template you want to choose.</p>
                     </td>
                   </tr>
                 </tbody>
@@ -102,7 +129,7 @@
 <div id="crwp-snackbar" class="crwp-snackbar">Test</div>
 <pre>
   <?php
-  //delete_option('crwp_apps');
+  // print_r(get_option('crwp_apps'));
   // print_r($this->get_app_uri($this->app_path('app1'), 1));
 
   ?>

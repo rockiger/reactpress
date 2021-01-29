@@ -92,7 +92,9 @@ p {
 .m0auto {
   margin: 0 auto;
 }
-
+.mb025 {
+  margin-bottom: 0.25rem;
+}
 .mb075 {
   margin-bottom: 0.75rem;
 }
@@ -101,10 +103,10 @@ p {
   margin-bottom: 1rem;
 }
 
-.ml025,
-.wp-core-ui .button.ml025,
-.wp-core-ui .button-link.ml025 {
-  margin-left: 0.25rem;
+.mr025,
+.wp-core-ui .button.mr025,
+.wp-core-ui .button-build.mr025 {
+  margin-right: 0.25rem;
 }
 
 .p0 {
@@ -156,7 +158,9 @@ p {
   display: flex;
   flex-direction: row;
 }
-
+.form-table th {
+  width: 100px;
+}
 .head {
   border-bottom: 1px solid #ccd0d4;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);

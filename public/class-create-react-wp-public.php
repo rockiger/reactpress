@@ -125,18 +125,23 @@ class Create_React_Wp_Public {
 		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
-			$appname = 'app1';
+			$current_app = array_values(array_filter($crwp_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
+			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
-			$relative_apppath = '/' . explode(
-				get_home_path(),
-				$plugin_app_dir_url
-			)[1];
+
+			$relative_apppath = "/wp-content/plugins/create-react-wp/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
+			if (function_exists('get_home_path')) {
+				$relative_apppath = '/' . explode(
+					get_home_path(),
+					$plugin_app_dir_url
+				)[1];
+			}
 
 			$react_app_build = $plugin_app_dir_url . 'build/';
 			$manifest_url = $react_app_build . 'asset-manifest.json';
 
 			// Request manifest file.
-			$request = file_get_contents($manifest_url);
+			$request = @file_get_contents($manifest_url);
 
 			// If the remote request fails, return.
 			if (!$request)
