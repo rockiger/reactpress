@@ -109,11 +109,11 @@ class Create_React_Wp_Public {
 	}
 
 	/**
-	 * Load react app files in WordPress admin.
+	 * Load react app files im page should contain a react app.
 	 * (C) Ben Broide https://bit.ly/3iQXsCi
+	 * 
 	 * @return bool|void
 	 * @since 1.0.0
-	 * 
 	 */
 	function crwp_load_react_app() {
 		// Only load react app scripts in site front end home page.

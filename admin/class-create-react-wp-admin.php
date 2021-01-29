@@ -111,6 +111,7 @@ class Create_React_Wp_Admin {
 	/**
 	 * Add page template.
 	 * (C) https://bit.ly/3iSRjpu
+	 * 
 	 * @param  array  $templates  The list of page templates
 	 * @return array  $templates  The modified list of page templates* 
 	 * @since 1.0.0
@@ -122,6 +123,11 @@ class Create_React_Wp_Admin {
 	}
 
 	public function crwp_handle_admin_ajax_request() {
+		/**
+		 * Handles all request from the admin frontend.
+		 * 
+		 * @since 1.0.0
+		 */
 		$appname = $_POST['appname'] ?? '';
 		$crwp_apps = get_option('crwp_apps');
 		$pageslug = $_POST['pageslug'] ?? '';
@@ -237,6 +243,15 @@ class Create_React_Wp_Admin {
 		}
 	}
 
+	/**
+	 * Downloads the content of the page with the given pageslug and removes the
+	 * the react assets of the build page, that we can use the content for our
+	 * development server.
+	 *
+	 * @param string $pageslug
+	 * @return string
+	 * @since 1.0.0
+	 */
 	public function get_index_html_content(string $pageslug) {
 		$file_contents =	file_get_contents(site_url() . '/' . $pageslug);
 		$file_contents_arr = explode(PHP_EOL, $file_contents);
@@ -247,11 +262,32 @@ class Create_React_Wp_Admin {
 		return $filtered_contents;
 	}
 
-	public function write_index_html(string $appname, $content) {
+	/**
+	 * Writes the given to the index.html file in the app directory of
+	 * the given appname.
+	 *
+	 * @param string $appname
+	 * @param string $content
+	 * @return bool if the writing of the file succeded or not
+	 * @since 1.0.0
+	 */
+	public function write_index_html(string $appname, string $content) {
 		$index_html_path = sprintf("%sapps/%s/public/index.html", CRWP_PLUGIN_PATH, $appname);
 		return file_put_contents($index_html_path, $content);
 	}
 
+	/**
+	 * Writes a new app to the database and starts the creation of the app
+	 * in the filesystem.
+	 *
+	 * @param mixed $crwp_apps
+	 * @param string $appname
+	 * @param string $pageslug
+	 * @param string $template
+	 * @param string $type
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function create_new_app(
 		$crwp_apps,
 		string $appname,
@@ -280,6 +316,16 @@ class Create_React_Wp_Admin {
 		}
 	}
 
+	/**
+	 * Start create-react-app or just creates the directory for the given 
+	 * appname.
+	 * 
+	 * @param string $appname
+	 * @param string $type
+	 * @param string $template
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function create_react_app(string $appname, string $type, string $template = '') {
 		$output = '';
 		$retval = '';
@@ -302,6 +348,7 @@ class Create_React_Wp_Admin {
 	 * Important when out.log file is still being created.
 	 * @return array contains the protocol, the ip and the 
 	 * port of the uri.
+	 * @since 1.0.0
 	 */
 	function get_app_uri(string $apppath, int $max_trys = 1) {
 		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
@@ -326,6 +373,14 @@ class Create_React_Wp_Admin {
 		}
 	}
 
+	/**
+	 * Builds the given react app, adds the right source path to
+	 * package.json, that react loads assets in the right way.
+	 *
+	 * @param string $appname
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function build_react_app($appname) {
 		$apppath = $this->app_path($appname);
 		// We need the relative path, that we can deploy our
@@ -360,6 +415,7 @@ class Create_React_Wp_Admin {
 	 *
 	 * @param string $appname
 	 * @return array of the pids
+	 * @since 1.0.0
 	 */
 	function get_node_pids($appname) {
 		$apppath = $this->app_path($appname);
@@ -369,12 +425,27 @@ class Create_React_Wp_Admin {
 		return array_map(fn ($el) => preg_split("/\ + /", $el)[1], $processes);
 	}
 
+	/**
+	 * Checks if the given app is running
+	 *
+	 * @param string $appname
+	 * @return boolean
+	 * @since 1.0.0
+	 */
 	function is_react_app_running(string $appname) {
 		return !empty($this->get_node_pids($appname));
 	}
 
+	/**
+	 * Creates the path the app, beginning from root of filesystem
+	 * or htdocs.
+	 *
+	 * @param string $appname
+	 * @param boolean $relative_to_home_path
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function app_path(string $appname, $relative_to_home_path = false) {
-
 		$apppath = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}");
 		if ($relative_to_home_path) {
 			return '/' . explode(get_home_path(), $apppath)[1];
@@ -383,13 +454,28 @@ class Create_React_Wp_Admin {
 		}
 	}
 
-	function start_react_app($appname) {
+	/**
+	 * Start the react app and extracts the right url auf the development
+	 * server.
+	 *
+	 * @param string $appname
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function start_react_app(string $appname) {
 		$apppath = $this->app_path($appname);
 		chdir($apppath);
 		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
 		return $this->get_app_uri($apppath, 100);
 	}
 
+	/**
+	 * Stops all processes, that were started for the given app
+	 *
+	 * @param string $appname
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function stop_react_app($appname) {
 		// end node processes based on the app path
 		$SIGHUP = 1;
@@ -405,10 +491,28 @@ class Create_React_Wp_Admin {
 		unlink("{$apppath}/out.log");
 	}
 
+	/**
+	 * Helper function to add an element to an array
+	 * without mutationg the original array.
+	 *
+	 * @param array $array
+	 * @param [type] $entry
+	 * @return void
+	 * @since 1.0.0
+	 */
 	function array_add(array $array, $entry) {
 		return array_merge($array, [$entry]);
 	}
 
+	/**
+	 * Creates a new page with the given name and slug. Rejects if the slug is already
+	 * taken
+	 *
+	 * @param string $appname
+	 * @param string $pageslug
+	 * @return void
+	 * @since 1.0.0
+	 */
 	public function insert_react_page(string $appname, string $pageslug) {
 		global $wpdb;
 		// check if post_name (which is the slug and should be unique) exist
@@ -448,6 +552,7 @@ class Create_React_Wp_Admin {
 	 * produces a message for the user.
 	 *
 	 * @return string
+	 * @since 1.0.0
 	 */
 	public function environment_message(): string {
 		$has_exec = function_exists('exec');
@@ -463,10 +568,10 @@ class Create_React_Wp_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to npm 6 or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installers</a> work fine for me.</li>";
+			$message .= "<li>Your dev server needs access to npm 6 or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installers</a> work fine development.</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with Create React WP.</li>";
+			$message .= "<li>Right now Windows is not supported for developing apps with Create React WP. Windows users can use WSL.</li>";
 		}
 		return $message;
 	}
@@ -475,8 +580,10 @@ class Create_React_Wp_Admin {
 /**
  * Deletes directory recursively
  * (C) Paulund https://bit.ly/2KTq8yb
+ * 
  * @param string $dirname
  * @return bool true if directory deleted
+ * @since 1.0.0
  */
 function crwp_delete_directory(string $dirname): bool {
 	if (is_dir($dirname))
@@ -503,6 +610,7 @@ function crwp_response(mixed $value, int $options = 0, int $depth = 512) {
  * Write error to a log file named debug.log in wp-content.
  * 
  * @param mixed $log The thing you want to log.
+ * @since 1.0.0
  */
 function crwp_log($log) {
 	if (true === WP_DEBUG) {
@@ -515,6 +623,9 @@ function crwp_log($log) {
 	return $log;
 }
 
+/**
+ * The html block, the react apps hook to.
+ */
 define("CRWP_REACT_ROOT_TAG", "<!-- wp:html -->\n<!-- Please don't change. Block is needed for React app. -->\n<noscript>You need to enable JavaScript to run this app.</noscript>\n<div id=\"root\"></div>\n<!-- /wp:html -->");
 
 define("MENU_ICON",     "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjI0IgogICBoZWlnaHQ9IjI0IgogICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2Zzg5NyIKICAgc29kaXBvZGk6ZG9jbmFtZT0iYnhsLXJlYWN0LnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4wLjEgKDA3NjdmODMwMmEsIDIwMjAtMTAtMTcpIj4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE5MDMiPgogICAgPHJkZjpSREY+CiAgICAgIDxjYzpXb3JrCiAgICAgICAgIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgICAgICA8ZGM6dHlwZQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM5MDEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxIgogICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiCiAgICAgZ3JpZHRvbGVyYW5jZT0iMTAiCiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEwMTUiCiAgICAgaWQ9Im5hbWVkdmlldzg5OSIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgaW5rc2NhcGU6em9vbT0iMzYuMTI1IgogICAgIGlua3NjYXBlOmN4PSIxMiIKICAgICBpbmtzY2FwZTpjeT0iMTIiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjE5MjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjI4IgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnODk3IiAvPgogIDxjaXJjbGUKICAgICBjeD0iMTIiCiAgICAgY3k9IjExLjI0NSIKICAgICByPSIxLjc4NSIKICAgICBpZD0iY2lyY2xlODg3IgogICAgIHN0eWxlPSJmaWxsOiNhMGE1YWE7ZmlsbC1vcGFjaXR5OjEiIC8+CiAgPHBhdGgKICAgICBkPSJNNy4wMDIsMTQuNzk0bC0wLjM5NS0wLjEwMWMtMi45MzQtMC43NDEtNC42MTctMi4wMDEtNC42MTctMy40NTJjMC0xLjQ1MiwxLjY4NC0yLjcxMSw0LjYxNy0zLjQ1MmwwLjM5NS0wLjFMNy4xMTMsOC4wOCBjMC4yOTcsMS4wMjMsMC42NzYsMi4wMjIsMS4xMzYsMi45ODNsMC4wODUsMC4xNzhsLTAuMDg1LDAuMTc4Yy0wLjQ2LDAuOTYzLTAuODQxLDEuOTYxLTEuMTM2LDIuOTg1TDcuMDAyLDE0Ljc5NEw3LjAwMiwxNC43OTR6IE02LjQyNSw4LjY5OWMtMi4yMjksMC42MjgtMy41OTgsMS41ODYtMy41OTgsMi41NDJjMCwwLjk1NCwxLjM2OCwxLjkxMywzLjU5OCwyLjU0YzAuMjczLTAuODY4LDAuNjAzLTEuNzE3LDAuOTg1LTIuNTQgQzcuMDI1LDEwLjQxNiw2LjY5Niw5LjU2Nyw2LjQyNSw4LjY5OXogTTE2Ljk5NywxNC43OTRsLTAuMTEtMC4zOTJjLTAuMjk4LTEuMDI0LTAuNjc3LTIuMDIyLTEuMTM3LTIuOTg0bC0wLjA4NS0wLjE3NyBsMC4wODUtMC4xNzljMC40Ni0wLjk2MSwwLjgzOS0xLjk2LDEuMTM3LTIuOTg0bDAuMTEtMC4zOWwwLjM5NSwwLjFjMi45MzUsMC43NDEsNC42MTcsMiw0LjYxNywzLjQ1MyBjMCwxLjQ1Mi0xLjY4MywyLjcxMS00LjYxNywzLjQ1MkwxNi45OTcsMTQuNzk0eiBNMTYuNTg3LDExLjI0MWMwLjQsMC44NjYsMC43MzMsMS43MTgsMC45ODcsMi41NCBjMi4yMy0wLjYyNywzLjU5OS0xLjU4NiwzLjU5OS0yLjU0YzAtMC45NTYtMS4zNjgtMS45MTMtMy41OTktMi41NDJDMTcuMzAxLDkuNTY3LDE2Ljk3MiwxMC40MTYsMTYuNTg3LDExLjI0MUwxNi41ODcsMTEuMjQxeiIKICAgICBpZD0icGF0aDg4OSIKICAgICBzdHlsZT0iZmlsbDojYTBhNWFhO2ZpbGwtb3BhY2l0eToxIiAvPgogIDxwYXRoCiAgICAgZD0iTTYuNDE5LDguNjk1bC0wLjExLTAuMzlDNS40ODMsNS4zOTcsNS43MzMsMy4zMTQsNi45OTYsMi41ODhjMS4yMzUtMC43MTUsMy4yMjIsMC4xMyw1LjMwMywyLjI2NWwwLjI4NCwwLjI5MiBsLTAuMjg0LDAuMjkxYy0wLjczOSwwLjc2OS0xLjQxNSwxLjU5Ni0yLjAyLDIuNDc0bC0wLjExMywwLjE2Mkw5Ljk3LDguMDg4QzguOTA3LDguMTcxLDcuODUxLDguMzQyLDYuODEzLDguNTk3TDYuNDE5LDguNjk1IEw2LjQxOSw4LjY5NXogTTguMDAxLDMuMTY2Yy0wLjIyNCwwLTAuNDIyLDAuMDQ5LTAuNTg5LDAuMTQ1QzYuNTg0LDMuNzg4LDYuNDM4LDUuNDQ5LDcuMDA4LDcuNjkxIGMwLjg5MS0wLjE5NywxLjc5LTAuMzM4LDIuNjk2LTAuNDE3YzAuNTI1LTAuNzQ1LDEuMDk3LTEuNDUzLDEuNzEzLTIuMTIzQzEwLjExNCwzLjg4NCw4Ljg4NCwzLjE2Niw4LjAwMSwzLjE2Nkw4LjAwMSwzLjE2NnogTTE1Ljk5OCwyMC4xNUwxNS45OTgsMjAuMTVjLTEuMTg4LDAtMi43MTQtMC44OTYtNC4yOTgtMi41MjJsLTAuMjgzLTAuMjkxbDAuMjgzLTAuMjljMC43MzktMC43NywxLjQxNi0xLjU5OSwyLjAyMS0yLjQ3NyBsMC4xMTItMC4xNmwwLjE5NC0wLjAxOWMxLjA2NS0wLjA4MiwyLjEyMi0wLjI1MiwzLjE1OC0wLjUwN2wwLjM5NS0wLjFsMC4xMTEsMC4zOTFjMC44MjIsMi45MDYsMC41NzMsNC45OTItMC42ODgsNS43MTggQzE2LjY5OCwyMC4wNjYsMTYuMzUyLDIwLjE1NSwxNS45OTgsMjAuMTVMMTUuOTk4LDIwLjE1eiBNMTIuNTgzLDE3LjMzYzEuMzAyLDEuMjY3LDIuNTMzLDEuOTg2LDMuNDE1LDEuOTg2bDAsMCBjMC4yMjUsMCwwLjQyMy0wLjA1LDAuNTg5LTAuMTQ1YzAuODI5LTAuNDc4LDAuOTc2LTIuMTQyLDAuNDA0LTQuMzg0Yy0wLjg5LDAuMTk4LTEuNzksMC4zNC0yLjY5OCwwLjQxOSBDMTMuNzcxLDE1Ljk1MSwxMy4xOTksMTYuNjYxLDEyLjU4MywxNy4zM3oiCiAgICAgaWQ9InBhdGg4OTEiCiAgICAgc3R5bGU9ImZpbGw6I2EwYTVhYTtmaWxsLW9wYWNpdHk6MSIgLz4KICA8cGF0aAogICAgIGQ9Ik0xNy41OCw4LjY5NWwtMC4zOTUtMC4wOTljLTEuMDM2LTAuMjU2LTIuMDkzLTAuNDI2LTMuMTU4LTAuNTA5bC0wLjE5NC0wLjAxN2wtMC4xMTItMC4xNjIgYy0wLjYwNC0wLjg3OC0xLjI4MS0xLjcwNS0yLjAyMS0yLjQ3NGwtMC4yODMtMC4yOTFMMTEuNyw0Ljg1M2MyLjA4LTIuMTM0LDQuMDY2LTIuOTc5LDUuMzAzLTIuMjY1IGMxLjI2MiwwLjcyNywxLjUxMywyLjgxLDAuNjg4LDUuNzE3TDE3LjU4LDguNjk1TDE3LjU4LDguNjk1eiBNMTQuMjkzLDcuMjc0YzAuOTU0LDAuMDg1LDEuODU4LDAuMjI4LDIuNjk4LDAuNDE3IGMwLjU3MS0yLjI0MiwwLjQyNS0zLjkwMy0wLjQwNC00LjM4MWMtMC44MjQtMC40NzctMi4zNzUsMC4yNTMtNC4wMDQsMS44NDFDMTMuMTk5LDUuODIxLDEzLjc3MSw2LjUyOSwxNC4yOTMsNy4yNzR6IE04LjAwMSwyMC4xNSBjLTAuMzUzLDAuMDA1LTAuNjk5LTAuMDg0LTEuMDA1LTAuMjU3Yy0xLjI2My0wLjcyNi0xLjUxMy0yLjgxMS0wLjY4OC01LjcxOGwwLjEwOC0wLjM5MWwwLjM5NSwwLjEgYzAuOTY0LDAuMjQzLDIuMDI2LDAuNDE0LDMuMTU4LDAuNTA3bDAuMTk0LDAuMDE5bDAuMTEzLDAuMTZjMC42MDQsMC44NzgsMS4yOCwxLjcwNywyLjAyLDIuNDc3bDAuMjg0LDAuMjlsLTAuMjg0LDAuMjkxIEMxMC43MTMsMTkuMjU1LDkuMTg3LDIwLjE1LDguMDAxLDIwLjE1TDguMDAxLDIwLjE1eiBNNy4wMDgsMTQuNzg4Yy0wLjU3LDIuMjQyLTAuNDI0LDMuOTA2LDAuNDA0LDQuMzg0IGMwLjgyNSwwLjQ3LDIuMzcxLTAuMjU1LDQuMDA1LTEuODQyYy0wLjYxNi0wLjY3LTEuMTg4LTEuMzc5LTEuNzEzLTIuMTIzQzguNzk4LDE1LjEyOCw3Ljg5OCwxNC45ODYsNy4wMDgsMTQuNzg4TDcuMDA4LDE0Ljc4OHoiCiAgICAgaWQ9InBhdGg4OTMiCiAgICAgc3R5bGU9ImZpbGw6I2EwYTVhYTtmaWxsLW9wYWNpdHk6MSIgLz4KICA8cGF0aAogICAgIGQ9Ik0xMiwxNS4zMTNjLTAuNjg3LDAtMS4zOTItMC4wMjktMi4xLTAuMDg4bC0wLjE5Ni0wLjAxN2wtMC4xMTMtMC4xNjJjLTAuMzk4LTAuNTcyLTAuNzc0LTEuMTYzLTEuMTI2LTEuNzY5IGMtMC4zNDktMC42MDctMC42NzItMS4yMjYtMC45NzEtMS44NTlMNy40MSwxMS4yNDFsMC4wODQtMC4xNzljMC4yOTktMC42MzIsMC42MjItMS4yNTIsMC45NzEtMS44NTggYzAuMzQ3LTAuNTk2LDAuNzI2LTEuMTkyLDEuMTI2LTEuNzdsMC4xMTMtMC4xNkw5LjksNy4yNTZjMS4zOTctMC4xMTcsMi44MDEtMC4xMTcsNC4xOTgsMGwwLjE5NCwwLjAxOWwwLjExMywwLjE2IGMwLjc5OSwxLjE0OSwxLjUwMywyLjM2MiwyLjEsMy42MjhsMC4wODMsMC4xNzlsLTAuMDgzLDAuMTc3Yy0wLjU5NywxLjI2OC0xLjI5OSwyLjQ4MS0yLjEsMy42MjhsLTAuMTEzLDAuMTYybC0wLjE5NCwwLjAxNyBDMTMuMzkyLDE1LjI4MywxMi42ODYsMTUuMzEzLDEyLDE1LjMxM0wxMiwxNS4zMTN6IE0xMC4xNjYsMTQuNDA5YzEuMjM1LDAuMDkzLDIuNDMzLDAuMDkzLDMuNjY3LDAgYzAuNjktMS4wMSwxLjMwMS0yLjA2OCwxLjgzMi0zLjE2OGMtMC41MjktMS4xMDItMS4xNDItMi4xNjEtMS44MzItMy4xNjhjLTEuMjIxLTAuMDk0LTIuNDQ2LTAuMDk0LTMuNjY3LDAgYy0wLjY4OSwxLjAwNy0xLjMwNSwyLjA2NS0xLjgzMiwzLjE2OEM4Ljg2NSwxMi4zNDEsOS40NzksMTMuMzk5LDEwLjE2NiwxNC40MDlMMTAuMTY2LDE0LjQwOXoiCiAgICAgaWQ9InBhdGg4OTUiCiAgICAgc3R5bGU9ImZpbGw6I2EwYTVhYTtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPgo8L3N2Zz4K");
