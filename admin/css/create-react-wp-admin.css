@@ -51,6 +51,9 @@ p {
 .col {
   flex-direction: column;
 }
+.disc {
+  list-style: disc;
+}
 
 .fg-green {
   color: #46b450 !important;
@@ -133,6 +136,9 @@ p {
 .wp-core-ui .button.pl025,
 .wp-core-ui .button-link.pl025 {
   padding-left: 0.25rem;
+}
+.pl2 {
+  padding-left: 2rem;
 }
 .pt1 {
   padding-top: 1rem;

@@ -16,14 +16,15 @@
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
 
-    // TODO v1.0.0 Check for shell_exec, exec, npm -v >= 6.0.0, windows
     // TODO v1.0.0 Publish wordpress plugin
     // // TODO Document methods and functions
+    // // TODO Make sure people have the right php ersion: 7.4+
 
     // TODO v1.x.0 Swap file_get_contents for wp_remote_get.
     // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
     // TODO v1.x.0 Check if windows version can be implemented
 
+    // DONE v1.0.0 Check for shell_exec, exec, npm -v >= 6.0.0, windows
     // DONE v1.0.0 Deploy app to production
     // DONE v1.0.0 Add TypeScript/template support
     // DONE v1.0.0 Delete app
@@ -107,7 +108,8 @@
       const spinner = $('#crwp-spinner')
       const templateSelect = $('#crwp-template-select')
       const template = templateSelect.val()
-      const type = $('input[name=type]:checked', '#crwp-create-form').val()
+      const typeRadio = $('input[name=type]:checked', '#crwp-create-form')
+      const type = typeRadio.val()
       const postdata = `action=crwp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
       console.log({ postdata })
 
@@ -124,7 +126,7 @@
         fieldset.prop('disabled', false)
         pageslugField.val('')
         $('#crwp-template-select > option:first-child').prop('selected', true)
-        $('#crwp-type-development').prop('checked', true)
+        typeRadio.prop('checked', false)
         spinner.removeClass('is-active')
         showSnackbar(result.message)
       })

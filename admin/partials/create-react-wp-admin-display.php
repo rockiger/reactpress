@@ -18,6 +18,7 @@
 <?php
 $crwp_apps = get_option('crwp_apps') ?? [];
 $apps = $crwp_apps ? $crwp_apps : [];
+$environment_message = $this->environment_message();
 ?>
 <div class="crwp-content">
   <div class='head'>
@@ -62,6 +63,15 @@ $apps = $crwp_apps ? $crwp_apps : [];
         <p class="pt1"><b>For deployments</b> to work, make sure, that you upload the build folder of your React app into the app directory.</p>
       </div>
       <div class=" flex col half">
+        <?php if ($environment_message) : ?>
+          <div class="notice notice-info inline m0 mb1">
+            <p>
+              Currently you are in <b>Deployment Mode</b>, (this means you can only deploy React apps) because:</p>
+            <ul class="disc pl2">
+              <?= $environment_message; ?>
+            </ul>
+          </div>
+        <?php endif; ?>
         <div class="card fullwidth p2">
           <h2>Create new React app.</h2>
           <form id="crwp-create-form" method="post" action="javascript:void(0)">
@@ -88,14 +98,14 @@ $apps = $crwp_apps ? $crwp_apps : [];
                     <td>
                       <div class="mb025">
                         <label>
-                          <input id="crwp-type-development" type="radio" name="type" value="development" checked />
-                          <span>Develop a new app (Usually on a local machine).</span>
+                          <input type="radio" name="type" value="development" required <?= $environment_message ? 'disabled' : '' ?> />
+                          <span>Develop a new app (<?= $environment_message ? '<b>Doesn\' work in Deploment Mode</b>' : 'Usually on a local machine'; ?>).</span>
                         </label>
                       </div>
                       <div class="mb025">
                         <label>
-                          <input type="radio" name="type" value="deployment" />
-                          <span>Deploy an allready build app (Usually on a server).</span>
+                          <input type="radio" name="type" value="deployment" required <?= $environment_message ? 'checked' : ''; ?> />
+                          <span>Deploy an already build app (Usually on a server).</span>
                         </label>
                       </div>
                       <p class="description">If you want to deploy an app, you must choose the same name and slug as on your development version.</p>

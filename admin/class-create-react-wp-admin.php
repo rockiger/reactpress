@@ -442,6 +442,34 @@ class Create_React_Wp_Admin {
 			}
 		}
 	}
+
+	/**
+	 * Checks if the dev environment is suitable. If not
+	 * produces a message for the user.
+	 *
+	 * @return string
+	 */
+	public function environment_message(): string {
+		$has_exec = function_exists('exec');
+		$has_shell_exec = function_exists('shell_exec');
+		$is_posix = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
+		$has_npm_v6 = false;
+		if ($has_exec && $has_shell_exec) {
+			$has_npm_v6 = (int)shell_exec('npm -v') >= 6;
+		}
+
+		$message = '';
+		if (!($has_exec && $has_shell_exec)) {
+			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
+		}
+		if (!$has_npm_v6) {
+			$message .= "<li>Your dev server needs access to npm 6 or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installers</a> work fine for me.</li>";
+		}
+		if (!$is_posix) {
+			$message .= "<li>Right now Windows is not supported for developing apps with Create React WP.</li>";
+		}
+		return $message;
+	}
 }
 
 /**
