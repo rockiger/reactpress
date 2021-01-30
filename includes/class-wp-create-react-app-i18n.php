@@ -35,7 +35,7 @@ class Create_React_Wp_i18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'create-react-wp',
+			'wp-create-react-app',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);

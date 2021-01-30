@@ -13,15 +13,15 @@
  * @package           Create_React_Wp
  *
  * @wordpress-plugin
- * Plugin Name:       Create React WP
- * Plugin URI:        https://create-react-wp.dev
+ * Plugin Name:       WP Create React App
+ * Plugin URI:        https://wp-create-react-app.dev
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           1.0.0
  * Author:            Marco Laspe
  * Author URI:        https://rockiger.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       create-react-wp
+ * Text Domain:       wp-create-react-app
  * Domain Path:       /languages
  */
 
@@ -43,19 +43,19 @@ define('CRWP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-create-react-wp-activator.php
+ * This action is documented in includes/class-wp-create-react-app-activator.php
  */
 function activate_create_react_wp() {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-create-react-wp-activator.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app-activator.php';
 	Create_React_Wp_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-create-react-wp-deactivator.php
+ * This action is documented in includes/class-wp-create-react-app-deactivator.php
  */
 function deactivate_create_react_wp() {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-create-react-wp-deactivator.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app-deactivator.php';
 	Create_React_Wp_Deactivator::deactivate();
 }
 
@@ -66,7 +66,7 @@ register_deactivation_hook(__FILE__, 'deactivate_create_react_wp');
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/class-create-react-wp.php';
+require plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app.php';
 
 /**
  * Begins execution of the plugin.

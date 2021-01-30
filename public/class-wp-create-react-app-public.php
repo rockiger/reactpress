@@ -72,7 +72,7 @@ class Create_React_Wp_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/create-react-wp-public.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-create-react-app-public.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Create_React_Wp_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/create-react-wp-public.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-create-react-app-public.js', array('jquery'), $this->version, false);
 
 		$this->crwp_load_react_app();
 	}
@@ -129,7 +129,7 @@ class Create_React_Wp_Public {
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
 
-			$relative_apppath = "/wp-content/plugins/create-react-wp/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
+			$relative_apppath = "/wp-content/plugins/wp-create-react-app/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
 			if (function_exists('get_home_path')) {
 				$relative_apppath = '/' . explode(
 					get_home_path(),

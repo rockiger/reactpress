@@ -61,11 +61,11 @@ class Create_React_Wp_Admin {
 	 */
 	public function enqueue_styles() {
 
-		$valid_pages = ['create-react-wp'];
+		$valid_pages = ['wp-create-react-app'];
 		$page = $_REQUEST['page'] ?? "";
 
 		if (in_array($page, $valid_pages)) {
-			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/create-react-wp-admin.css', array(), $this->version, 'all');
+			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-create-react-app-admin.css', array(), $this->version, 'all');
 		}
 	}
 
@@ -76,13 +76,13 @@ class Create_React_Wp_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		$valid_pages = ['create-react-wp'];
+		$valid_pages = ['wp-create-react-app'];
 		$page = $_REQUEST['page'] ?? "";
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_script('crwp-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
 
-			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/create-react-wp-admin.js', array('jquery'), $this->version, false);
+			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-create-react-app-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "crwp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
@@ -99,11 +99,11 @@ class Create_React_Wp_Admin {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			'Create React WP',
-			'Create React WP',
+			'WP Create React App',
+			'Create React App',
 			'manage_options',
-			'create-react-wp',
-			fn () =>  require_once('partials/create-react-wp-admin-display.php'),
+			'wp-create-react-app',
+			fn () =>  require_once('partials/wp-create-react-app-admin-display.php'),
 			MENU_ICON
 		);
 	}
@@ -117,7 +117,7 @@ class Create_React_Wp_Admin {
 	 * @since 1.0.0
 	 */
 	public function crwp_add_page_template($templates) {
-		$templates[CRWP_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From Create React WP', 'text-domain');
+		$templates[CRWP_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From WP Create React App', 'text-domain');
 
 		return $templates;
 	}
@@ -571,7 +571,7 @@ class Create_React_Wp_Admin {
 			$message .= "<li>Your dev server needs access to npm 6 or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installers</a> work fine development.</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with Create React WP. Windows users can use WSL.</li>";
+			$message .= "<li>Right now Windows is not supported for developing apps with WP Create React App. Windows users can use WSL.</li>";
 		}
 		return $message;
 	}

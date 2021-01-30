@@ -24,7 +24,7 @@ $environment_message = $this->environment_message();
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
       <?= LOGO ?>
-      <h1 style="color: #82878C;">Create React WP</h1>
+      <h1 style="color: #82878C;">WP Create React App</h1>
     </div>
   </div>
 
@@ -59,7 +59,7 @@ $environment_message = $this->environment_message();
             </div>
           <?php endforeach; ?>
         </div>
-        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./create-react-wp/apps/[appname]</code>.</p>
+        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./wp-create-react-app/apps/[appname]</code>.</p>
         <p class="pt1"><b>For deployments</b> to work, make sure, that you upload the build folder of your React app into the app directory.</p>
       </div>
       <div class=" flex col half">
