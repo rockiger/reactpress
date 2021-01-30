@@ -196,17 +196,17 @@ svg.react > * {
   padding-left: 0;
 }
 
-.crwp-content * {
+.wpcra-content * {
   box-sizing: border-box;
 }
 
-.crwp-button-spinner.spinner {
+.wpcra-button-spinner.spinner {
   float: none;
   margin-top: 5px;
   vertical-align: top;
 }
 
-.crwp-snackbar {
+.wpcra-snackbar {
   background-color: #1e1e1e;
   border-radius: 2px;
   bottom: 20px;
@@ -225,7 +225,7 @@ svg.react > * {
 }
 
 /* Show the snackbar when clicking on a button (class added with JavaScript) */
-.crwp-snackbar.show {
+.wpcra-snackbar.show {
   visibility: visible; /* Show the snackbar */
   /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
   However, delay the fade out process for 2.5 seconds */

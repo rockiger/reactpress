@@ -83,7 +83,7 @@ class Create_React_Wp_Public {
 	public function enqueue_scripts() {
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-create-react-app-public.js', array('jquery'), $this->version, false);
 
-		$this->crwp_load_react_app();
+		$this->wpcra_load_react_app();
 	}
 
 
@@ -96,7 +96,7 @@ class Create_React_Wp_Public {
 	 * @return mixed
 	 * @since 1.0.0
 	 */
-	public function crwp_change_page_template($template) {
+	public function wpcra_change_page_template($template) {
 		if (is_page()) {
 			$meta = get_post_meta(get_the_ID());
 
@@ -115,19 +115,19 @@ class Create_React_Wp_Public {
 	 * @return bool|void
 	 * @since 1.0.0
 	 */
-	function crwp_load_react_app() {
+	function wpcra_load_react_app() {
 		// Only load react app scripts in site front end home page.
 		// TODO only on pages that contain our apps
 		global $post;
-		$crwp_apps = get_option('crwp_apps');
-		$valid_pages = array_map(fn ($el) => $el['pageslug'], $crwp_apps);
+		$wpcra_apps = get_option('wpcra_apps');
+		$valid_pages = array_map(fn ($el) => $el['pageslug'], $wpcra_apps);
 
 		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
-			$current_app = array_values(array_filter($crwp_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
+			$current_app = array_values(array_filter($wpcra_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
 			$appname = $current_app['appname'];
-			$plugin_app_dir_url = escapeshellcmd(CRWP_PLUGIN_PATH . "apps/{$appname}/");
+			$plugin_app_dir_url = escapeshellcmd(WPCRA_PLUGIN_PATH . "apps/{$appname}/");
 
 			$relative_apppath = "/wp-content/plugins/wp-create-react-app/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
 			if (function_exists('get_home_path')) {
@@ -170,12 +170,12 @@ class Create_React_Wp_Public {
 
 			// Load css files.
 			foreach ($css_files as $index => $css_file) {
-				wp_enqueue_style('crwp-react-app-asset-' . $index, $relative_apppath . 'build/' . $css_file);
+				wp_enqueue_style('wpcra-react-app-asset-' . $index, $relative_apppath . 'build/' . $css_file);
 			}
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('crwp-react-app-asset-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
+				wp_enqueue_script('wpcra-react-app-asset-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
 			}
 		}
 	}
