@@ -1,15 +1,15 @@
 === Plugin Name ===
-Contributors: (this should be a list of wordpress.org userid's)
+rockiger
 Donate link: https://rockiger.com
-Tags: comments, spam
+Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 5.6
 Requires PHP: 7.4
-Stable tag: 4.3
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Easily create, build and deploy React apps into your existing WordPress sites. Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
 
 == Description ==
 
