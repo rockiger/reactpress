@@ -13,7 +13,7 @@
  * @package           Create_React_Wp
  *
  * @wordpress-plugin
- * Plugin Name:       WP Create React App
+ * Plugin Name:       React Press
  * Plugin URI:        https://rockiger.com
  * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
  * Version:           1.0.0
