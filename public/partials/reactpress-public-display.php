@@ -8,8 +8,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/public/partials
+ * @package    Reactpress
+ * @subpackage Reactpress/public/partials
  */
 ?>
 

@@ -6,8 +6,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Create_React_Wp_Deactivator {
+class Reactpress_Deactivator {
 
 	/**
 	 * Short Description. (use period)
@@ -30,7 +30,5 @@ class Create_React_Wp_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
-
 	}
-
 }

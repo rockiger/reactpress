@@ -10,7 +10,7 @@
  *
  * @link              https://rockiger.com
  * @since             1.0.0
- * @package           Create_React_Wp
+ * @package           Reactpress
  *
  * @wordpress-plugin
  * Plugin Name:       ReactPress
@@ -45,22 +45,22 @@ define('RP_PLUGIN_PATH', plugin_dir_path(__FILE__));
  * The code that runs during plugin activation.
  * This action is documented in includes/class-reactpress-activator.php
  */
-function activate_create_react_wp() {
+function activate_reactpress() {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-reactpress-activator.php';
-	Create_React_Wp_Activator::activate();
+	Reactpress_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-reactpress-deactivator.php
  */
-function deactivate_create_react_wp() {
+function deactivate_reactpress() {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-reactpress-deactivator.php';
-	Create_React_Wp_Deactivator::deactivate();
+	Reactpress_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_create_react_wp');
-register_deactivation_hook(__FILE__, 'deactivate_create_react_wp');
+register_activation_hook(__FILE__, 'activate_reactpress');
+register_deactivation_hook(__FILE__, 'deactivate_reactpress');
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -77,9 +77,9 @@ require plugin_dir_path(__FILE__) . 'includes/class-reactpress.php';
  *
  * @since    1.0.0
  */
-function run_create_react_wp() {
+function run_reactpress() {
 
-	$plugin = new Create_React_Wp();
+	$plugin = new Reactpress();
 	$plugin->run();
 }
-run_create_react_wp();
+run_reactpress();

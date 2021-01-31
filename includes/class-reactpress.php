@@ -9,8 +9,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Create_React_Wp {
+class Reactpress {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,7 +35,7 @@ class Create_React_Wp {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Create_React_Wp_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Reactpress_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -85,10 +85,10 @@ class Create_React_Wp {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Create_React_Wp_Loader. Orchestrates the hooks of the plugin.
-	 * - Create_React_Wp_i18n. Defines internationalization functionality.
-	 * - Create_React_Wp_Admin. Defines all hooks for the admin area.
-	 * - Create_React_Wp_Public. Defines all hooks for the public side of the site.
+	 * - Reactpress_Loader. Orchestrates the hooks of the plugin.
+	 * - Reactpress_i18n. Defines internationalization functionality.
+	 * - Reactpress_Admin. Defines all hooks for the admin area.
+	 * - Reactpress_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -121,13 +121,13 @@ class Create_React_Wp {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-reactpress-public.php';
 
-		$this->loader = new Create_React_Wp_Loader();
+		$this->loader = new Reactpress_Loader();
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Create_React_Wp_i18n class in order to set the domain and to register the hook
+	 * Uses the Reactpress_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -135,7 +135,7 @@ class Create_React_Wp {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Create_React_Wp_i18n();
+		$plugin_i18n = new Reactpress_i18n();
 
 		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
@@ -149,7 +149,7 @@ class Create_React_Wp {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Create_React_Wp_Admin($this->get_plugin_name(), $this->get_version());
+		$plugin_admin = new Reactpress_Admin($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -172,7 +172,7 @@ class Create_React_Wp {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Create_React_Wp_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public = new Reactpress_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
@@ -204,7 +204,7 @@ class Create_React_Wp {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Create_React_Wp_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Reactpress_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

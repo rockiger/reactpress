@@ -7,8 +7,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/admin
+ * @package    Reactpress
+ * @subpackage Reactpress/admin
  */
 
 /**
@@ -17,11 +17,11 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/admin
+ * @package    Reactpress
+ * @subpackage Reactpress/admin
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Create_React_Wp_Admin {
+class Reactpress_Admin {
 
 	/**
 	 * The ID of this plugin.

@@ -9,8 +9,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Create_React_Wp
- * @subpackage Create_React_Wp/includes
+ * @package    Reactpress
+ * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Create_React_Wp_i18n {
+class Reactpress_i18n {
 
 
 	/**

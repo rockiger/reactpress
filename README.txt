@@ -1,6 +1,5 @@
 === ReactPress - Create React App for Wordpress ===
 Contributors: rockiger
-Donate link: https://rockiger.com
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 5.6
