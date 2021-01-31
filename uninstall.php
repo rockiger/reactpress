@@ -32,5 +32,5 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 
 $role = get_role('administrator');
 if (!empty($role)) {
-	delete_option('wpcra_apps');
+	delete_option('rp_apps');
 }

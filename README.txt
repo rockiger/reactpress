@@ -1,4 +1,4 @@
-=== WP Create React App ===
+=== ReactPress - Create React App for Wordpress ===
 Contributors: rockiger
 Donate link: https://rockiger.com
 Tags: react, embed, developer, javascript, js
@@ -21,7 +21,7 @@ Combine the flexibility of WordPress with the UI capabilities of React and seaml
 
 [youtube www.youtube.com/watch?v=pVi07A_OZYA ]
 
-WP Create React App does 3 things:
+ReactPress does 3 things:
 * It integrates your local dev server into your WordPress theme, that you have instant feedback, how your React app looks in the context of your WordPress website.
 * It builds your React app in a way that it is usable from your WordPress site.
 * It makes it easy to upload your app to a live server after building.

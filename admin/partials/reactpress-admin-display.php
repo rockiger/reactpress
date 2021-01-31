@@ -16,11 +16,11 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
 <?php
-$wpcra_apps = get_option('wpcra_apps') ?? [];
-$apps = $wpcra_apps ? $wpcra_apps : [];
+$rp_apps = get_option('rp_apps') ?? [];
+$apps = $rp_apps ? $rp_apps : [];
 $environment_message = $this->environment_message();
 ?>
-<div class="wpcra-content">
+<div class="rp-content">
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
       <?= LOGO ?>
@@ -49,9 +49,9 @@ $environment_message = $this->environment_message();
               <div class="flex">
                 <?php if ($app['type'] === 'development') : ?>
                   <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
-                  <span id="wpcra-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                  <span id="rp-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                   <div class="grow1"></div>
-                  <span id="wpcra-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                  <span id="rp-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
                   <button class="button button-build mr025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
                 <?php endif; ?>
                 <button class="button-link button-delete" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
@@ -59,7 +59,7 @@ $environment_message = $this->environment_message();
             </div>
           <?php endforeach; ?>
         </div>
-        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./wp-create-react-app/apps/[appname]</code>.</p>
+        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./reactpress/apps/[appname]</code>.</p>
         <p class="pt1"><b>For deployments</b> to work, make sure, that you upload the build folder of your React app into the app directory.</p>
       </div>
       <div class=" flex col half">
@@ -74,22 +74,22 @@ $environment_message = $this->environment_message();
         <?php endif; ?>
         <div class="card fullwidth p2">
           <h2>Create new React app.</h2>
-          <form id="wpcra-create-form" method="post" action="javascript:void(0)">
-            <fieldset id="wpcra-create-fieldset">
+          <form id="rp-create-form" method="post" action="javascript:void(0)">
+            <fieldset id="rp-create-fieldset">
               <input hidden name="action" value="CREATE_NEW_APP" />
               <table class="form-table" role="presentation">
                 <tbody>
                   <tr>
                     <th scope="row">App Name</th>
                     <td>
-                      <input id="wpcra-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
+                      <input id="rp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
                       <p class="description">The name of your React app. Must be one word, lowercase and unique.</p>
                     </td>
                   </tr>
                   <tr>
                     <th scope="row">Page Slug</th>
                     <td>
-                      <input id="wpcra-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
+                      <input id="rp-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
                       <p class="description">The slug of page where your app should be displayed. Must be unique.</p>
                     </td>
                   </tr>
@@ -114,7 +114,7 @@ $environment_message = $this->environment_message();
                   <tr>
                     <th scope="row">Template</th>
                     <td>
-                      <select name="template" id="wpcra-template-select">
+                      <select name="template" id="rp-template-select">
                         <option selected="selected" value="">Default</option>
                         <option value="typescript">TypeScript</option>
                         <option value="redux">Redux</option>
@@ -127,7 +127,7 @@ $environment_message = $this->environment_message();
               </table>
               <div>
                 <input type="submit" name="submit" id="submit" class="button button-primary" value="Create React App" />
-                <span id="wpcra-spinner" class="crpw-button-spinner spinner"></span>
+                <span id="rp-spinner" class="crpw-button-spinner spinner"></span>
               </div>
             </fieldset>
           </form>
@@ -136,10 +136,10 @@ $environment_message = $this->environment_message();
     </div>
   </div>
 </div>
-<div id="wpcra-snackbar" class="wpcra-snackbar">Test</div>
+<div id="rp-snackbar" class="rp-snackbar">Test</div>
 <pre>
   <?php
-  // print_r(get_option('wpcra_apps'));
+  // print_r(get_option('rp_apps'));
   // print_r($this->get_app_uri($this->app_path('app1'), 1));
 
   ?>

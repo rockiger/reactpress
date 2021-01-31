@@ -5,13 +5,13 @@
      * Start *
      *********/
 
-    const AJAXURL = wpcra.ajaxurl
+    const AJAXURL = rp.ajaxurl
 
     // TODO v1.0.1 onchange form input
-    $('#wpcra-create-form').validate()
+    $('#rp-create-form').validate()
 
     // processing event on button click
-    $(document).on('submit', '#wpcra-create-form', handleSubmit)
+    $(document).on('submit', '#rp-create-form', handleSubmit)
     $('.button-build').click(handleBuildButton)
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
@@ -26,8 +26,8 @@
       console.log('handleDeleteButton')
       const buttonNode = $(ev.target)
       const { appname = null, pageslug = null } = buttonNode.data()
-      const postdata = `action=wpcra_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
-      const spinnerNode = $(`#wpcra-build-spinner-${appname}`)
+      const postdata = `action=rp_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
+      const spinnerNode = $(`#rp-build-spinner-${appname}`)
 
       buttonNode.prop('disabled', true)
       spinnerNode.addClass('is-active')
@@ -45,7 +45,7 @@
       const is_delete = window.confirm(
         `Do you really want to delete app ${appname}? This will delete all files and cant\'t be undone!`
       )
-      const postdata = `action=wpcra_admin_ajax_request&param=delete_react_app&appname=${appname}`
+      const postdata = `action=rp_admin_ajax_request&param=delete_react_app&appname=${appname}`
       if (is_delete) {
         $.post(AJAXURL, postdata, (response) => {
           const result = JSON.parse(response)
@@ -61,10 +61,10 @@
       const buttonNode = $(ev.target)
       const buttonState = buttonNode.text()
       const { appname = null, pageslug = null } = buttonNode.data()
-      const postdata = `action=wpcra_admin_ajax_request&param=${
+      const postdata = `action=rp_admin_ajax_request&param=${
         buttonState === 'Stop' ? 'stop' : 'start'
       }_react_app&appname=${appname}&pageslug=${pageslug}`
-      const spinnerNode = $(`#wpcra-start-spinner-${appname}`)
+      const spinnerNode = $(`#rp-start-spinner-${appname}`)
 
       buttonNode.prop('disabled', true)
       spinnerNode.addClass('is-active')
@@ -92,17 +92,17 @@
     }
 
     function handleSubmit() {
-      const appnameField = $('#wpcra-appname')
+      const appnameField = $('#rp-appname')
       const appname = appnameField.val()
-      const fieldset = $('#wpcra-create-fieldset')
-      const pageslugField = $('#wpcra-pageslug')
+      const fieldset = $('#rp-create-fieldset')
+      const pageslugField = $('#rp-pageslug')
       const pageslug = pageslugField.val()
-      const spinner = $('#wpcra-spinner')
-      const templateSelect = $('#wpcra-template-select')
+      const spinner = $('#rp-spinner')
+      const templateSelect = $('#rp-template-select')
       const template = templateSelect.val()
-      const typeRadio = $('input[name=type]:checked', '#wpcra-create-form')
+      const typeRadio = $('input[name=type]:checked', '#rp-create-form')
       const type = typeRadio.val()
-      const postdata = `action=wpcra_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
+      const postdata = `action=rp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
       console.log({ postdata })
 
       fieldset.prop('disabled', true)
@@ -118,7 +118,7 @@
         appnameField.val('')
         fieldset.prop('disabled', false)
         pageslugField.val('')
-        $('#wpcra-template-select > option:first-child').prop('selected', true)
+        $('#rp-template-select > option:first-child').prop('selected', true)
         typeRadio.prop('checked', false)
         spinner.removeClass('is-active')
         showSnackbar(result.message)
@@ -126,8 +126,8 @@
     }
 
     function showSnackbar(message = '') {
-      $('#wpcra-snackbar').addClass('show').text(message)
-      setTimeout(() => $('#wpcra-snackbar').removeClass('show').text(''), 5000)
+      $('#rp-snackbar').addClass('show').text(message)
+      setTimeout(() => $('#rp-snackbar').removeClass('show').text(''), 5000)
     }
 
     /**
@@ -156,9 +156,9 @@
                   type === 'deployment'
                     ? ''
                     : `<button class="button button-primary button-start-stop" data-appname="${appname}" data-pageslug="${pageslug}">Start</button>
-                <span id="wpcra-start-spinner-${appname}" class="crpw-button-spinner spinner"></span>
+                <span id="rp-start-spinner-${appname}" class="crpw-button-spinner spinner"></span>
                 <div class="grow1"></div>
-                <span id="wpcra-build-spinner-${appname}" class="crpw-button-spinner spinner"></span>
+                <span id="rp-build-spinner-${appname}" class="crpw-button-spinner spinner"></span>
                 <button class="button button-build mr025" data-appname="${appname}" data-pageslug="${pageslug}">Build</button>`
                 }
                 <button class="button-link button-delete" data-appname="${appname}" data-pageslug="${pageslug}">Delete</button>
