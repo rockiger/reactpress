@@ -14,8 +14,8 @@
  *
  * @wordpress-plugin
  * Plugin Name:       WP Create React App
- * Plugin URI:        https://wp-create-react-app.dev
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Plugin URI:        https://rockiger.com
+ * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
  * Version:           1.0.0
  * Author:            Marco Laspe
  * Author URI:        https://rockiger.com

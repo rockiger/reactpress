@@ -22,12 +22,6 @@
     // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
     // TODO v1.x.0 Check if windows version can be implemented
 
-    // DONE v1.0.0 Check for shell_exec, exec, npm -v >= 6.0.0, windows
-    // DONE v1.0.0 Deploy app to production
-    // DONE v1.0.0 Add TypeScript/template support
-    // DONE v1.0.0 Delete app
-    // DONE v1.0.0 Build app
-
     function handleBuildButton(ev) {
       console.log('handleDeleteButton')
       const buttonNode = $(ev.target)

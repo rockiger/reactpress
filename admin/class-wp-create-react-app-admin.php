@@ -568,10 +568,10 @@ class Create_React_Wp_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to npm 6 or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installers</a> work fine development.</li>";
+			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installer</a> works fine for development with <code>npm</code>.</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with WP Create React App. Windows users can use WSL.</li>";
+			$message .= "<li>Right now Windows is not supported for developing apps with WP Create React App. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
 		}
 		return $message;
 	}

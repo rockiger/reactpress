@@ -1,5 +1,5 @@
-=== Plugin Name ===
-rockiger
+=== WP Create React App ===
+Contributors: rockiger
 Donate link: https://rockiger.com
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
@@ -9,107 +9,111 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Easily create, build and deploy React apps into your existing WordPress sites. Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
+Easily create, build and deploy React apps into your existing WordPress sites. 
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Easily create, build and deploy React apps into your existing WordPress sites.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
 
-A few notes about the sections above:
+Combine the flexibility of WordPress with the UI capabilities of React and seamlessly integrate create-react-app into your WordPress project for your next SaaS.
 
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
+[youtube www.youtube.com/watch?v=pVi07A_OZYA ]
 
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
+WP Create React App does 3 things:
+* It integrates your local dev server into your WordPress theme, that you have instant feedback, how your React app looks in the context of your WordPress website.
+* It builds your React app in a way that it is usable from your WordPress site.
+* It makes it easy to upload your app to a live server after building.
 
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+=== System Requirements ===
+
+To develop React app your WordPress installations needs access to:
+
+* the PHP function `shell_exec` and `exec`,
+
+* the nodejs package manager `npm` version 6 or higher
+
+* and a POSIX compatible system ([Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers")).
+
+=== Usage ===
+
+To create and deploy your first app:
+
+1. Click on *Create React App* in the sidebar of your WordPress admin.
+
+2. Fill out the *Create new React form*, choose "Develop a new app." as type.
+
+3. Click on *Start* and open the link with the port number.
+
+4. Develop your app, changes will automatically hot reloaded.
+
+5. When you are finished, build the app. You can find it on development WordPress installation on [your-domain]/[your-slug]. 
+
+6. To deploy create the same app on your live server. This time choose "Deploy an already build app." for the type. Make sure you use the same name for the app - otherwise the app won't work as expected.
+
+7. Upload the build folder from your dev system under `plugins/wp-create/react-app/apps/[your-app-name]` to the same directory onto your live server.
+
+8. Open the React app under [your-domain]/[your-slug].
+
+Repeat steps 5 to 8 when you have new releases you want to deploy.
+
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
 
-e.g.
+1. Like any other plugin install via *Plugins/Add New*. You can download the plugin via admin or upload it to the plugins directory.
 
-1. Upload `wp-create-react-app.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
+2. Activate the plugin through the 'Plugins' menu in WordPress
+
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
 
-An answer to that question.
+= The app won't show in the page. =
 
-= What about foo bar? =
+Have you build the React app and, in case of a live server, uploaded the build folder to the right location?
 
-Answer to foo bar dilemma.
+= It shows I am in development mode, but I am on a local server. =
+
+Has your WordPress/PHP installation access to `npm`. If you use a docker container like Local, you need to install node in that container or use a non virtualized dev server like Bitnami WordPress Installer.
+
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+
+1. Create a new React app for development called *reactino*.
+
+2. The new React app is created and running.
+
+3. The local React dev server is running on port: 3000. Every change will hot reload immediately.
+
+4. Create a new React app for deployment on the server.
+
+5. The new React app is created, but no dev server is running.
+
+6. The React app is deployed on the public server.
 
 == Changelog ==
 
 = 1.0 =
-* A change since the previous version.
-* Another change.
 
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+* Check for if it allows `shell_exec` and `exec`
 
-== Upgrade Notice ==
+* `npm -v >= 6.0.0` is reachable from WordPress
 
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
+* Find out if we are in Windows environment
 
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
+* Deploy app to production
 
-== Arbitrary section ==
+* Add TypeScript/template support
 
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
+* Delete app
 
-== A brief Markdown Example ==
+* Build app
 
-Ordered list:
+* Extend index.html in React app to look like WordPress site
 
-1. Some feature
-1. Another feature
-1. Something else about the plugin
+* Create new React app
 
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+* Add React app in specified page

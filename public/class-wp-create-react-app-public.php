@@ -116,8 +116,7 @@ class Create_React_Wp_Public {
 	 * @since 1.0.0
 	 */
 	function wpcra_load_react_app() {
-		// Only load react app scripts in site front end home page.
-		// TODO only on pages that contain our apps
+		// Only load react app scripts on pages that contain our apps
 		global $post;
 		$wpcra_apps = get_option('wpcra_apps');
 		$valid_pages = array_map(fn ($el) => $el['pageslug'], $wpcra_apps);
