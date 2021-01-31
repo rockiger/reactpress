@@ -72,7 +72,7 @@ class Create_React_Wp {
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'wp-create-react-app';
+		$this->plugin_name = 'reactpress';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -102,24 +102,24 @@ class Create_React_Wp {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wp-create-react-app-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-reactpress-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wp-create-react-app-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-reactpress-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-wp-create-react-app-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-reactpress-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-wp-create-react-app-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-reactpress-public.php';
 
 		$this->loader = new Create_React_Wp_Loader();
 	}

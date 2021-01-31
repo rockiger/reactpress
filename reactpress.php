@@ -21,7 +21,7 @@
  * Author URI:        https://rockiger.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       wp-create-react-app
+ * Text Domain:       reactpress
  * Domain Path:       /languages
  */
 
@@ -43,19 +43,19 @@ define('WPCRA_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-wp-create-react-app-activator.php
+ * This action is documented in includes/class-reactpress-activator.php
  */
 function activate_create_react_wp() {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app-activator.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/class-reactpress-activator.php';
 	Create_React_Wp_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-wp-create-react-app-deactivator.php
+ * This action is documented in includes/class-reactpress-deactivator.php
  */
 function deactivate_create_react_wp() {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app-deactivator.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/class-reactpress-deactivator.php';
 	Create_React_Wp_Deactivator::deactivate();
 }
 
@@ -66,7 +66,7 @@ register_deactivation_hook(__FILE__, 'deactivate_create_react_wp');
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/class-wp-create-react-app.php';
+require plugin_dir_path(__FILE__) . 'includes/class-reactpress.php';
 
 /**
  * Begins execution of the plugin.

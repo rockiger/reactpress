@@ -61,11 +61,11 @@ class Create_React_Wp_Admin {
 	 */
 	public function enqueue_styles() {
 
-		$valid_pages = ['wp-create-react-app'];
+		$valid_pages = ['reactpress'];
 		$page = $_REQUEST['page'] ?? "";
 
 		if (in_array($page, $valid_pages)) {
-			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-create-react-app-admin.css', array(), $this->version, 'all');
+			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/reactpress-admin.css', array(), $this->version, 'all');
 		}
 	}
 
@@ -76,13 +76,13 @@ class Create_React_Wp_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		$valid_pages = ['wp-create-react-app'];
+		$valid_pages = ['reactpress'];
 		$page = $_REQUEST['page'] ?? "";
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_script('wpcra-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
 
-			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-create-react-app-admin.js', array('jquery'), $this->version, false);
+			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "wpcra", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
@@ -102,8 +102,8 @@ class Create_React_Wp_Admin {
 			'React Press',
 			'Create React App',
 			'manage_options',
-			'wp-create-react-app',
-			fn () =>  require_once('partials/wp-create-react-app-admin-display.php'),
+			'reactpress',
+			fn () =>  require_once('partials/reactpress-admin-display.php'),
 			MENU_ICON
 		);
 	}
