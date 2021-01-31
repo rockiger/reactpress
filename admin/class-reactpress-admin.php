@@ -99,8 +99,8 @@ class Create_React_Wp_Admin {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			'React Press',
-			'Create React App',
+			'ReactPress',
+			'ReactPress',
 			'manage_options',
 			'reactpress',
 			fn () =>  require_once('partials/reactpress-admin-display.php'),
@@ -117,7 +117,7 @@ class Create_React_Wp_Admin {
 	 * @since 1.0.0
 	 */
 	public function rp_add_page_template($templates) {
-		$templates[RP_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From React Press', 'text-domain');
+		$templates[RP_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From ReactPress', 'text-domain');
 
 		return $templates;
 	}
@@ -571,7 +571,7 @@ class Create_React_Wp_Admin {
 			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installer</a> works fine for development with <code>npm</code>.</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with React Press. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
+			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
 		}
 		return $message;
 	}

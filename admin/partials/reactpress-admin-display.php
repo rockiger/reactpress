@@ -24,7 +24,7 @@ $environment_message = $this->environment_message();
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
       <?= LOGO ?>
-      <h1 style="color: #82878C;">React Press</h1>
+      <h1 style="color: #82878C;">ReactPress</h1>
     </div>
   </div>
 
