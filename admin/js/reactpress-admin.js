@@ -110,7 +110,9 @@
       $.post(AJAXURL, postdata, (response) => {
         const result = JSON.parse(response)
         if (result.status) {
-          $('#existing-apps').append(appCardTemplate(appname, pageslug, type))
+          $('#existing-apps').append(
+            appCardTemplate(result.appname, result.pageslug, type)
+          )
           $(`#${appname} .button-start-stop`).click(handleStartStopButton)
           $(`#${appname} .button-build`).click(handleBuildButton)
           $(`#${appname} .button-delete`).click(handleDeleteButton)
@@ -122,6 +124,7 @@
         typeRadio.prop('checked', false)
         spinner.removeClass('is-active')
         showSnackbar(result.message)
+        console.log(result)
       })
     }
 

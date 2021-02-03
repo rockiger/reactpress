@@ -62,7 +62,7 @@ class Reactpress_Admin {
 	public function enqueue_styles() {
 
 		$valid_pages = ['reactpress'];
-		$page = $_REQUEST['page'] ?? "";
+		$page = sanitize_title($_REQUEST['page']) ?? "";
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/reactpress-admin.css', array(), $this->version, 'all');
@@ -77,7 +77,7 @@ class Reactpress_Admin {
 	public function enqueue_scripts() {
 
 		$valid_pages = ['reactpress'];
-		$page = $_REQUEST['page'] ?? "";
+		$page = sanitize_title($_REQUEST['page']) ?? "";
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_script('rp-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
@@ -128,34 +128,50 @@ class Reactpress_Admin {
 		 * 
 		 * @since 1.0.0
 		 */
-		$appname = $_POST['appname'] ?? '';
+		global $wpdb;
+		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$rp_apps = get_option('rp_apps');
-		$pageslug = $_POST['pageslug'] ?? '';
-		$param = $_REQUEST['param'] ?? "";
-		$template = $_POST['template'] ?? '';
-		$type = $_POST['type'] ?? 'development';
+		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
+		$param = sanitize_file_name($_REQUEST['param'] ?? "");
+		$template = sanitize_file_name($_POST['template'] ?? '');
+		$type = sanitize_file_name($_POST['type'] ?? 'development');
 
 		try {
 			if (!empty($param)) {
 				if ($param === "create_react_app" && $appname && $pageslug) {
 
-					$this->create_new_app($rp_apps, $appname, $pageslug, $template, $type);
-					$this->insert_react_page($appname, $pageslug);
-					if ($type === 'development') {
-						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+					$existing_appnames = array_map(fn ($el) => $el['appname'], $rp_apps);
+					$does_pageslug_exist = !empty($wpdb->get_row(
+						$wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s", $pageslug)
+					));
+
+					if (in_array($appname, $existing_appnames) || $does_pageslug_exist) {
+						echo wp_json_encode([
+							'status' => 0,
+							'message' => "App name or page slug already exists.",
+						]);
+					} else {
+
+						$this->create_new_app($rp_apps, $appname, $pageslug, $template, $type);
+						$this->insert_react_page($appname, $pageslug);
+						if ($type === 'development') {
+							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						}
+						echo wp_json_encode([
+							'status' => 1,
+							'message' => "React app created.",
+							'appname' => $appname,
+							'pageslug' => $pageslug
+						]);
 					}
-					echo json_encode([
-						'status' => 1,
-						'message' => "React app created.",
-					]);
 				} elseif ($param === "start_react_app" && $appname && $pageslug) {
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 					$parts = $this->start_react_app($appname);
 					$parts;
 					if (empty($parts)) {
-						echo json_encode(['status' => 0, 'message' => "Couldn't load app."]);
+						echo wp_json_encode(['status' => 0, 'message' => "Couldn't load app."]);
 					} else {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 1,
 							'ip' => substr($parts[1], 2),
 							'message' => 'App started.',
@@ -165,14 +181,14 @@ class Reactpress_Admin {
 					}
 				} elseif ($param === 'stop_react_app' && $appname) {
 					$this->stop_react_app($appname);
-					echo json_encode([
+					echo wp_json_encode([
 						'status' => 1,
 						'message' => 'App stopped.',
 					]);
 				} elseif ($param === 'is_react_app_running' && $appname) {
 					if ($this->is_react_app_running($appname)) {
 						$parts = $this->get_app_uri($this->app_path($appname), 1);
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 1,
 							'ip' => substr($parts[1], 2),
 							'message' => 'App is running.',
@@ -192,22 +208,22 @@ class Reactpress_Admin {
 					));
 					$is_appdir_removed = rp_delete_directory($this->app_path($appname));
 					if ($is_option_deleted && $is_option_deleted) {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'App deleted.',
 						]);
 					} elseif ($is_option_deleted) {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 1,
 							'message' => "Couldn't remove files. Please remove directory by hand.",
 						]);
 					} elseif ($is_appdir_removed) {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 0,
 							'message' => "Couldn't remove app from database. Please try again later.",
 						]);
 					} else {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 0,
 							'message' => 'App not running.',
 						]);
@@ -215,22 +231,22 @@ class Reactpress_Admin {
 				} elseif ($param === "build_react_app" && $appname && $pageslug) {
 
 					if ($this->build_react_app($appname)) {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 1,
 							'message' => "App {$appname} build. View",
 						]);
 					} else {
-						echo json_encode([
+						echo wp_json_encode([
 							'status' => 0,
 							'message' => "Build failed.",
 						]);
 					}
 				} else {
-					echo json_encode($_REQUEST);
+					echo wp_json_encode($_REQUEST);
 				}
 			}
 		} catch (Exception $e) {
-			echo (json_encode([
+			echo (wp_json_encode([
 				'status' => 0,
 				'message' => $e->getMessage(),
 				'code' => $e->getCode(), // User-defined Exception code
@@ -327,12 +343,12 @@ class Reactpress_Admin {
 	 * @since 1.0.0
 	 */
 	function create_react_app(string $appname, string $type, string $template = '') {
-		$output = '';
+		$output = [];
 		$retval = '';
 		$template_option = $template ? " --template {$template}" : '';
 		chdir(RP_PLUGIN_PATH);
 		if ($type === 'deployment') {
-			return mkdir("apps/{$appname}");
+			return mkdir("apps/{$appname}", 0777, true);
 		} else {
 			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
 			return end($output) === 'Happy hacking!' ? true : false;
@@ -586,6 +602,8 @@ class Reactpress_Admin {
  * @since 1.0.0
  */
 function rp_delete_directory(string $dirname): bool {
+	rp_log($dirname);
+	$dir_handle = '';
 	if (is_dir($dirname))
 		$dir_handle = opendir($dirname);
 	if (!$dir_handle)
@@ -603,7 +621,7 @@ function rp_delete_directory(string $dirname): bool {
 }
 
 function rp_response(mixed $value, int $options = 0, int $depth = 512) {
-	echo (json_encode($value, $options, $depth));
+	echo (wp_json_encode($value, $options, $depth));
 }
 
 /**

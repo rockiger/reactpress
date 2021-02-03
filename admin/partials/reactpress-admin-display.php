@@ -23,7 +23,7 @@ $environment_message = $this->environment_message();
 <div class="rp-content">
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
-      <?= LOGO ?>
+      <?php echo LOGO ?>
       <h1 style="color: #82878C;">ReactPress</h1>
     </div>
   </div>
@@ -34,27 +34,29 @@ $environment_message = $this->environment_message();
       <div class="col flex grow1 half">
         <div id="existing-apps" class="flex flexwrap gap row">
           <?php foreach ($apps as $app) :
-            $is_running = $app['type'] === 'deployment' ? false : $this->is_react_app_running($app['appname']);
-            [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($app['appname']), 1) : ['', '', ''];
+            $appname = esc_attr($app['appname']);
+            $pageslug = esc_attr($app['pageslug']);
+            $is_running = $app['type'] === 'deployment' ? false : $this->is_react_app_running($appname);
+            [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($appname), 1) : ['', '', ''];
           ?>
-            <div id="<?= $app['appname'] ?>" class="card col flex half m0 p1_5">
-              <h3 class="title flex m0 mb075 row"><?= REACT_ICON_SVG ?><?= $app['appname'] ?></h3>
+            <div id="<?php echo $appname ?>" class="card col flex half m0 p1_5">
+              <h3 class="title flex m0 mb075 row"><?php echo REACT_ICON_SVG ?><?php echo $appname ?></h3>
               <div class="grow1 mb1">
-                <p><b>URL Slug: </b><a href="<?= $app['pageslug'] ?>"><?= $app['pageslug'] ?></a></p>
+                <p><b>URL Slug: </b><a href="<?php echo $pageslug ?>"><?php echo $pageslug ?></a></p>
                 <?php if ($app['type'] === 'development') : ?>
-                  <p><b>Status:</b> <b id="status-<?= $app['appname'] ?>" class=" fg-<?= $is_running ? 'green' : 'red' ?>"><?= $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b></p>
+                  <p><b>Status:</b> <b id="status-<?php echo $appname ?>" class=" fg-<?php echo $is_running ? 'green' : 'red' ?>"><?php echo $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b></p>
                 <?php endif; ?>
-                <p><b>Type:</b> <span style="text-transform: capitalize;"> <?= $app['type'] ?></p>
+                <p><b>Type:</b> <span style="text-transform: capitalize;"> <?php echo esc_html($app['type']) ?></p>
               </div>
               <div class="flex">
                 <?php if ($app['type'] === 'development') : ?>
-                  <button class="button button-primary button-start-stop" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>"><?= $is_running ? 'Stop' : 'Start' ?></button>
-                  <span id="rp-start-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
+                  <button class="button button-primary button-start-stop" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>"><?php echo $is_running ? 'Stop' : 'Start' ?></button>
+                  <span id="rp-start-spinner-<?php echo $appname ?>" class="crpw-button-spinner spinner"></span>
                   <div class="grow1"></div>
-                  <span id="rp-build-spinner-<?= $app['appname'] ?>" class="crpw-button-spinner spinner"></span>
-                  <button class="button button-build mr025" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Build</button>
+                  <span id="rp-build-spinner-<?php echo $appname ?>" class="crpw-button-spinner spinner"></span>
+                  <button class="button button-build mr025" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Build</button>
                 <?php endif; ?>
-                <button class="button-link button-delete" data-appname="<?= $app['appname'] ?>" data-pageslug="<?= $app['pageslug'] ?>">Delete</button>
+                <button class="button-link button-delete" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Delete</button>
               </div>
             </div>
           <?php endforeach; ?>
@@ -68,7 +70,7 @@ $environment_message = $this->environment_message();
             <p>
               Currently you are in <b>Deployment Mode</b>, (this means you can only deploy React apps) because:</p>
             <ul class="disc pl2">
-              <?= $environment_message; ?>
+              <?php echo esc_html($environment_message); ?>
             </ul>
           </div>
         <?php endif; ?>
@@ -98,13 +100,13 @@ $environment_message = $this->environment_message();
                     <td>
                       <div class="mb025">
                         <label>
-                          <input type="radio" name="type" value="development" required <?= $environment_message ? 'disabled' : '' ?> />
-                          <span>Develop a new app (<?= $environment_message ? '<b>Doesn\' work in Deploment Mode</b>' : 'Usually on a local machine'; ?>).</span>
+                          <input type="radio" name="type" value="development" required <?php echo $environment_message ? 'disabled' : '' ?> />
+                          <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deploment Mode</b>' : 'Usually on a local machine'; ?>).</span>
                         </label>
                       </div>
                       <div class="mb025">
                         <label>
-                          <input type="radio" name="type" value="deployment" required <?= $environment_message ? 'checked' : ''; ?> />
+                          <input type="radio" name="type" value="deployment" required <?php echo $environment_message ? 'checked' : ''; ?> />
                           <span>Deploy an already build app (Usually on a server).</span>
                         </label>
                       </div>
@@ -139,6 +141,7 @@ $environment_message = $this->environment_message();
 <div id="rp-snackbar" class="rp-snackbar">Test</div>
 <pre>
   <?php
+  delete_option('rp_apps');
   // print_r(get_option('rp_apps'));
   // print_r($this->get_app_uri($this->app_path('app1'), 1));
 
