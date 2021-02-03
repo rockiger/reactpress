@@ -110,7 +110,7 @@ class Reactpress_Admin {
 
 	/**
 	 * Add page template.
-	 * (C) https://bit.ly/3iSRjpu
+	 * (C) https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
 	 * 
 	 * @param  array  $templates  The list of page templates
 	 * @return array  $templates  The modified list of page templates* 
@@ -579,7 +579,7 @@ class Reactpress_Admin {
 
 /**
  * Deletes directory recursively
- * (C) Paulund https://bit.ly/2KTq8yb
+ * (C) Paulund https://paulund.co.uk/php-delete-directory-and-files-in-directory
  * 
  * @param string $dirname
  * @return bool true if directory deleted

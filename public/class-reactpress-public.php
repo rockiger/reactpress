@@ -89,7 +89,7 @@ class Reactpress_Public {
 
 	/**
 	 * Change the page template to the our template on the dropdown if selected.
-	 * (C) PRADIP DEBNATH https://bit.ly/3iSRjpu
+	 * (C) PRADIP DEBNATH https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
 	 * 
 	 * @param $template
 	 *
@@ -110,7 +110,7 @@ class Reactpress_Public {
 
 	/**
 	 * Load react app files im page should contain a react app.
-	 * (C) Ben Broide https://bit.ly/3iQXsCi
+	 * (C) Ben Broide https://medium.com/swlh/wordpress-create-react-app-integration-30b41657b79e
 	 * 
 	 * @return bool|void
 	 * @since 1.0.0
