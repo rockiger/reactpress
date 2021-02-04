@@ -26,7 +26,7 @@
       console.log('handleDeleteButton')
       const buttonNode = $(ev.target)
       const { appname = null, pageslug = null } = buttonNode.data()
-      const postdata = `action=rp_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
+      const postdata = `action=repr_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
       const spinnerNode = $(`#rp-build-spinner-${appname}`)
 
       buttonNode.prop('disabled', true)
@@ -45,7 +45,7 @@
       const is_delete = window.confirm(
         `Do you really want to delete app ${appname}? This will delete all files and cant\'t be undone!`
       )
-      const postdata = `action=rp_admin_ajax_request&param=delete_react_app&appname=${appname}`
+      const postdata = `action=repr_admin_ajax_request&param=delete_react_app&appname=${appname}`
       if (is_delete) {
         $.post(AJAXURL, postdata, (response) => {
           const result = JSON.parse(response)
@@ -61,7 +61,7 @@
       const buttonNode = $(ev.target)
       const buttonState = buttonNode.text()
       const { appname = null, pageslug = null } = buttonNode.data()
-      const postdata = `action=rp_admin_ajax_request&param=${
+      const postdata = `action=repr_admin_ajax_request&param=${
         buttonState === 'Stop' ? 'stop' : 'start'
       }_react_app&appname=${appname}&pageslug=${pageslug}`
       const spinnerNode = $(`#rp-start-spinner-${appname}`)
@@ -102,7 +102,7 @@
       const template = templateSelect.val()
       const typeRadio = $('input[name=type]:checked', '#rp-create-form')
       const type = typeRadio.val()
-      const postdata = `action=rp_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
+      const postdata = `action=repr_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
       console.log({ postdata })
 
       fieldset.prop('disabled', true)

@@ -16,14 +16,14 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
 <?php
-$rp_apps = get_option('rp_apps') ?? [];
-$apps = $rp_apps ? $rp_apps : [];
+$repr_apps = get_option('repr_apps') ?? [];
+$apps = $repr_apps ? $repr_apps : [];
 $environment_message = $this->environment_message();
 ?>
 <div class="rp-content">
   <div class='head'>
     <div class='head--inner align-center flex m0auto maxWidth80 p2 pb1 pt1'>
-      <?php echo LOGO ?>
+      <?php echo REPR_LOGO ?>
       <h1 style="color: #82878C;">ReactPress</h1>
     </div>
   </div>
@@ -40,7 +40,7 @@ $environment_message = $this->environment_message();
             [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($appname), 1) : ['', '', ''];
           ?>
             <div id="<?php echo $appname ?>" class="card col flex half m0 p1_5">
-              <h3 class="title flex m0 mb075 row"><?php echo REACT_ICON_SVG ?><?php echo $appname ?></h3>
+              <h3 class="title flex m0 mb075 row"><?php echo REPR_REACT_ICON_SVG ?><?php echo $appname ?></h3>
               <div class="grow1 mb1">
                 <p><b>URL Slug: </b><a href="<?php echo $pageslug ?>"><?php echo $pageslug ?></a></p>
                 <?php if ($app['type'] === 'development') : ?>
@@ -141,8 +141,7 @@ $environment_message = $this->environment_message();
 <div id="rp-snackbar" class="rp-snackbar">Test</div>
 <pre>
   <?php
-  delete_option('rp_apps');
-  // print_r(get_option('rp_apps'));
+  // print_r(get_option('repr_apps'));
   // print_r($this->get_app_uri($this->app_path('app1'), 1));
 
   ?>

@@ -83,7 +83,7 @@ class Reactpress_Public {
 	public function enqueue_scripts() {
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-public.js', array('jquery'), $this->version, false);
 
-		$this->rp_load_react_app();
+		$this->repr_load_react_app();
 	}
 
 
@@ -96,7 +96,7 @@ class Reactpress_Public {
 	 * @return mixed
 	 * @since 1.0.0
 	 */
-	public function rp_change_page_template($template) {
+	public function repr_change_page_template($template) {
 		if (is_page()) {
 			$meta = get_post_meta(get_the_ID());
 
@@ -115,18 +115,18 @@ class Reactpress_Public {
 	 * @return bool|void
 	 * @since 1.0.0
 	 */
-	function rp_load_react_app() {
+	function repr_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
-		$rp_apps = get_option('rp_apps');
-		$valid_pages = array_map(fn ($el) => $el['pageslug'], $rp_apps);
+		$repr_apps = get_option('repr_apps');
+		$valid_pages = array_map(fn ($el) => $el['pageslug'], $repr_apps);
 
 		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
-			$current_app = array_values(array_filter($rp_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
+			$current_app = array_values(array_filter($repr_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
 			$appname = $current_app['appname'];
-			$plugin_app_dir_url = escapeshellcmd(RP_PLUGIN_PATH . "apps/{$appname}/");
+			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
 
 			$relative_apppath = "/wp-content/plugins/reactpress/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
 			if (function_exists('get_home_path')) {

@@ -67,8 +67,8 @@ class Reactpress {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if (defined('RP_VERSION')) {
-			$this->version = RP_VERSION;
+		if (defined('REPR_VERSION')) {
+			$this->version = REPR_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
@@ -156,10 +156,10 @@ class Reactpress {
 
 		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
 
-		$this->loader->add_action('wp_ajax_rp_admin_ajax_request', $plugin_admin, 'rp_handle_admin_ajax_request');
+		$this->loader->add_action('wp_ajax_repr_admin_ajax_request', $plugin_admin, 'repr_handle_admin_ajax_request');
 
 		// Add our custom template to the admin's templates dropdown
-		$this->loader->add_filter('theme_page_templates', $plugin_admin, 'rp_add_page_template');
+		$this->loader->add_filter('theme_page_templates', $plugin_admin, 'repr_add_page_template');
 	}
 
 
@@ -177,7 +177,7 @@ class Reactpress {
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 		// Add template 
-		$this->loader->add_filter('template_include', $plugin_public, 'rp_change_page_template', 99);
+		$this->loader->add_filter('template_include', $plugin_public, 'repr_change_page_template', 99);
 	}
 
 	/**
