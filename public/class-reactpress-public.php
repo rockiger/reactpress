@@ -115,12 +115,14 @@ class Reactpress_Public {
 	 * @return bool|void
 	 * @since 1.0.0
 	 */
+
+	// TODO Install bitnami nginx like dev
+	// TODO Read about the possiblity to change directories in WP
 	function repr_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
-		$repr_apps = get_option('repr_apps');
-		$valid_pages = array_map(fn ($el) => $el['pageslug'], $repr_apps);
-
+		$repr_apps = get_option('repr_apps') ?? [];
+		$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
 		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
