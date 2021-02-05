@@ -7,7 +7,6 @@
 
     const AJAXURL = rp.ajaxurl
 
-    // TODO v1.0.1 onchange form input
     $('#rp-create-form').validate()
 
     // processing event on button click
@@ -15,12 +14,6 @@
     $('.button-build').click(handleBuildButton)
     $('.button-start-stop').click(handleStartStopButton)
     $('.button-delete').click(handleDeleteButton)
-
-    // TODO v1.0.0 Publish wordpress plugin
-
-    // TODO v1.x.0 Swap file_get_contents for wp_remote_get.
-    // TODO v1.x.0 Check if servers are running every 60 seconds and on focus
-    // TODO v1.x.0 Check if windows version can be implemented
 
     function handleBuildButton(ev) {
       console.log('handleDeleteButton')
