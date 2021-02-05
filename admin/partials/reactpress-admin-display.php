@@ -61,8 +61,8 @@ $environment_message = $this->environment_message();
             </div>
           <?php endforeach; ?>
         </div>
-        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code>./reactpress/apps/[appname]</code>.</p>
-        <p class="pt1"><b>For deployments</b> to work, make sure, that you upload the build folder of your React app into the app directory.</p>
+        <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code><?php echo REPR_PLUGIN_PATH ?>apps/[appname]</code>.</p>
+        <p class="pt1"><b>For deployments</b> to work, make sure, that you <b>upload the build folder</b> of your React app into the app directory and that you have the <b>same folder structure</b> in your dev and live wordpress installation.</p>
       </div>
       <div class=" flex col half">
         <?php if ($environment_message) : ?>
