@@ -70,7 +70,7 @@ $environment_message = $this->environment_message();
             <p>
               Currently you are in <b>Deployment Mode</b>, (this means you can only deploy React apps) because:</p>
             <ul class="disc pl2">
-              <?php echo esc_html($environment_message); ?>
+              <?php echo $environment_message; ?>
             </ul>
           </div>
         <?php endif; ?>
