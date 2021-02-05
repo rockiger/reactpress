@@ -62,7 +62,7 @@ class Reactpress_Admin {
 	public function enqueue_styles() {
 
 		$valid_pages = ['reactpress'];
-		$page = sanitize_title($_REQUEST['page']) ?? "";
+		$page = sanitize_title($_REQUEST['page'] ?? "");
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/reactpress-admin.css', array(), $this->version, 'all');
@@ -77,7 +77,7 @@ class Reactpress_Admin {
 	public function enqueue_scripts() {
 
 		$valid_pages = ['reactpress'];
-		$page = sanitize_title($_REQUEST['page']) ?? "";
+		$page = sanitize_title($_REQUEST['page'] ?? "");
 
 		if (in_array($page, $valid_pages)) {
 			wp_enqueue_script('rp-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
@@ -130,7 +130,7 @@ class Reactpress_Admin {
 		 */
 		global $wpdb;
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$repr_apps = get_option('repr_apps');
+		$repr_apps = get_option('repr_apps') ?? [];
 		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
@@ -463,8 +463,9 @@ class Reactpress_Admin {
 	 */
 	function app_path(string $appname, $relative_to_home_path = false): string {
 		$apppath = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}");
+		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
 		if ($relative_to_home_path) {
-			return '/' . explode(get_home_path(), $apppath)[1];
+			return explode($document_root, $apppath)[1];
 		} else {
 			return $apppath;
 		}

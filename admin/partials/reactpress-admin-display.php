@@ -141,7 +141,6 @@ $environment_message = $this->environment_message();
 <div id="rp-snackbar" class="rp-snackbar">Test</div>
 <pre>
   <?php
-  // print_r(get_option('repr_apps'));
-  // print_r($this->get_app_uri($this->app_path('app1'), 1));
-
+  //print_r(REPR_PLUGIN_PATH);
+  //var_dump($_SERVER);
   ?>

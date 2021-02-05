@@ -116,27 +116,20 @@ class Reactpress_Public {
 	 * @since 1.0.0
 	 */
 
-	// TODO Install bitnami nginx like dev
-	// TODO Read about the possiblity to change directories in WP
 	function repr_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
 		$repr_apps = get_option('repr_apps') ?? [];
 		$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
-		if (is_page() && in_array($post->post_name, $valid_pages)) {
+		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
+		if (is_page() && in_array($post->post_name, $valid_pages) && $document_root) {
 
 			// Setting path variables.
 			$current_app = array_values(array_filter($repr_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
 
-			$relative_apppath = "/wp-content/plugins/reactpress/apps/{$appname}/"; // fallback, because get_home_path() seems to don't exists on nginx
-			if (function_exists('get_home_path')) {
-				$relative_apppath = '/' . explode(
-					get_home_path(),
-					$plugin_app_dir_url
-				)[1];
-			}
+			$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
 
 			$react_app_build = $plugin_app_dir_url . 'build/';
 			$manifest_url = $react_app_build . 'asset-manifest.json';
