@@ -242,7 +242,10 @@ class Reactpress_Admin {
 						]);
 					}
 				} else {
-					echo wp_json_encode($_REQUEST);
+					echo wp_json_encode([
+						'status' => -1,
+						'message' => "Request unknown.",
+					]);
 				}
 			}
 		} catch (Exception $e) {
