@@ -645,6 +645,32 @@ function repr_log($log) {
 	return $log;
 }
 
+
+function repr_thread($operator, $first, ...$args) {
+	$isThreadFirst = false;
+	switch ($operator) {
+		case '->>':
+			$isThreadFirst = false;
+			break;
+		case '->':
+			$isThreadFirst = true;
+			break;
+		default:
+			throw new Exception('Operator not supported');
+			break;
+	}
+
+	return array_reduce($args, function ($prev, $next) use ($isThreadFirst) {
+		if (is_array($next)) {
+			$head = $next[0];
+			$tail = array_slice($next, 1);
+			return $isThreadFirst ? call_user_func_array($head, [$prev, ...$tail]) : call_user_func_array($head, [...$tail, $prev]);
+		} else {
+			return call_user_func_array($next, $prev);
+		}
+	}, $first);
+}
+
 /**
  * The html block, the react apps hook to.
  */
