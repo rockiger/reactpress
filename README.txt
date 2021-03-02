@@ -28,7 +28,7 @@ ReactPress does 3 things:
 
 === System Requirements ===
 
-To develop React app your WordPress installations needs access to:
+To develop React apps your WordPress installations needs access to:
 
 * the PHP function `shell_exec` and `exec`,
 

@@ -101,7 +101,7 @@ $environment_message = $this->environment_message();
                       <div class="mb025">
                         <label>
                           <input type="radio" name="type" value="development" required <?php echo $environment_message ? 'disabled' : '' ?> />
-                          <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deploment Mode</b>' : 'Usually on a local machine'; ?>).</span>
+                          <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deployment Mode</b>' : 'Usually on a local machine'; ?>).</span>
                         </label>
                       </div>
                       <div class="mb025">
