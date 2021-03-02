@@ -96,7 +96,7 @@ Has your WordPress/PHP installation access to `npm`. If you use a docker contain
 
 == Changelog ==
 
-= 1.0 =
+= 1.0.0 =
 
 * Check for if it allows `shell_exec` and `exec`
 

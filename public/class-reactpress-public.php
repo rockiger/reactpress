@@ -171,6 +171,9 @@ class Reactpress_Public {
 			foreach ($js_files as $index => $js_file) {
 				wp_enqueue_script('rp-react-app-asset-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
 			}
+
+			// Variables for app use
+			wp_localize_script('rp-react-app-asset-0', 'reactPress', array('user' => wp_get_current_user()));
 		}
 	}
 }
