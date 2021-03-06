@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,9 @@ To develop React apps your WordPress installations needs access to:
 * the nodejs package manager `npm` version 6 or higher
 
 * and a POSIX compatible system ([Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers")).
+
+[For convience we provide a VirtualBox image that works well with ReactPress.](https://rockiger.com/en/reactpress-dev-environment/)
+
 
 === Usage ===
 
@@ -74,9 +77,9 @@ Repeat steps 5 to 8 when you have new releases you want to deploy.
 
 Have you build the React app and, in case of a live server, uploaded the build folder to the right location?
 
-= It shows I am in development mode, but I am on a local server. =
+= It shows I am in deployment mode, but I am on a local server. =
 
-Has your WordPress/PHP installation access to `npm`. If you use a docker container like Local, you need to install node in that container or use a non virtualized dev server like Bitnami WordPress Installer.
+Has your WordPress/PHP installation access to `npm`. If you use a docker container like Local, then you are probably not. [We provide a VirtualBox that is made to work with ReactPress.](https://rockiger.com/en/reactpress-dev-environment/) 
 
 
 == Screenshots ==
@@ -95,6 +98,16 @@ Has your WordPress/PHP installation access to `npm`. If you use a docker contain
 6. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 1.1.0 =
+
+* Test with WordPress 5.7
+
+* Insert the current user object to the global window object in Javascript, to have it accessable without a call to the API.
+
+* add .env with CHOKIDAR_USEPOLLING=true to ensure watcher works with VM
+
+* Use npm instead of yarn.
 
 = 1.0.0 =
 

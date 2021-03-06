@@ -14,8 +14,7 @@ ReactPress does 3 things:
 
 ## TODO
 
-- [x] v1.1.0 Fix typos
-- [x] v1.1.0 Insert the current user object to the global window object in Javascript, to have it accessable without a call to the API.
+- [ ] v1.2.0 Add ability to manually set the plugin directory, because
 - [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.
 - [ ] v1.x.0 validate onchange form input
 - [ ] v1.x.0 Make it possible to run more than one dev server at a time.

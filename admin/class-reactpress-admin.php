@@ -354,8 +354,22 @@ class Reactpress_Admin {
 			return mkdir("apps/{$appname}", 0777, true);
 		} else {
 			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
+			$this->fix_hot_reloading($appname);
 			return end($output) === 'Happy hacking!' ? true : false;
 		}
+	}
+
+	/**
+	 * Add .env file to fix hot reloading in VM.
+	 * See https://stackoverflow.com/questions/43274925/development-server-of-create-react-app-does-not-auto-refresh#answer-43281575
+	 *
+	 * @param string $appname
+	 * @return void
+	 */
+	function fix_hot_reloading(string $appname) {
+		$index_html_path = sprintf("%sapps/%s/.env", REPR_PLUGIN_PATH, $appname);
+		$content = "# Fix hot reloading in VMs\nCHOKIDAR_USEPOLLING=true";
+		return file_put_contents($index_html_path, $content);
 	}
 
 	/**
@@ -419,7 +433,7 @@ class Reactpress_Admin {
 		);
 
 		chdir($apppath);
-		shell_exec("yarn build");
+		shell_exec("npm run build");
 
 		array_splice($package_json_arr_VAR, 1, 1);
 		file_put_contents(
@@ -430,7 +444,7 @@ class Reactpress_Admin {
 	}
 
 	/**
-	 * Get the pid of the processes start by yarn start.
+	 * Get the pid of the processes start by npm start.
 	 *
 	 * @param string $appname
 	 * @return array of the pids
@@ -485,7 +499,7 @@ class Reactpress_Admin {
 	function start_react_app(string $appname) {
 		$apppath = $this->app_path($appname);
 		chdir($apppath);
-		shell_exec("yarn start > out.log 2>&1 & echo $! > pid.log");
+		shell_exec("npm start > out.log 2>&1 & echo $! > pid.log");
 		return $this->get_app_uri($apppath, 100);
 	}
 
@@ -503,9 +517,9 @@ class Reactpress_Admin {
 		foreach ($this->get_node_pids($appname) as $pid) {
 			posix_kill((int)$pid, $SIGHUP);
 		}
-		// cancel yarn start
-		$yarn_pid = file_get_contents("{$apppath}/pid.log");
-		posix_kill((int)$yarn_pid, $SIGHUP);
+		// cancel npm start
+		$npm_pid = file_get_contents("{$apppath}/pid.log");
+		posix_kill((int)$npm_pid, $SIGHUP);
 		// cleanup remove out.log and pid.log
 		unlink("{$apppath}/pid.log");
 		unlink("{$apppath}/out.log");
@@ -588,10 +602,13 @@ class Reactpress_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps. <a href=\"https://bitnami.com/stack/wordpress/installer\" rel=\"noopener\" target=\"_blank\">Bitnami WordPress installer</a> works fine for development with <code>npm</code>.</li>";
+			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps.</a>";
 		}
 		if (!$is_posix) {
 			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
+		}
+		if ($message) {
+			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">For convience we provide a VirtualBox image that works well with ReactPress.</a></p>";
 		}
 		return $message;
 	}
