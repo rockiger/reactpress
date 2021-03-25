@@ -173,7 +173,12 @@ class Reactpress_Public {
 			}
 
 			// Variables for app use
-			wp_localize_script('rp-react-app-asset-0', 'reactPress', array('user' => wp_get_current_user()));
+			wp_localize_script('rp-react-app-asset-0', 'reactPress', array(
+				'user' => wp_get_current_user(),
+				'usermeta' => get_user_meta(
+					get_current_user_id()
+				)
+			));
 		}
 	}
 }
