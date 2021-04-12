@@ -39,26 +39,7 @@ $environment_message = $this->environment_message();
             $is_running = $app['type'] === 'deployment' ? false : $this->is_react_app_running($appname);
             [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($appname), 1) : ['', '', ''];
           ?>
-            <div id="<?php echo $appname ?>" class="card col flex half m0 p1_5">
-              <h3 class="title flex m0 mb075 row"><?php echo REPR_REACT_ICON_SVG ?><?php echo $appname ?></h3>
-              <div class="grow1 mb1">
-                <p><b>URL Slug: </b><a href="<?php echo $pageslug ?>"><?php echo $pageslug ?></a></p>
-                <?php if ($app['type'] === 'development') : ?>
-                  <p><b>Status:</b> <b id="status-<?php echo $appname ?>" class=" fg-<?php echo $is_running ? 'green' : 'red' ?>"><?php echo $is_running ? "Running at port: <a href=\"{$protocol}://{$ip}:{$port}\" rel=\"noopener\" target=\"_blank\">{$port}<i class=\"external-link\"></i></a>" : 'Stopped' ?></b></p>
-                <?php endif; ?>
-                <p><b>Type:</b> <span style="text-transform: capitalize;"> <?php echo esc_html($app['type']) ?></p>
-              </div>
-              <div class="flex">
-                <?php if ($app['type'] === 'development') : ?>
-                  <button class="button button-primary button-start-stop" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>"><?php echo $is_running ? 'Stop' : 'Start' ?></button>
-                  <span id="rp-start-spinner-<?php echo $appname ?>" class="crpw-button-spinner spinner"></span>
-                  <div class="grow1"></div>
-                  <span id="rp-build-spinner-<?php echo $appname ?>" class="crpw-button-spinner spinner"></span>
-                  <button class="button button-build mr025" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Build</button>
-                <?php endif; ?>
-                <button class="button-link button-delete" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Delete</button>
-              </div>
-            </div>
+            <?php include_once(plugin_dir_path(__FILE__) . 'reactpress-admin-app.php'); ?>
           <?php endforeach; ?>
         </div>
         <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code><?php echo REPR_PLUGIN_PATH ?>apps/[appname]</code>.</p>

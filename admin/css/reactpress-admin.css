@@ -101,9 +101,14 @@ p {
 .mb075 {
   margin-bottom: 0.75rem;
 }
-
 .mb1 {
   margin-bottom: 1rem;
+}
+.mb-025 {
+  margin-bottom: -0.25rem;
+}
+.mb-05 {
+  margin-bottom: -0.5rem;
 }
 
 .mr025,
