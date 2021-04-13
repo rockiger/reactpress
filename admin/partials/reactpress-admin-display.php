@@ -36,10 +36,8 @@ $environment_message = $this->environment_message();
           <?php foreach ($apps as $app) :
             $appname = esc_attr($app['appname']);
             $pageslug = esc_attr($app['pageslug']);
-            $is_running = $app['type'] === 'deployment' ? false : $this->is_react_app_running($appname);
-            [$protocol, $ip, $port] = $is_running ? $this->get_app_uri($this->app_path($appname), 1) : ['', '', ''];
           ?>
-            <?php include_once(plugin_dir_path(__FILE__) . 'reactpress-admin-app.php'); ?>
+            <?php include(plugin_dir_path(__FILE__) . 'reactpress-admin-app.php'); ?>
           <?php endforeach; ?>
         </div>
         <p class="pt1">You can find <b>all app sources</b> in your WordPress plugin folder under:<code><?php echo REPR_PLUGIN_PATH ?>apps/[appname]</code>.</p>
@@ -123,5 +121,5 @@ $environment_message = $this->environment_message();
 <pre>
   <?php
   //print_r(REPR_PLUGIN_PATH);
-  //var_dump($_SERVER);
+  var_dump(get_option('repr_apps'));
   ?>

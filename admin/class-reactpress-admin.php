@@ -164,6 +164,12 @@ class Reactpress_Admin {
 							'pageslug' => $pageslug
 						]);
 					}
+				} elseif ($param === "update_index_html" && $appname && $pageslug) {
+					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						echo wp_json_encode([
+							'status' => 1,
+							'message' => 'Index.html updated.',
+						]);
 				} elseif ($param === "start_react_app" && $appname && $pageslug) {
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 					$parts = $this->start_react_app($appname);
