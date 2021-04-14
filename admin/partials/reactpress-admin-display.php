@@ -16,8 +16,7 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
 <?php
-$repr_apps = get_option('repr_apps') ?? [];
-$apps = $repr_apps ? $repr_apps : [];
+$apps = $this->get_apps();
 $environment_message = $this->environment_message();
 ?>
 <div class="rp-content">
@@ -121,5 +120,6 @@ $environment_message = $this->environment_message();
 <pre>
   <?php
   //print_r(REPR_PLUGIN_PATH);
-  var_dump(get_option('repr_apps'));
+  //var_dump($this->get_apps());
+  //var_dump(get_option('repr_apps'));
   ?>

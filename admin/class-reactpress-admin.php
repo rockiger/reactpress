@@ -130,7 +130,7 @@ class Reactpress_Admin {
 		 */
 		global $wpdb;
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$repr_apps = get_option('repr_apps') ?? [];
+		$repr_apps = $this->get_apps();
 		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
@@ -213,27 +213,17 @@ class Reactpress_Admin {
 						fn ($el) => $el['appname'] !== $appname
 					));
 					$is_appdir_removed = repr_delete_directory($this->app_path($appname));
-					if ($is_option_deleted && $is_option_deleted) {
+					if ($is_appdir_removed) {
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'App deleted.',
 						]);
-					} elseif ($is_option_deleted) {
+					} else {
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => "Couldn't remove files. Please remove directory by hand.",
 						]);
-					} elseif ($is_appdir_removed) {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => "Couldn't remove app from database. Please try again later.",
-						]);
-					} else {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => 'App not running.',
-						]);
-					}
+					} 
 				} elseif ($param === "build_react_app" && $appname && $pageslug) {
 
 					if ($this->build_react_app($appname)) {
@@ -617,6 +607,46 @@ class Reactpress_Admin {
 			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">For convience we provide a VirtualBox image that works well with ReactPress.</a></p>";
 		}
 		return $message;
+	}
+
+	/**
+	 * Get all folders in the apps directory and return them as an array
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public function get_app_names() {
+		chdir(REPR_PLUGIN_PATH . 'apps');
+		$appnames = scandir(REPR_PLUGIN_PATH . 'apps');
+		return array_values(array_filter($appnames, fn($el) => $el[0] !== '.' && is_dir($el)));
+	}
+
+	/**
+	 * Return all apps as an array
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public function get_apps() {
+		$appnames = $this->get_app_names();
+		$app_options = get_option('repr_apps');
+
+		$apps = array_map(function($el) use ($app_options) {
+			$app_option = array_reduce(
+				$app_options, 
+				fn($carry, $item) => 
+					$item['appname'] === $el ? $item : $carry, 
+				[]
+			);
+			return [
+				'appname' => $el,
+				'pageslug' => $app_option['pageslug'],
+				'type' => 	is_file(REPR_PLUGIN_PATH . 'apps/' . $el . '/package.json') ? 		
+										'development' : 
+										'deployment'
+			];
+		}, $appnames);
+		return $apps;
 	}
 }
 
