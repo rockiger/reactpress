@@ -58,6 +58,9 @@ p {
 .fg-green {
   color: #46b450 !important;
 }
+.fg-grey {
+  color: #646970 !important;
+}
 
 .fg-orange {
   color: #f56e28 !important;
@@ -83,7 +86,12 @@ p {
 .grow1 {
   flex-grow: 1;
 }
-
+.inline-block {
+  display: inline-block;
+}
+.lh1 {
+  line-height: 1;
+}
 .maxWidth80 {
   max-width: 80rem;
 }
@@ -110,7 +118,9 @@ p {
 .mb-05 {
   margin-bottom: -0.5rem;
 }
-
+.ml025 {
+  margin-left: 0.25rem;
+}
 .mr025,
 .wp-core-ui .button.mr025,
 .wp-core-ui .button-build.mr025 {
@@ -145,6 +155,12 @@ p {
 .pl2 {
   padding-left: 2rem;
 }
+.pt025 {
+  padding-top: 0.25rem;
+}
+.pt05 {
+  padding-top: 0.5rem;
+}
 .pt1 {
   padding-top: 1rem;
 }
@@ -161,7 +177,10 @@ p {
 /***************************
  * Components / Overwrites *
  ***************************/
-
+.button.button-icon {
+  line-height: 1;
+  margin-left: 0.25rem;
+}
 .card {
   margin-top: 0;
 }

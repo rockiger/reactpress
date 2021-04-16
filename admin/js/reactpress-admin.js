@@ -14,6 +14,9 @@
     $('.button-build').click(handleBuildButton)
     $('.button-update').click(handleUpdateButton)
     $('.button-delete').click(handleDeleteButton)
+    $('.button-link-to-slug').click(handleEditSlugButton)
+    $('.button-edit-slug-cancel').click(handleEditSlugButton)
+    $('.button-edit-slug-save').click(handleEditSlugSaveButton)
 
     function handleBuildButton(ev) {
       console.log('handleDeleteButton')
@@ -48,6 +51,28 @@
           showSnackbar(result.message)
         })
       }
+    }
+
+    function handleEditSlugButton(ev) {
+      const buttonNode = $(ev.target)
+      const { appname = null } = buttonNode.data()
+      const linkToSlug = $(`#link-to-slug-${appname}`)
+      const editSlug = $(`#edit-slug-${appname}`)
+
+      linkToSlug.toggle()
+      editSlug.toggle()
+    }
+
+    function handleEditSlugSaveButton(ev) {
+      const buttonNode = $(ev.target)
+      const { appname = null } = buttonNode.data()
+      const linkToSlug = $(`#link-to-slug-${appname}`)
+      const editSlug = $(`#edit-slug-${appname}`)
+
+      // TODO get input, change slug
+
+      linkToSlug.toggle()
+      editSlug.toggle()
     }
 
     function handleUpdateButton(ev) {

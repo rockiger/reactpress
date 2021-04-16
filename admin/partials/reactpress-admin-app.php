@@ -18,7 +18,21 @@
       <tr>
         <th scope="row">URL Slug</th>
         <td>
-          <a href="<?php echo $pageslug ?>"><?php echo $pageslug ?></a>
+          <div id="link-to-slug-<?php echo $appname ?>">
+            <?php if(!$pageslug): ?>
+              <i class="fg-grey inline-block lh1 pt05">Not set.</i>
+            <?php else: ?>
+            <a class="inline-block lh1 pt05" href="<?php echo $pageslug ?>"><?php echo $pageslug ?></a>
+            <?php endif ?>
+            <button class="button button-icon button-link-to-slug" data-appname="<?php echo $appname?>">
+              <span class="dashicons dashicons-edit" data-appname="<?php echo $appname?>"></span>
+            </button>
+          </div>
+          <div id="edit-slug-<?php echo $appname ?>" style="display: none;">
+            <input type="text" value="<?php echo $pageslug ?>"/> 
+            <button class="button button-primary button-edit-slug-save" id="edit-slug-save-<?php echo $appname ?>" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Save</button> 
+            <button class="button button-link button-edit-slug-cancel ml025" id="edit-slug-cancel-<?php echo $appname ?>" data-appname="<?php echo $appname ?>">Cancel</button>
+          </div>
         </td>
       </tr>
       <tr>
