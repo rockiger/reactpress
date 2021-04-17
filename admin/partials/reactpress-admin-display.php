@@ -52,65 +52,69 @@ $environment_message = $this->environment_message();
             </ul>
           </div>
         <?php endif; ?>
-        <div class="card fullwidth p2">
-          <h2>Create new React app.</h2>
-          <form id="rp-create-form" method="post" action="javascript:void(0)">
-            <fieldset id="rp-create-fieldset">
-              <input hidden name="action" value="CREATE_NEW_APP" />
-              <table class="form-table" role="presentation">
-                <tbody>
-                  <tr>
-                    <th scope="row">App Name</th>
-                    <td>
-                      <input id="rp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
-                      <p class="description">The name of your React app. Must be one word, lowercase and unique.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Page Slug</th>
-                    <td>
-                      <input id="rp-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
-                      <p class="description">The slug of page where your app should be displayed. Must be unique.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Type</th>
-                    <td>
-                      <div class="mb025">
-                        <label>
-                          <input type="radio" name="type" value="development" required <?php echo $environment_message ? 'disabled' : '' ?> />
-                          <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deployment Mode</b>' : 'Usually on a local machine'; ?>).</span>
-                        </label>
-                      </div>
-                      <div class="mb025">
-                        <label>
-                          <input type="radio" name="type" value="deployment" required <?php echo $environment_message ? 'checked' : ''; ?> />
-                          <span>Deploy an already build app (Usually on a server).</span>
-                        </label>
-                      </div>
-                      <p class="description">If you want to deploy an app, you must choose the same name and slug as on your development version.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Template</th>
-                    <td>
-                      <select name="template" id="rp-template-select">
-                        <option selected="selected" value="">Default</option>
-                        <option value="typescript">TypeScript</option>
-                        <option value="redux">Redux</option>
-                        <option value="cra-template-rb">React Boilerplate</option>
-                      </select>
-                      <p class="description">The create-react-app template you want to choose.</p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <input type="submit" name="submit" id="submit" class="button button-primary" value="Create React App" />
-                <span id="rp-spinner" class="crpw-button-spinner spinner"></span>
-              </div>
-            </fieldset>
-          </form>
+        <div id="existing-apps" class="flex flexwrap gap row">
+          <div class="card fullwidth p2">
+            <h2>Create new React app</h2>
+            <form id="rp-create-form" method="post" action="javascript:void(0)">
+              <fieldset id="rp-create-fieldset">
+                <input hidden name="action" value="CREATE_NEW_APP" />
+                <table class="form-table" role="presentation">
+                  <tbody>
+                    <tr>
+                      <th scope="row">App Name</th>
+                      <td>
+                        <input id="rp-appname" name="app_name" placeholder="e.g. my-email-app" required type="text" />
+                        <p class="description">The name of your React app. Must be one word, lowercase and unique.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Page Slug</th>
+                      <td>
+                        <input id="rp-pageslug" name="page_slug" placeholder="e.g. inbox" required type="text" />
+                        <p class="description">The slug of page where your app should be displayed. Must be unique.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Type</th>
+                      <td>
+                        <div class="mb025">
+                          <label>
+                            <input type="radio" name="type" value="development" required <?php echo $environment_message ? 'disabled' : '' ?> />
+                            <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deployment Mode</b>' : 'Usually on a local machine'; ?>).</span>
+                          </label>
+                        </div>
+                        <div class="mb025">
+                          <label>
+                            <input type="radio" name="type" value="deployment" required <?php echo $environment_message ? 'checked' : ''; ?> />
+                            <span>Deploy an already build app (Usually on a server).</span>
+                          </label>
+                        </div>
+                        <p class="description">If you want to deploy an app, you must choose the same name and slug as on your development version.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Template</th>
+                      <td>
+                        <select name="template" id="rp-template-select">
+                          <option selected="selected" value="">Default</option>
+                          <option value="typescript">TypeScript</option>
+                          <option value="redux">Redux</option>
+                          <option value="cra-template-rb">React Boilerplate</option>
+                        </select>
+                        <p class="description">The create-react-app template you want to choose.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div>
+                  <input type="submit" name="submit" id="submit" class="button button-primary" value="Create React App" />
+                  <span id="rp-spinner" class="crpw-button-spinner spinner"></span>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <?php // include_once(plugin_dir_path(__FILE__) . 'reactpress-admin-advanced_settings.php'); 
+          ?>
         </div>
       </div>
     </div>
