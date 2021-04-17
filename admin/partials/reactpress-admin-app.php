@@ -29,7 +29,7 @@
             </button>
           </div>
           <div id="edit-slug-<?php echo $appname ?>" style="display: none;">
-            <input type="text" value="<?php echo $pageslug ?>"/> 
+            <input id="edit-slug-input-<?php echo $appname ?>" type="text" value="<?php echo $pageslug ?>"/> 
             <button class="button button-primary button-edit-slug-save" id="edit-slug-save-<?php echo $appname ?>" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Save</button> 
             <button class="button button-link button-edit-slug-cancel ml025" id="edit-slug-cancel-<?php echo $appname ?>" data-appname="<?php echo $appname ?>">Cancel</button>
           </div>

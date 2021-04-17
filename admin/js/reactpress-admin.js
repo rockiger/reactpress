@@ -19,7 +19,6 @@
     $('.button-edit-slug-save').click(handleEditSlugSaveButton)
 
     function handleBuildButton(ev) {
-      console.log('handleDeleteButton')
       const buttonNode = $(ev.target)
       const { appname = null, pageslug = null } = buttonNode.data()
       const postdata = `action=repr_admin_ajax_request&param=build_react_app&appname=${appname}&pageslug=${pageslug}`
@@ -59,6 +58,7 @@
       const linkToSlug = $(`#link-to-slug-${appname}`)
       const editSlug = $(`#edit-slug-${appname}`)
 
+      window.linkToSlug = linkToSlug
       linkToSlug.toggle()
       editSlug.toggle()
     }
@@ -68,11 +68,20 @@
       const { appname = null } = buttonNode.data()
       const linkToSlug = $(`#link-to-slug-${appname}`)
       const editSlug = $(`#edit-slug-${appname}`)
+      const editSlugInput = $(`#edit-slug-input-${appname}`)
 
-      // TODO get input, change slug
-
-      linkToSlug.toggle()
-      editSlug.toggle()
+      const postdata = `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${editSlugInput.val()}`
+      $.post(AJAXURL, postdata, (response) => {
+        console.log(response)
+        const result = JSON.parse(response)
+        if (!result.status) {
+          showSnackbar(result.message)
+        }
+        linkToSlug.children().first().attr('href', editSlugInput.val())
+        linkToSlug.children().first().text(editSlugInput.val())
+        linkToSlug.toggle()
+        editSlug.toggle()
+      })
     }
 
     function handleUpdateButton(ev) {
