@@ -160,20 +160,19 @@ class Reactpress_Admin {
 					}
 				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
 					$app_option = $this->get_app_options($app_options_list, $appname);
-					repr_log($app_option);
 					if (($app_option && $app_option['pageslug'])) {
-						repr_log("app_option['pleslug']");
-						repr_log($this->update_react_page($app_option['pageslug'], $pageslug));
-						repr_log($this->change_pageslug_option($app_options_list, $appname, $pageslug));
+						$this->update_react_page($app_option['pageslug'], $pageslug);
+						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug changed.'
 						]);
-					} elseif (!$this->does_pageslug_exist($pageslug)) {
-						//! create shit not update 
+					} elseif (!$this->does_pageslug_exist($pageslug) && $pageslug) {
+						$this->insert_react_page($appname, $pageslug);
+						$this->add_app_options($app_options_list, $appname, $pageslug);
 						echo wp_json_encode([
 							'status' => 1,
-							'message' => 'create shit not update'
+							'message' => 'Url Slug created.'
 						]);
 					} else {
 						echo wp_json_encode([
@@ -256,7 +255,7 @@ class Reactpress_Admin {
 					}
 				} else {
 					echo wp_json_encode([
-						'status' => -1,
+						'status' => 0,
 						'message' => "Request unknown.",
 					]);
 				}
@@ -341,19 +340,7 @@ class Reactpress_Admin {
 		string $template,
 		string $type
 	) {
-		if (!is_array($app_options_list) && $appname && $pageslug && $type) {
-			add_option('repr_apps', [[
-				'appname' => $appname,
-				'pageslug' => $pageslug,
-				'type' => $type,
-			]]);
-		} elseif ($appname && $pageslug) {
-			update_option('repr_apps', $this->array_add($app_options_list, [
-				'appname' => $appname,
-				'pageslug' => $pageslug,
-				'type' => $type,
-			]));
-		}
+		$this->add_app_options($app_options_list, $appname, $pageslug);
 
 		if ($appname && $pageslug && $type) {
 			return $this->create_react_app($appname, $type, $template,);
@@ -716,6 +703,20 @@ class Reactpress_Admin {
 		return $apps;
 	}
 
+	public function add_app_options(array $app_options_list, string $appname, string $pageslug) {
+		if (!is_array($app_options_list) && $appname && $pageslug) {
+			add_option('repr_apps', [[
+				'appname' => $appname,
+				'pageslug' => $pageslug,
+			]]);
+		} elseif ($appname && $pageslug) {
+			update_option('repr_apps', $this->array_add($app_options_list, [
+				'appname' => $appname,
+				'pageslug' => $pageslug,
+			]));
+		}
+	}
+
 	/**
 	 * Get the option for the given app name.
 	 * @param string $appname 
@@ -756,7 +757,6 @@ class Reactpress_Admin {
  * @since 1.0.0
  */
 function repr_delete_directory(string $dirname): bool {
-	repr_log($dirname);
 	$dir_handle = '';
 	if (is_dir($dirname))
 		$dir_handle = opendir($dirname);

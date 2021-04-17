@@ -121,5 +121,6 @@ $environment_message = $this->environment_message();
   <?php
   //print_r(REPR_PLUGIN_PATH);
   //var_dump($this->get_apps());
-  //var_dump(get_option('repr_apps'));
+  //print_r(get_option('repr_apps'));
+
   ?>

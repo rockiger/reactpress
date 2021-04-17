@@ -28,7 +28,6 @@
       spinnerNode.addClass('is-active')
       $.post(AJAXURL, postdata, (response) => {
         const result = JSON.parse(response)
-        console.log({ result })
         buttonNode.prop('disabled', false)
         spinnerNode.removeClass('is-active')
         showSnackbar(result.message)
@@ -72,13 +71,17 @@
 
       const postdata = `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${editSlugInput.val()}`
       $.post(AJAXURL, postdata, (response) => {
-        console.log(response)
         const result = JSON.parse(response)
         if (!result.status) {
           showSnackbar(result.message)
+        } else {
+          linkToSlug
+            .children()
+            .first()
+            .replaceWith(
+              `<a class="inline-block lh1 pt05" href="${editSlugInput.val()}">${editSlugInput.val()}</a>`
+            )
         }
-        linkToSlug.children().first().attr('href', editSlugInput.val())
-        linkToSlug.children().first().text(editSlugInput.val())
         linkToSlug.toggle()
         editSlug.toggle()
       })
@@ -113,7 +116,6 @@
       const typeRadio = $('input[name=type]:checked', '#rp-create-form')
       const type = typeRadio.val()
       const postdata = `action=repr_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
-      console.log({ postdata })
 
       fieldset.prop('disabled', true)
       spinner.addClass('is-active')
@@ -126,6 +128,12 @@
           $(`#${appname} .button-update`).click(handleUpdateButton)
           $(`#${appname} .button-build`).click(handleBuildButton)
           $(`#${appname} .button-delete`).click(handleDeleteButton)
+
+          $(`#${appname} .button-link-to-slug`).click(handleEditSlugButton)
+          $(`#${appname} .button-edit-slug-cancel`).click(handleEditSlugButton)
+          $(`#${appname} .button-edit-slug-save`).click(
+            handleEditSlugSaveButton
+          )
         }
         appnameField.val('')
         fieldset.prop('disabled', false)
@@ -134,7 +142,6 @@
         typeRadio.prop('checked', false)
         spinner.removeClass('is-active')
         showSnackbar(result.message)
-        console.log(result)
       })
     }
 
@@ -161,6 +168,22 @@
               <tr>
                 <th scope="row">URL Slug</th>
                 <td>
+                  <div id="link-to-slug-${appname}">
+                    ${
+                      !pageslug
+                        ? `<i class="fg-grey inline-block lh1 pt05">Not set.</i>`
+                        : `<a class="inline-block lh1 pt05" href="${pageslug}">${pageslug}</a>`
+                    }
+                    <button class="button button-icon button-link-to-slug" data-appname="${appname}">
+                      <span class="dashicons dashicons-edit" data-appname="${appname}"></span>
+                    </button>
+                  </div>
+                  <div id="edit-slug-${appname}" style="display: none;">
+                    <input id="edit-slug-input-${appname}" type="text" value="${pageslug}"/> 
+                    <button class="button button-primary button-edit-slug-save" id="edit-slug-save-${appname}" data-appname="${appname}" data-pageslug="${pageslug}">Save</button> 
+                    <button class="button button-link button-edit-slug-cancel ml025" id="edit-slug-cancel-${appname}" data-appname="${appname}">Cancel</button>
+                  </div>
+                </td>
                   <a href="${pageslug}">${pageslug}</a>
                 </td>
               </tr>
