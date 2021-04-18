@@ -122,14 +122,15 @@ class Reactpress_Public {
 		$repr_apps = get_option('repr_apps') ?? [];
 		$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
 		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
-		if (is_page() && in_array($post->post_name, $valid_pages) && $document_root) {
+		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
 			$current_app = array_values(array_filter($repr_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
 
-			$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
+			// Use fallback if $_SERVER['DOCUMENT_ROOT'] is not set
+			$relative_apppath = $document_root ? explode($document_root, $plugin_app_dir_url)[1] : escapeshellcmd("/wp-content/plugins/reactpress/apps/{$appname}/");
 
 			$react_app_build = $plugin_app_dir_url . 'build/';
 			$manifest_url = $react_app_build . 'asset-manifest.json';

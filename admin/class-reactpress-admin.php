@@ -433,6 +433,7 @@ class Reactpress_Admin {
 		// We need the relative path, that we can deploy our
 		// build app to another server later.
 		$relative_apppath = $this->app_path($appname, true);
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
@@ -652,13 +653,13 @@ class Reactpress_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps.</a>";
+			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
 		}
 		if (!$is_posix) {
 			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
 		}
 		if ($message) {
-			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">For convience we provide a VirtualBox image that works well with ReactPress.</a></p>";
+			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">If you have trouble using ReactPress we provide a VirtualBox image that works well with ReactPress.</a></p>";
 		}
 		return $message;
 	}
@@ -683,11 +684,11 @@ class Reactpress_Admin {
 	 */
 	public function get_apps() {
 		$appnames = $this->get_app_names();
-		$app_options = get_option('repr_apps');
+		$app_options = get_option('repr_apps') ?? [];
 
 		$apps = array_map(function ($el) use ($app_options) {
 			$app_option = array_reduce(
-				$app_options,
+				$app_options ? $app_options : [],
 				fn ($carry, $item) =>
 				$item['appname'] === $el ? $item : $carry,
 				[]
