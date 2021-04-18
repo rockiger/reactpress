@@ -163,6 +163,7 @@ class Reactpress_Admin {
 					if (($app_option && $app_option['pageslug'])) {
 						$this->update_react_page($app_option['pageslug'], $pageslug);
 						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
+						$this->add_build_path($appname);
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug changed.'
@@ -170,6 +171,7 @@ class Reactpress_Admin {
 					} elseif (!$this->does_pageslug_exist($pageslug) && $pageslug) {
 						$this->insert_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
+						$this->add_build_path($appname);
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
@@ -369,6 +371,7 @@ class Reactpress_Admin {
 		} else {
 			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
 			$this->fix_hot_reloading($appname);
+			$this->add_build_path($appname);
 			return end($output) === 'Happy hacking!' ? true : false;
 		}
 	}
@@ -425,7 +428,7 @@ class Reactpress_Admin {
 	 * package.json, that react loads assets in the right way.
 	 *
 	 * @param string $appname
-	 * @return void
+	 * @return int 0 if no success
 	 * @since 1.0.0
 	 */
 	function build_react_app($appname) {
@@ -437,25 +440,52 @@ class Reactpress_Admin {
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
-		$package_json_arr_VAR = explode(PHP_EOL, $package_json_contents);
+		if (stripos($package_json_contents, $homepage)) {
+			chdir($apppath);
+			shell_exec("npm run build");
+			return 1;
+		} else {
+			// Add a homepage attribute during the build process and remove it again, 
+			// that the developer can build with the public/index.html without WP.
+			file_put_contents(
+				$path_package_json,
+				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+			);
+			chdir($apppath);
+			shell_exec("npm run build");
+			return 2;
+		}
+		return 0;
+	}
 
-		// Add a homepage attribute during the build process and remove it again, 
-		// that the developer can build with the public/index.html without WP.
-		array_splice($package_json_arr_VAR, 1, 0, '  "homepage": "' . $homepage . '",');
-		file_put_contents(
-			$path_package_json,
-			implode(PHP_EOL, $package_json_arr_VAR)
-		);
-
-		chdir($apppath);
-		shell_exec("npm run build");
-
-		array_splice($package_json_arr_VAR, 1, 1);
-		file_put_contents(
-			$path_package_json,
-			implode(PHP_EOL, $package_json_arr_VAR)
-		);
-		return true;
+	/**
+	 * Add the right build path to package.json
+	 *
+	 * @param string $appname
+	 * @return int 0 if no success
+	 * @since 1.2.0
+	 */
+	function add_build_path($appname) {
+		$apppath = $this->app_path($appname);
+		// We need the relative path, that we can deploy our
+		// build app to another server later.
+		$relative_apppath = $this->app_path($appname, true);
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
+		$homepage = "{$relative_apppath}/build";
+		$path_package_json = "{$apppath}/package.json";
+		$package_json_contents = file_get_contents($path_package_json);
+		if (stripos($package_json_contents, $homepage)) {
+			return 1;
+		} else {
+			// Add a homepage attribute during the build process and remove it again, 
+			// that the developer can build with the public/index.html without WP.
+			file_put_contents(
+				$path_package_json,
+				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+			);
+			return 2;
+		}
+		return 0;
 	}
 
 	/**
@@ -653,13 +683,10 @@ class Reactpress_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
+			$message .= "<li>Your WordPress installation needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and use <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
-		}
-		if ($message) {
-			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">If you have trouble using ReactPress we provide a VirtualBox image that works well with ReactPress.</a></p>";
+			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL. You can also go to the app directory and try <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
 		}
 		return $message;
 	}

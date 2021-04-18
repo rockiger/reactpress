@@ -46,7 +46,7 @@ $environment_message = $this->environment_message();
         <?php if ($environment_message) : ?>
           <div class="notice notice-info inline m0 mb1">
             <p>
-              Currently you are in <b>Deployment Mode</b>, (this means you can only deploy React apps) because:</p>
+              Currently you are in <b>Manual Mode</b>, (this means, you can create React apps only in your terminal) because:</p>
             <ul class="disc pl2">
               <?php echo $environment_message; ?>
             </ul>

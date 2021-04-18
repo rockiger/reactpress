@@ -57,7 +57,6 @@
       const linkToSlug = $(`#link-to-slug-${appname}`)
       const editSlug = $(`#edit-slug-${appname}`)
 
-      window.linkToSlug = linkToSlug
       linkToSlug.toggle()
       editSlug.toggle()
     }
@@ -84,6 +83,7 @@
         }
         linkToSlug.toggle()
         editSlug.toggle()
+        location.reload()
       })
     }
 
@@ -142,6 +142,7 @@
         typeRadio.prop('checked', false)
         spinner.removeClass('is-active')
         showSnackbar(result.message)
+        location.reload()
       })
     }
 

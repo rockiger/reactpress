@@ -92,6 +92,9 @@ p {
 .lh1 {
   line-height: 1;
 }
+.line-break {
+  line-break: anywhere;
+}
 .maxWidth80 {
   max-width: 80rem;
 }

@@ -16,12 +16,11 @@ ReactPress does 3 things:
 
 - [ ] v1.2.0 Revamp the process of adding using reactpress.
       -- [x] Don't start the react app any more, only update the index.html from admin
-      -- [ ] Make it possible to add apps manually with npm or yarn
-- [ ] v1.2.0 Add ability to manually set the plugin directory, because sometimes we don't find it programmatically.
+      -- [x] Make it possible to add apps manually with npm or yarn
+- [x] v1.2.0 Add fallback if we can't find the plugin directory programmatically.
 - [ ] v1.x.0 Add the ability to create admin pages
 - [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.
 - [ ] v1.x.0 validate onchange form input
-- [ ] v1.x.0 Make it possible to run more than one dev server at a time.
 - [ ] v1.x.0 Swap file_get_contents for wp_remote_get.
 - [ ] v1.x.0 Check if servers are running every 60 seconds and on focus
 - [ ] v1.x.0 Check if windows version can be implemented
