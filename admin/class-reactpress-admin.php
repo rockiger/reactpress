@@ -474,7 +474,9 @@ class Reactpress_Admin {
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
-		if (stripos($package_json_contents, $homepage)) {
+		if (!$package_json_contents) {
+			return 0;
+		} elseif (stripos($package_json_contents, $homepage)) {
 			return 1;
 		} else {
 			// Add a homepage attribute during the build process and remove it again, 
