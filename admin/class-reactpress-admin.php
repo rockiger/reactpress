@@ -164,6 +164,7 @@ class Reactpress_Admin {
 						$this->update_react_page($app_option['pageslug'], $pageslug);
 						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug changed.'
@@ -172,6 +173,7 @@ class Reactpress_Admin {
 						$this->insert_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
@@ -685,7 +687,7 @@ class Reactpress_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your WordPress installation needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and use <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
+			$message .= "<li>Your WordPress installation needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and use <a href='https://rockiger.com/en/easily-embed-react-apps-into-wordpress-with-reactpress-plugin/#create-react-app' title='Create React App Website'  target=\"_blank\">create-react-app</a> from there</li>";
 		}
 		if (!$is_posix) {
 			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL. You can also go to the app directory and try <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";

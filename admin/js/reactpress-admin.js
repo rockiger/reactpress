@@ -80,10 +80,10 @@
             .replaceWith(
               `<a class="inline-block lh1 pt05" href="${editSlugInput.val()}">${editSlugInput.val()}</a>`
             )
+          linkToSlug.toggle()
+          editSlug.toggle()
+          location.reload()
         }
-        linkToSlug.toggle()
-        editSlug.toggle()
-        location.reload()
       })
     }
 

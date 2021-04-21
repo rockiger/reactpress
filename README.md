@@ -14,10 +14,6 @@ ReactPress does 3 things:
 
 ## TODO
 
-- [ ] v1.2.0 Revamp the process of adding using reactpress.
-      -- [x] Don't start the react app any more, only update the index.html from admin
-      -- [x] Make it possible to add apps manually with npm or yarn
-- [x] v1.2.0 Add fallback if we can't find the plugin directory programmatically.
 - [ ] v1.x.0 Add the ability to create admin pages
 - [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.
 - [ ] v1.x.0 validate onchange form input

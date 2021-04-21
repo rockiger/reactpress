@@ -46,7 +46,7 @@ $environment_message = $this->environment_message();
         <?php if ($environment_message) : ?>
           <div class="notice notice-info inline m0 mb1">
             <p>
-              Currently you are in <b>Manual Mode</b>, (this means, you can create React apps only in your terminal) because:</p>
+              Currently you are in <b>Manual Mode</b>, (this means, you can create React apps only in your command line) because:</p>
             <ul class="disc pl2">
               <?php echo $environment_message; ?>
             </ul>
@@ -80,7 +80,7 @@ $environment_message = $this->environment_message();
                         <div class="mb025">
                           <label>
                             <input type="radio" name="type" value="development" required <?php echo $environment_message ? 'disabled' : '' ?> />
-                            <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Deployment Mode</b>' : 'Usually on a local machine'; ?>).</span>
+                            <span>Develop a new app (<?php echo $environment_message ? '<b>Doesn\' work in Manual Mode</b>' : 'Usually on a local machine'; ?>).</span>
                           </label>
                         </div>
                         <div class="mb025">

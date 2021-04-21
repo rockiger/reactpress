@@ -64,7 +64,7 @@
         <tr>
           <th scope="row">Manual Build</th>
           <td>
-            <p class="description">Build the app in your terminal with <code>npm run build</code> or <code>yarn build</code>.</p>
+            <p class="description">Build the app in your command line with <code>npm run build</code> or <code>yarn build</code>.</p>
           </td>
         </tr>
         <?php if (!$environment_message) : ?>
@@ -73,7 +73,7 @@
             <td>
               <span id="rp-build-spinner-<?php echo $appname ?>" class="crpw-button-spinner spinner"></span>
               <button class="button button-build mr025" data-appname="<?php echo $appname ?>" data-pageslug="<?php echo $pageslug ?>">Build App</button>
-              <p class="description">If you don't care about terminal output you can use the automatic build process.</p>
+              <p class="description">If you don't care about command line output you can use the automatic build process.</p>
             </td>
           </tr>
         <?php endif; ?>
