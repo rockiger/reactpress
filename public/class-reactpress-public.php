@@ -129,8 +129,12 @@ class Reactpress_Public {
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
 
-			$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
-
+			$relative_apppath = escapeshellcmd("/wp-content/plugins/reactpress/apps/{$appname}/");
+			
+			if(strpos($plugin_app_dir_url, $document_root) === 0) {
+				$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
+			}
+			
 			$react_app_build = $plugin_app_dir_url . 'build/';
 			$manifest_url = $react_app_build . 'asset-manifest.json';
 
