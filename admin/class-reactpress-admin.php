@@ -128,9 +128,8 @@ class Reactpress_Admin {
 		 * 
 		 * @since 1.0.0
 		 */
-		global $wpdb;
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$repr_apps = get_option('repr_apps') ?? [];
+		$app_options_list = $this->get_apps();
 		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
@@ -139,20 +138,15 @@ class Reactpress_Admin {
 		try {
 			if (!empty($param)) {
 				if ($param === "create_react_app" && $appname && $pageslug) {
+					$existing_appnames = array_map(fn ($el) => $el['appname'], $app_options_list);
 
-					$existing_appnames = array_map(fn ($el) => $el['appname'], $repr_apps);
-					$does_pageslug_exist = !empty($wpdb->get_row(
-						$wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s", $pageslug)
-					));
-
-					if (in_array($appname, $existing_appnames) || $does_pageslug_exist) {
+					if (in_array($appname, $existing_appnames) || $this->does_pageslug_exist($pageslug)) {
 						echo wp_json_encode([
 							'status' => 0,
 							'message' => "App name or page slug already exists.",
 						]);
 					} else {
-
-						$this->create_new_app($repr_apps, $appname, $pageslug, $template, $type);
+						$this->create_new_app($app_options_list, $appname, $pageslug, $template, $type);
 						$this->insert_react_page($appname, $pageslug);
 						if ($type === 'development') {
 							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
@@ -164,6 +158,38 @@ class Reactpress_Admin {
 							'pageslug' => $pageslug
 						]);
 					}
+				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
+					$app_option = $this->get_app_options($app_options_list, $appname);
+					if (($app_option && $app_option['pageslug'])) {
+						$this->update_react_page($app_option['pageslug'], $pageslug);
+						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
+						$this->add_build_path($appname);
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						echo wp_json_encode([
+							'status' => 1,
+							'message' => 'Url Slug changed.'
+						]);
+					} elseif (!$this->does_pageslug_exist($pageslug) && $pageslug) {
+						$this->insert_react_page($appname, $pageslug);
+						$this->add_app_options($app_options_list, $appname, $pageslug);
+						$this->add_build_path($appname);
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						echo wp_json_encode([
+							'status' => 1,
+							'message' => 'Url Slug created.'
+						]);
+					} else {
+						echo wp_json_encode([
+							'status' => 0,
+							'message' => "There exists another page that already has this page slug.",
+						]);
+					}
+				} elseif ($param === "update_index_html" && $appname && $pageslug) {
+					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+					echo wp_json_encode([
+						'status' => 1,
+						'message' => 'Index.html updated.',
+					]);
 				} elseif ($param === "start_react_app" && $appname && $pageslug) {
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 					$parts = $this->start_react_app($appname);
@@ -207,25 +233,15 @@ class Reactpress_Admin {
 						fn ($el) => $el['appname'] !== $appname
 					));
 					$is_appdir_removed = repr_delete_directory($this->app_path($appname));
-					if ($is_option_deleted && $is_option_deleted) {
+					if ($is_appdir_removed) {
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'App deleted.',
 						]);
-					} elseif ($is_option_deleted) {
+					} else {
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => "Couldn't remove files. Please remove directory by hand.",
-						]);
-					} elseif ($is_appdir_removed) {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => "Couldn't remove app from database. Please try again later.",
-						]);
-					} else {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => 'App not running.',
 						]);
 					}
 				} elseif ($param === "build_react_app" && $appname && $pageslug) {
@@ -243,7 +259,7 @@ class Reactpress_Admin {
 					}
 				} else {
 					echo wp_json_encode([
-						'status' => -1,
+						'status' => 0,
 						'message' => "Request unknown.",
 					]);
 				}
@@ -260,6 +276,20 @@ class Reactpress_Admin {
 		} finally {
 			wp_die();
 		}
+	}
+
+	/**
+	 * Checks if the given string is already used as a pageslug of any
+	 * post in the current WP site.
+	 * @param string $pageslug 
+	 * @return bool 
+	 * @since 1.2.0
+	 */
+	public function does_pageslug_exist(string $pageslug) {
+		global $wpdb;
+		return !empty($wpdb->get_row(
+			$wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s", $pageslug)
+		));
 	}
 
 	/**
@@ -299,7 +329,7 @@ class Reactpress_Admin {
 	 * Writes a new app to the database and starts the creation of the app
 	 * in the filesystem.
 	 *
-	 * @param mixed $repr_apps
+	 * @param mixed $app_options_list
 	 * @param string $appname
 	 * @param string $pageslug
 	 * @param string $template
@@ -308,25 +338,13 @@ class Reactpress_Admin {
 	 * @since 1.0.0
 	 */
 	function create_new_app(
-		$repr_apps,
+		$app_options_list,
 		string $appname,
 		string $pageslug,
 		string $template,
 		string $type
 	) {
-		if (!is_array($repr_apps) && $appname && $pageslug && $type) {
-			add_option('repr_apps', [[
-				'appname' => $appname,
-				'pageslug' => $pageslug,
-				'type' => $type,
-			]]);
-		} elseif ($appname && $pageslug) {
-			update_option('repr_apps', $this->array_add($repr_apps, [
-				'appname' => $appname,
-				'pageslug' => $pageslug,
-				'type' => $type,
-			]));
-		}
+		$this->add_app_options($app_options_list, $appname, $pageslug);
 
 		if ($appname && $pageslug && $type) {
 			return $this->create_react_app($appname, $type, $template,);
@@ -355,6 +373,7 @@ class Reactpress_Admin {
 		} else {
 			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
 			$this->fix_hot_reloading($appname);
+			$this->add_build_path($appname);
 			return end($output) === 'Happy hacking!' ? true : false;
 		}
 	}
@@ -411,7 +430,7 @@ class Reactpress_Admin {
 	 * package.json, that react loads assets in the right way.
 	 *
 	 * @param string $appname
-	 * @return void
+	 * @return int 0 if no success
 	 * @since 1.0.0
 	 */
 	function build_react_app($appname) {
@@ -419,28 +438,58 @@ class Reactpress_Admin {
 		// We need the relative path, that we can deploy our
 		// build app to another server later.
 		$relative_apppath = $this->app_path($appname, true);
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
-		$package_json_arr_VAR = explode(PHP_EOL, $package_json_contents);
+		if (stripos($package_json_contents, $homepage)) {
+			chdir($apppath);
+			shell_exec("npm run build");
+			return 1;
+		} else {
+			// Add a homepage attribute during the build process and remove it again, 
+			// that the developer can build with the public/index.html without WP.
+			file_put_contents(
+				$path_package_json,
+				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+			);
+			chdir($apppath);
+			shell_exec("npm run build");
+			return 2;
+		}
+		return 0;
+	}
 
-		// Add a homepage attribute during the build process and remove it again, 
-		// that the developer can build with the public/index.html without WP.
-		array_splice($package_json_arr_VAR, 1, 0, '  "homepage": "' . $homepage . '",');
-		file_put_contents(
-			$path_package_json,
-			implode(PHP_EOL, $package_json_arr_VAR)
-		);
-
-		chdir($apppath);
-		shell_exec("npm run build");
-
-		array_splice($package_json_arr_VAR, 1, 1);
-		file_put_contents(
-			$path_package_json,
-			implode(PHP_EOL, $package_json_arr_VAR)
-		);
-		return true;
+	/**
+	 * Add the right build path to package.json
+	 *
+	 * @param string $appname
+	 * @return int 0 if no success
+	 * @since 1.2.0
+	 */
+	function add_build_path($appname) {
+		$apppath = $this->app_path($appname);
+		// We need the relative path, that we can deploy our
+		// build app to another server later.
+		$relative_apppath = $this->app_path($appname, true);
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
+		$homepage = "{$relative_apppath}/build";
+		$path_package_json = "{$apppath}/package.json";
+		$package_json_contents = file_get_contents($path_package_json);
+		if (!$package_json_contents) {
+			return 0;
+		} elseif (stripos($package_json_contents, $homepage)) {
+			return 1;
+		} else {
+			// Add a homepage attribute during the build process and remove it again, 
+			// that the developer can build with the public/index.html without WP.
+			file_put_contents(
+				$path_package_json,
+				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+			);
+			return 2;
+		}
+		return 0;
 	}
 
 	/**
@@ -582,6 +631,42 @@ class Reactpress_Admin {
 	}
 
 	/**
+	 * Change the slug of a page to the new one.
+	 *
+	 * @param string $oldSlug
+	 * @param string $newSlug
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function update_react_page(string $oldSlug, string $newSlug) {
+		global $wpdb;
+		// check if post_name (which is the slug and should be unique) exist
+		$get_data = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
+				$oldSlug
+			)
+		);
+
+		if (empty($get_data)) {
+			// alreade we have data with this post name
+			return ['status' => 'false', 'message' => 'Couldn\'t find page.'];
+		} else {
+			$result = wp_update_post(
+				array(
+					'ID' => $get_data->ID,
+					'post_name' => $newSlug,
+				)
+			);
+			if ($result) {
+				return ['status' => 'true', 'message' => 'Page updated.'];
+			} else {
+				return ['status' => 'false', 'message' => "Couldn't update page"];
+			}
+		}
+	}
+
+	/**
 	 * Checks if the dev environment is suitable. If not
 	 * produces a message for the user.
 	 *
@@ -602,15 +687,96 @@ class Reactpress_Admin {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
 		}
 		if (!$has_npm_v6) {
-			$message .= "<li>Your dev server needs access to <code>npm 6</code> or higher to develop React apps.</a>";
+			$message .= "<li>Your WordPress installation needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and use <a href='https://rockiger.com/en/easily-embed-react-apps-into-wordpress-with-reactpress-plugin/#create-react-app' title='Create React App Website'  target=\"_blank\">create-react-app</a> from there</li>";
 		}
 		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL.</li>";
-		}
-		if ($message) {
-			$message .= "<p><a href=\"https://rockiger.com/en/reactpress-dev-environment/\" rel=\"noopener\" target=\"_blank\">For convience we provide a VirtualBox image that works well with ReactPress.</a></p>";
+			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL. You can also go to the app directory and try <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
 		}
 		return $message;
+	}
+
+	/**
+	 * Get all folders in the apps directory and return them as an array
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public function get_app_names() {
+		chdir(REPR_PLUGIN_PATH . 'apps');
+		$appnames = scandir(REPR_PLUGIN_PATH . 'apps');
+		return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
+	}
+
+	/**
+	 * Return all apps as an array
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public function get_apps() {
+		$appnames = $this->get_app_names();
+		$app_options = get_option('repr_apps') ?? [];
+
+		$apps = array_map(function ($el) use ($app_options) {
+			$app_option = array_reduce(
+				$app_options ? $app_options : [],
+				fn ($carry, $item) =>
+				$item['appname'] === $el ? $item : $carry,
+				[]
+			);
+			return [
+				'appname' => $el,
+				'pageslug' => $app_option['pageslug'] ?? '',
+				'type' => 	is_file(REPR_PLUGIN_PATH . 'apps/' . $el . '/package.json') ?
+					'development' :
+					'deployment'
+			];
+		}, $appnames);
+		return $apps;
+	}
+
+	public function add_app_options(array $app_options_list, string $appname, string $pageslug) {
+		if (!is_array($app_options_list) && $appname && $pageslug) {
+			add_option('repr_apps', [[
+				'appname' => $appname,
+				'pageslug' => $pageslug,
+			]]);
+		} elseif ($appname && $pageslug) {
+			update_option('repr_apps', $this->array_add($app_options_list, [
+				'appname' => $appname,
+				'pageslug' => $pageslug,
+			]));
+		}
+	}
+
+	/**
+	 * Get the option for the given app name.
+	 * @param string $appname 
+	 * @return mixed
+	 */
+	public function change_pageslug_option(array $app_options_list, string $appname, string $pageslug) {
+		foreach ($app_options_list as $key => $val) {
+			if ($val['appname'] === $appname) {
+				$app_options_list[$key]['pageslug'] = $pageslug;
+			}
+		}
+		update_option('repr_apps', $app_options_list);
+		return $app_options_list;
+	}
+
+	/**
+	 * Get the option for the given app name.
+	 * @param string $appname 
+	 * @return mixed
+	 */
+	public function get_app_options(array $app_options_list, string $appname) {
+		$app_options = null;
+		foreach ($app_options_list as $key => $val) {
+			if ($val['appname'] === $appname) {
+				$app_options = $val;
+			}
+		}
+		return $app_options;
 	}
 }
 
@@ -623,7 +789,6 @@ class Reactpress_Admin {
  * @since 1.0.0
  */
 function repr_delete_directory(string $dirname): bool {
-	repr_log($dirname);
 	$dir_handle = '';
 	if (is_dir($dirname))
 		$dir_handle = opendir($dirname);
