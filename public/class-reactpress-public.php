@@ -90,7 +90,8 @@ class Reactpress_Public {
 	/**
 	 * Change the page template to the our template on the dropdown if selected.
 	 * (C) PRADIP DEBNATH https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
-	 * 
+	 * Fix for template incompatibility with Elementor and some other plugins.
+	 * (C) Sally CJ https://stackoverflow.com/questions/67696139/error-in-wordpress-with-plugin-reactpress/68455647#answer-67751220
 	 * @param $template
 	 *
 	 * @return mixed
@@ -100,7 +101,9 @@ class Reactpress_Public {
 		if (is_page()) {
 			$meta = get_post_meta(get_the_ID());
 
-			if (!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template) {
+			if (
+				!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template && 'default' !== $meta['_wp_page_template'][0] // check if the value is NOT "default"
+			) {
 				$template = $meta['_wp_page_template'][0];
 			}
 		}
