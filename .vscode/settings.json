@@ -2,7 +2,7 @@
   "logViewer.watch": [
     {
       "title": "Wordpress",
-      "pattern": "/home/macco/macco/websites/dev/bitnami/apps/wordpress/htdocs/wp-content/debug.log"
+      "pattern": "/home/macco/Local Sites/reactpress/app/public/wp-content/debug.log"
     }
   ]
 }

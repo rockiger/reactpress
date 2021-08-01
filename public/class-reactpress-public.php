@@ -102,7 +102,7 @@ class Reactpress_Public {
 			$meta = get_post_meta(get_the_ID());
 
 			if (
-				!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template && 'default' !== $meta['_wp_page_template'][0] // check if the value is NOT "default"
+				!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template && 'default' !== $meta['_wp_page_template'][0] &&	strpos($meta['_wp_page_template'][0], 'react-page-template.php')
 			) {
 				$template = $meta['_wp_page_template'][0];
 			}
