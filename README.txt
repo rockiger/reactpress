@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,12 @@ If you have no chance using a POSIX compatible system, you can use ReactPress if
 6. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 1.2.1 =
+
+* FIX: Template incompatibility with Elementor and some other plugins. Thank to the great answer of Sally CJ https://stackoverflow.com/questions/67696139/error-in-wordpress-with-plugin-reactpress/68455647#answer-67751220
+
+* FIX: Problems if document root and plugin app directory are on the same machine/server/locationn
 
 = 1.2.0 = 
 
