@@ -130,7 +130,11 @@ class Reactpress_Public {
 			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
 
 			// Use fallback if $_SERVER['DOCUMENT_ROOT'] is not set
-			$relative_apppath = $document_root ? explode($document_root, $plugin_app_dir_url)[1] : escapeshellcmd("/wp-content/plugins/reactpress/apps/{$appname}/");
+			$relative_apppath = escapeshellcmd("/wp-content/plugins/reactpress/apps/{$appname}/");
+			if (strpos($plugin_app_dir_url, $document_root) === 0) {
+				// Add check to ensure that the document root and plugin app dir live on the same disk
+				$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
+			}
 
 			$react_app_build = $plugin_app_dir_url . 'build/';
 			$manifest_url = $react_app_build . 'asset-manifest.json';
