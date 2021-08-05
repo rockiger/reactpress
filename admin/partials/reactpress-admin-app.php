@@ -19,7 +19,7 @@
       <tr>
         <th scope="row">App Directory</th>
         <td>
-          <code class="line-break"><?php echo REPR_PLUGIN_PATH . 'apps/' . $appname; ?></code>
+          <code class="line-break"><?php echo REPR_APPS_PATH . '/' . $appname; ?></code>
         </td>
       <tr>
         <th scope="row">URL Slug</th>

@@ -130,10 +130,10 @@ class Reactpress_Public {
 			// Setting path variables.
 			$current_app = array_values(array_filter($repr_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
 			$appname = $current_app['appname'];
-			$plugin_app_dir_url = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}/");
+			$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
 
 			// Use fallback if $_SERVER['DOCUMENT_ROOT'] is not set
-			$relative_apppath = escapeshellcmd("/wp-content/plugins/reactpress/apps/{$appname}/");
+			$relative_apppath = escapeshellcmd("/wp-content/reactpress/apps/{$appname}/");
 			if (strpos($plugin_app_dir_url, $document_root) === 0) {
 				// Add check to ensure that the document root and plugin app dir live on the same disk
 				$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
@@ -172,12 +172,12 @@ class Reactpress_Public {
 
 			// Load css files.
 			foreach ($css_files as $index => $css_file) {
-				wp_enqueue_style('rp-react-app-asset-' . $index, $relative_apppath . 'build/' . $css_file);
+				wp_enqueue_style('rp-react-app-asset-' . $index, $plugin_app_dir_url . 'build/' . $css_file);
 			}
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('rp-react-app-asset-' . $index, $relative_apppath . 'build/' . $js_file, array(), 1, true);
+				wp_enqueue_script('rp-react-app-asset-' . $index, $plugin_app_dir_url . 'build/' . $js_file, array(), 1, true);
 			}
 
 			// Variables for app use

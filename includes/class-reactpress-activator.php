@@ -30,5 +30,7 @@ class Reactpress_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
+		// check im reactpress directory exists if not create it
+		wp_mkdir_p(REPR_APPS_PATH);
 	}
 }

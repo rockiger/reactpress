@@ -41,6 +41,9 @@ define('REPR_VERSION', '1.2.2');
 define('REPR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('REPR_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
+define('REPR_APPS_PATH', WP_CONTENT_DIR . '/reactpress/apps');
+define('REPR_APPS_URL', content_url() . '/reactpress/apps');
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-reactpress-activator.php

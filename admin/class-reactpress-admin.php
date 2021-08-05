@@ -321,7 +321,7 @@ class Reactpress_Admin {
 	 * @since 1.0.0
 	 */
 	public function write_index_html(string $appname, string $content) {
-		$index_html_path = sprintf("%sapps/%s/public/index.html", REPR_PLUGIN_PATH, $appname);
+		$index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
 		return file_put_contents($index_html_path, $content);
 	}
 
@@ -367,11 +367,11 @@ class Reactpress_Admin {
 		$output = [];
 		$retval = '';
 		$template_option = $template ? " --template {$template}" : '';
-		chdir(REPR_PLUGIN_PATH);
+		chdir(REPR_APPS_PATH);
 		if ($type === 'deployment') {
-			return mkdir("apps/{$appname}", 0777, true);
+			return mkdir($appname, 0777, true);
 		} else {
-			exec("npx create-react-app apps/{$appname}{$template_option}", $output, $retval);
+			exec("npx create-react-app {$appname}{$template_option}", $output, $retval);
 			$this->fix_hot_reloading($appname);
 			$this->add_build_path($appname);
 			return end($output) === 'Happy hacking!' ? true : false;
@@ -386,7 +386,7 @@ class Reactpress_Admin {
 	 * @return void
 	 */
 	function fix_hot_reloading(string $appname) {
-		$index_html_path = sprintf("%sapps/%s/.env", REPR_PLUGIN_PATH, $appname);
+		$index_html_path = sprintf("%s/%s/.env", REPR_APPS_PATH, $appname);
 		$content = "# Fix hot reloading in VMs\nCHOKIDAR_USEPOLLING=true";
 		return file_put_contents($index_html_path, $content);
 	}
@@ -438,7 +438,7 @@ class Reactpress_Admin {
 		// We need the relative path, that we can deploy our
 		// build app to another server later.
 		$relative_apppath = $this->app_path($appname, true);
-		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
@@ -472,7 +472,7 @@ class Reactpress_Admin {
 		// We need the relative path, that we can deploy our
 		// build app to another server later.
 		$relative_apppath = $this->app_path($appname, true);
-		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/plugins/reactpress/apps/{$appname}/";
+		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
 		$package_json_contents = file_get_contents($path_package_json);
@@ -528,7 +528,7 @@ class Reactpress_Admin {
 	 * @since 1.0.0
 	 */
 	function app_path(string $appname, $relative_to_home_path = false): string {
-		$apppath = escapeshellcmd(REPR_PLUGIN_PATH . "apps/{$appname}");
+		$apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
 		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
 		if ($relative_to_home_path) {
 			return explode($document_root, $apppath)[1];
@@ -677,17 +677,10 @@ class Reactpress_Admin {
 		$has_exec = function_exists('exec');
 		$has_shell_exec = function_exists('shell_exec');
 		$is_posix = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
-		$has_npm_v6 = false;
-		if ($has_exec && $has_shell_exec) {
-			$has_npm_v6 = (int)shell_exec('npm -v') >= 6;
-		}
 
 		$message = '';
 		if (!($has_exec && $has_shell_exec)) {
 			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
-		}
-		if (!$has_npm_v6) {
-			$message .= "<li>Your WordPress installation needs access to <code>npm 6</code> or higher to create React apps from the admin interface. However you can go to the app directory and use <a href='https://rockiger.com/en/easily-embed-react-apps-into-wordpress-with-reactpress-plugin/#create-react-app' title='Create React App Website'  target=\"_blank\">create-react-app</a> from there</li>";
 		}
 		if (!$is_posix) {
 			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL. You can also go to the app directory and try <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
@@ -702,8 +695,8 @@ class Reactpress_Admin {
 	 * @since 1.2.0
 	 */
 	public function get_app_names() {
-		chdir(REPR_PLUGIN_PATH . 'apps');
-		$appnames = scandir(REPR_PLUGIN_PATH . 'apps');
+		chdir(REPR_APPS_PATH);
+		$appnames = scandir(REPR_APPS_PATH);
 		return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
 	}
 
@@ -727,7 +720,7 @@ class Reactpress_Admin {
 			return [
 				'appname' => $el,
 				'pageslug' => $app_option['pageslug'] ?? '',
-				'type' => 	is_file(REPR_PLUGIN_PATH . 'apps/' . $el . '/package.json') ?
+				'type' => 	is_file(REPR_APPS_PATH . '/' . $el . '/package.json') ?
 					'development' :
 					'deployment'
 			];

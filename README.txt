@@ -42,7 +42,7 @@ Optionally, to create React apps directly from the WordPress admin it needs also
 
 To create and deploy your first app:
 
-1. In your command line use npx create-react-app [your-app-name] in the apps directory of ReactPress, e.g. `[path-to-WordPress]/wp-content/plugins/reactpress/apps/my-app`
+1. In your command line use npx create-react-app [your-app-name] in the apps directory of ReactPress, e.g. `[path-to-WordPress]/wp-content/reactpress/apps/my-app`
 
 2. Reload the ReactPress admin page and add a URL Slug for your app.
 
@@ -52,9 +52,9 @@ To create and deploy your first app:
 
 5. When you are finished, build the app from the command line. You can now see your app embedded in your WordPress instance. Open it at [your-domain]/[your-slug].
 
-6. To deploy create the same app on your live server. Choose "Deploy an already build app." for the type. Make sure you use the same name for the app - otherwise the app won't work as expected.
+6. To deploy, create the same app on your live server. Choose "Deploy an already build app." for the type. Make sure you use the same name for the app - otherwise the app won't work as expected.
 
-7. Upload the build folder from your dev system under `plugins/wp-create/react-app/apps/[your-app-name]` to the same directory onto your live server.
+7. Upload the build folder from your dev system under `.../wp-content/reactpress/apps/[your-app-name]` to the same directory onto your live server.
 
 8. Open the React app under [your-domain]/[your-slug].
 
@@ -89,7 +89,7 @@ Has your WordPress/PHP installation access to `npm`. If you use a docker contain
 
 If you have no chance using a POSIX compatible system, you can use ReactPress if you do 2 things after Step 2:
 
-1. Change the build command in your `package.json` from `"build react-scripts build"` to `"PUBLIC_URL=/wp-content/plugins/reactpress/apps/[my-app]/build react-scripts build"`. Make sure that relative pathe to the build directory above is correct.
+1. Change the build command in your `package.json` from `"build react-scripts build"` to `"PUBLIC_URL=/wp-content/reactpress/apps/[my-app]/build react-scripts build"`. Make sure that relative pathe to the build directory above is correct.
 
 2. To have the styling of your WordPress site when developing your React app, go to the URL slug. Save the HTML as `index.html` into the `public` folder of your React app. Remove all tags that have an ID that starts with `id='rp-react-app-asset-`. Save it and you should see your dev server in the same style as your WordPress site.
 
