@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,12 @@ If you have no chance using a POSIX compatible system, you can use ReactPress if
 6. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 1.3.0 = 
+
+* Move apps directory to wp-content/reactpress/apps to don't mess with the created app when updating the plugin.
+
+* Remove possibility to create new react apps from the admin. From now on there is only the command line workflow.
 
 = 1.2.1 =
 
