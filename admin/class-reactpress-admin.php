@@ -695,6 +695,8 @@ class Reactpress_Admin {
 	 * @since 1.2.0
 	 */
 	public function get_app_names() {
+		// check im reactpress directory exists if not create it
+		wp_mkdir_p(REPR_APPS_PATH);
 		chdir(REPR_APPS_PATH);
 		$appnames = scandir(REPR_APPS_PATH);
 		return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
