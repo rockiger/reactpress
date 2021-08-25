@@ -14,9 +14,10 @@ ReactPress does 3 things:
 
 ## TODO
 
-- [ ] v1.x.0 Add the ability to create admin pages
-- [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.
+- [x] v1.x.0 Swap file_get_contents for wp_remote_get.
+- [ ] v1.x.0 Add post state label to signal the user a page was created by ReactPress (https://www.ibenic.com/post-states-labels/)
 - [ ] v1.x.0 validate onchange form input
-- [ ] v1.x.0 Swap file_get_contents for wp_remote_get.
-- [ ] v1.x.0 Check if servers are running every 60 seconds and on focus
-- [ ] v1.x.0 Check if windows version can be implemented
+- [ ] v1.x.0 Add the ability to create admin pages
+- [ ] v1.x.0 Create custom routing with react-router based on slug of the reactpress page (https://www.ibenic.com/custom-wordpress-rewrite-rule-combine-taxonomy-post-type/)
+- [ ] v1.x.0 Add PHP namespaces (https://www.ibenic.com/php-namespaces-wordpress-plugins/)
+- [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.

@@ -302,7 +302,9 @@ class Reactpress_Admin {
 	 * @since 1.0.0
 	 */
 	public function get_index_html_content(string $pageslug) {
-		$file_contents =	file_get_contents(site_url() . '/' . $pageslug);
+		$file_contents = wp_remote_retrieve_body(
+			wp_remote_get(site_url() . '/' . $pageslug, ['timeout' => 1000])
+		);
 		$file_contents_arr = explode(PHP_EOL, $file_contents);
 		// filter all build assets out of the file, that they don't conflict
 		// with the dev assets.
