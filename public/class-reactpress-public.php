@@ -189,4 +189,24 @@ class Reactpress_Public {
 			));
 		}
 	}
+
+	/**
+	 * Add new rewrite rules for every app to make react router usable.
+	 * 
+	 * @since 1.4.0
+	 */
+	public function add_repr_apps_rewrite_rules() {
+
+		$repr_apps = get_option('repr_apps') ?? [];
+		foreach ($repr_apps as $app) {
+			add_rewrite_rule('^' . $app['pageslug'] . '/(.*)?', 'index.php?pagename=' . $app['pageslug'], 'top');
+		}
+	}
+
+
+	public function site_custom_endpoint($wp_rewrite) {
+
+		repr_log($wp_rewrite);
+		return $wp_rewrite->rules;
+	}
 }

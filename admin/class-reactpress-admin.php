@@ -148,9 +148,12 @@ class Reactpress_Admin {
 					} else {
 						$this->create_new_app($app_options_list, $appname, $pageslug, $template, $type);
 						$this->insert_react_page($appname, $pageslug);
+						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+
 						if ($type === 'development') {
 							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						}
+						flush_rewrite_rules();
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => "React app created.",
@@ -164,7 +167,9 @@ class Reactpress_Admin {
 						$this->update_react_page($app_option['pageslug'], $pageslug);
 						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
+						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						flush_rewrite_rules();
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug changed.'
@@ -173,7 +178,9 @@ class Reactpress_Admin {
 						$this->insert_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
+						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						flush_rewrite_rules();
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
