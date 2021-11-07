@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 5.8
+Tested up to: 5.8.1
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,6 @@ Get started in seconds and develop your React app with instant feedback and your
 
 Combine the flexibility of WordPress with the UI capabilities of React and seamlessly integrate create-react-app into your WordPress project for your next SaaS.
 
-[youtube www.youtube.com/watch?v=uHqPbFLy-3Y]
 
 ReactPress does 3 things:
 
@@ -38,27 +37,37 @@ Optionally, to create React apps directly from the WordPress admin it needs also
 
 * the nodejs package manager `npm` version 6 or higher
 
-=== Usage ===
+=== Development ===
+
+Active development of this plugin is handled [on GitHub](https://github.com/rockiger/reactpress/).
+
+=== Documentation ===
+
+If you need more information than the following, you can have a look at the [Documentation page](https://rockiger.com/en/easily-embed-react-apps-into-wordpress-with-reactpress-plugin/).
 
 To create and deploy your first app:
 
-1. In your command line use npx create-react-app [your-app-name] in the apps directory of ReactPress, e.g. `[path-to-WordPress]/wp-content/reactpress/apps/my-app`
+1. Install ReactPress on your local WordPress installation.
 
-2. Reload the ReactPress admin page and add a URL Slug for your app.
+2. In your command line use npx create-react-app [your-app-name] in the apps directory of ReactPress, e.g. `[path-to-WordPress]/wp-content/reactpress/apps/my-app`
 
-3. In the command line start the React app with `npm start` or `yarn start`.
+3. Reload the ReactPress admin page and add a URL Slug for your app.
 
-4. Develop your app, changes will automatically hot reloaded.
+4. In the command line start the React app with `npm start` or `yarn start`.
 
-5. When you are finished, build the app from the command line. You can now see your app embedded in your WordPress instance. Open it at [your-domain]/[your-slug].
+5. Develop your app, changes will automatically hot reloaded.
 
-6. To deploy, create the same app on your live server. Choose "Deploy an already build app." for the type. Make sure you use the same name for the app - otherwise the app won't work as expected.
+6. When you are finished, build the app from the command line. You can now see your app embedded in your WordPress instance. Open it at [your-domain]/[your-slug].
 
-7. Upload the build folder from your dev system under `.../wp-content/reactpress/apps/[your-app-name]` to the same directory onto your live server.
+7. To deploy, Install ReactPress on live WordPress site.
 
-8. Open the React app under [your-domain]/[your-slug].
+8. Upload the build folder from your dev system under `.../wp-content/reactpress/apps/[your-app-name]` to the same directory onto your live server. No need for create-react-app.
 
-Repeat steps 5 to 8 when you have new releases you want to deploy.
+9. Reload the ReactPress admin page and add a URL Slug for your app.
+
+10. Open the React app under [your-domain]/[your-slug].
+
+Repeat steps 6 to 10 when you have new releases you want to deploy.
 
 
 == Installation ==
@@ -70,29 +79,15 @@ Repeat steps 5 to 8 when you have new releases you want to deploy.
 
 == Upgrade Notice ==
 
-This release does change to way to use ReactPress and gives you much more control. It should solve a lot of issues with using ReactPress in local development environments like Local, DevKinsta, and similar.
+Release 1.3.0+ does change to way to use ReactPress and gives you much more control. It should solve a lot of issues with using ReactPress in local development environments like Local, DevKinsta, and similar.
 
 Nonetheless, backward compatibility should be given.
 
 == Frequently Asked Questions ==
 
+= How do I make react-router work =
 
-= The app won't show on the page. =
-
-Have you build the React app and, in case of a live server, uploaded the build folder to the right location?
-
-= It shows I am in deployment mode, but I am on a local server. =
-
-Has your WordPress/PHP installation access to `npm`. If you use a docker container like Local, then you are probably not. [We provide a VirtualBox that is made to work with ReactPress.](https://rockiger.com/en/reactpress-dev-environment/) 
-
-= I am a Windows user and can't use WSL-2. Is there a way to use ReactPress? =
-
-If you have no chance using a POSIX compatible system, you can use ReactPress if you do 2 things after Step 2:
-
-1. Change the build command in your `package.json` from `"build react-scripts build"` to `"PUBLIC_URL=/wp-content/reactpress/apps/[my-app]/build react-scripts build"`. Make sure that relative pathe to the build directory above is correct.
-
-2. To have the styling of your WordPress site when developing your React app, go to the URL slug. Save the HTML as `index.html` into the `public` folder of your React app. Remove all tags that have an ID that starts with `id='rp-react-app-asset-`. Save it and you should see your dev server in the same style as your WordPress site.
-
+To make sure that react-router works you have to go to your WP permalink setting and click on save chang after every react app you install. This will rebuild the internal router of your WP installation.
 
 == Screenshots ==
 
@@ -110,6 +105,14 @@ If you have no chance using a POSIX compatible system, you can use ReactPress if
 6. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 1.3.1 = 
+
+* Swap file_get_contents for wp_remote_get.
+
+* Create custom routing for react-router based on slug of the reactpress page.
+
+* If the folder of an app is deleted, it is shown as type: Orphan
 
 = 1.3.0 = 
 
