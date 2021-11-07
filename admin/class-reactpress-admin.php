@@ -718,8 +718,13 @@ class Reactpress_Admin {
 	 * @since 1.2.0
 	 */
 	public function get_apps() {
-		$appnames = $this->get_app_names();
 		$app_options = get_option('repr_apps') ?? [];
+
+		// combine apps from directory and from settings to get a complete list
+		// event when the user deletes an app from the directory
+		$appnames_from_opts = array_map(fn ($el) => $el['appname'], $app_options);
+		$appnames_from_dir = $this->get_app_names();
+		$appnames = array_unique(array_merge($appnames_from_opts, $appnames_from_dir));
 
 		$apps = array_map(function ($el) use ($app_options) {
 			$app_option = array_reduce(
@@ -728,12 +733,18 @@ class Reactpress_Admin {
 				$item['appname'] === $el ? $item : $carry,
 				[]
 			);
+			$type = '';
+			if (is_file(REPR_APPS_PATH . '/' . $el . '/package.json')) {
+				$type = 'development';
+			} elseif (is_dir(REPR_APPS_PATH . '/' . $el)) {
+				$type = 'deployment';
+			} else {
+				$type = 'orphan';
+			}
 			return [
 				'appname' => $el,
 				'pageslug' => $app_option['pageslug'] ?? '',
-				'type' => 	is_file(REPR_APPS_PATH . '/' . $el . '/package.json') ?
-					'development' :
-					'deployment'
+				'type' => $type
 			];
 		}, $appnames);
 		return $apps;

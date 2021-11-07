@@ -18,6 +18,7 @@
 <?php
 $apps = $this->get_apps();
 $environment_message = $this->environment_message();
+$types = ['deployment' => 'Production', 'development' => 'Development', 'orphan' => 'Orphan - It seems the app folder was deleted.']
 ?>
 <div class="rp-content">
   <div class='head'>

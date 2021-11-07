@@ -14,8 +14,9 @@ ReactPress does 3 things:
 
 ## TODO
 
-- [x] v1.x.0 Swap file_get_contents for wp_remote_get.
-- [x] v1.x.0 Create custom routing for react-router based on slug of the reactpress page
+- [x] v1.3.1 Swap file_get_contents for wp_remote_get.
+- [x] v1.3.1 Create custom routing for react-router based on slug of the reactpress page
+- [x] v1.3.1 If the folder of an app is deleted, it is shown as type: Orphan
 - [ ] v1.x.0 Add post state label to signal the user a page was created by ReactPress (https://www.ibenic.com/post-states-labels/)
 - [ ] v1.x.0 validate onchange form input
 - [ ] v1.x.0 Add the ability to create admin pages

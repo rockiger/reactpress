@@ -48,7 +48,7 @@
       <tr>
         <th scope="row">Type</th>
         <td>
-          <span style="text-transform: capitalize;"> <?php echo esc_html($app['type']) ?></span>
+          <span style="text-transform: capitalize;"> <?php echo esc_html($types[$app['type']]) ?></span>
         </td>
       </tr>
       <?php if ($app['type'] === 'development') : ?>
