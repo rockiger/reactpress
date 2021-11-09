@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 5.8.1
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,7 +106,7 @@ To make sure that react-router works you have to go to your WP permalink setting
 
 == Changelog ==
 
-= 1.3.1 = 
+= 1.3.2 = 
 
 * Swap file_get_contents for wp_remote_get.
 
