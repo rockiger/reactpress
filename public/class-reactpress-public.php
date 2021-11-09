@@ -196,8 +196,7 @@ class Reactpress_Public {
 	 * @since 1.4.0
 	 */
 	public function add_repr_apps_rewrite_rules() {
-
-		$repr_apps = get_option('repr_apps') ?? [];
+		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
 		foreach ($repr_apps as $app) {
 			add_rewrite_rule('^' . $app['pageslug'] . '/(.*)?', 'index.php?pagename=' . $app['pageslug'], 'top');
 		}

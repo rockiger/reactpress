@@ -718,7 +718,8 @@ class Reactpress_Admin {
 	 * @since 1.2.0
 	 */
 	public function get_apps() {
-		$app_options = get_option('repr_apps') ?? [];
+		$app_options = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+
 
 		// combine apps from directory and from settings to get a complete list
 		// event when the user deletes an app from the directory
@@ -736,8 +737,10 @@ class Reactpress_Admin {
 			$type = '';
 			if (is_file(REPR_APPS_PATH . '/' . $el . '/package.json')) {
 				$type = 'development';
-			} elseif (is_dir(REPR_APPS_PATH . '/' . $el)) {
+			} elseif (is_dir(REPR_APPS_PATH . '/' . $el . '/build')) {
 				$type = 'deployment';
+			} elseif (is_dir(REPR_APPS_PATH . '/' . $el)) {
+				$type = 'empty';
 			} else {
 				$type = 'orphan';
 			}
