@@ -1,16 +1,6 @@
 <?php
 
 /**
- * Fired during plugin activation
- *
- * @link       https://rockiger.com
- * @since      1.0.0
- *
- * @package    Reactpress
- * @subpackage Reactpress/includes
- */
-
-/**
  * Fired during plugin activation.
  *
  * This class defines all code necessary to run during the plugin's activation.
@@ -20,7 +10,10 @@
  * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_Activator {
+
+namespace Rp\Includes;
+
+class Activator {
 
 	/**
 	 * Short Description. (use period)

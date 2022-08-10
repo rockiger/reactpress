@@ -1,16 +1,6 @@
 <?php
 
 /**
- * Fired during plugin deactivation
- *
- * @link       https://rockiger.com
- * @since      1.0.0
- *
- * @package    Reactpress
- * @subpackage Reactpress/includes
- */
-
-/**
  * Fired during plugin deactivation.
  *
  * This class defines all code necessary to run during the plugin's deactivation.
@@ -20,7 +10,10 @@
  * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_Deactivator {
+
+namespace Rp\Includes;
+
+class Deactivator {
 
 	/**
 	 * Short Description. (use period)

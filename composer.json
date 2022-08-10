@@ -1,0 +1,19 @@
+{
+  "name": "rockiger/reactpress",
+  "description": "Easily create, build and deploy React apps into your existing WordPress sites.",
+  "type": "project",
+  "license": "GPL",
+  "autoload": {
+    "psr-4": {
+      "Rp\\Includes\\": "includes/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Marco Laspe",
+      "email": "marco@rockiger.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {}
+}
