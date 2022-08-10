@@ -205,7 +205,7 @@ class Reactpress_Public {
 
 	public function site_custom_endpoint($wp_rewrite) {
 
-		repr_log($wp_rewrite);
+		// repr_log($wp_rewrite);
 		return $wp_rewrite->rules;
 	}
 }
