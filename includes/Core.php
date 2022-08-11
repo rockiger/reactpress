@@ -30,6 +30,13 @@
 
 namespace ReactPress\Includes;
 
+/**
+ * The class responsible for orchestrating the actions and filters of the
+ * core plugin.
+ */
+
+use ReactPress\Includes\Loader;
+
 class Core {
 
 	/**
@@ -38,7 +45,7 @@ class Core {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Reactpress_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -102,12 +109,6 @@ class Core {
 	private function load_dependencies() {
 
 		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-reactpress-loader.php';
-
-		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
@@ -124,7 +125,7 @@ class Core {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-reactpress-public.php';
 
-		$this->loader = new \Reactpress_Loader();
+		$this->loader = new Loader();
 	}
 
 	/**
@@ -210,7 +211,7 @@ class Core {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Reactpress_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

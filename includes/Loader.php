@@ -21,7 +21,10 @@
  * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_Loader {
+
+namespace ReactPress\Includes;
+
+class Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
