@@ -5,7 +5,9 @@
   "license": "GPL",
   "autoload": {
     "psr-4": {
-      "Rp\\Includes\\": "includes/"
+      "ReactPress\\Admin\\": "admin/",
+      "ReactPress\\Includes\\": "includes/",
+      "ReactPress\\User\\": "public/"
     }
   },
   "authors": [

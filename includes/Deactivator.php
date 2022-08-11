@@ -11,7 +11,7 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace Rp\Includes;
+namespace ReactPress\Includes;
 
 class Deactivator {
 

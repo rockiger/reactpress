@@ -35,6 +35,8 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
+use ReactPress\Includes\Activator;
+use ReactPress\Includes\Deactivator;
 
 
 /**
@@ -55,7 +57,7 @@ define('REPR_APPS_URL', content_url() . '/reactpress/apps');
  * This action is documented in includes/class-reactpress-activator.php
  */
 function activate_reactpress() {
-	Rp\Includes\Activator::activate();
+	Activator::activate();
 }
 
 /**
@@ -63,7 +65,7 @@ function activate_reactpress() {
  * This action is documented in includes/class-reactpress-deactivator.php
  */
 function deactivate_reactpress() {
-	Rp\Includes\Deactivator::deactivate();
+	Deactivator::deactivate();
 }
 
 register_activation_hook(__FILE__, 'activate_reactpress');
