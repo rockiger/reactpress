@@ -21,7 +21,10 @@
  * @subpackage Reactpress/admin
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_Admin {
+
+namespace ReactPress\Admin;
+
+class Admin {
 
 	/**
 	 * The ID of this plugin.
@@ -271,7 +274,7 @@ class Reactpress_Admin {
 					]);
 				}
 			}
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			echo (wp_json_encode([
 				'status' => 0,
 				'message' => $e->getMessage(),
@@ -418,7 +421,7 @@ class Reactpress_Admin {
 		while (empty($matches) && $trys < $max_trys) {
 			try {
 				$file_content = file_get_contents("{$apppath}/out.log");
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				return [];
 			}
 			preg_match($regex, $file_content, $matches);
@@ -856,7 +859,7 @@ function repr_thread($operator, $first, ...$args) {
 			$isThreadFirst = true;
 			break;
 		default:
-			throw new Exception('Operator not supported');
+			throw new \Exception('Operator not supported');
 			break;
 	}
 

@@ -24,7 +24,10 @@
  * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_i18n {
+
+namespace ReactPress\Includes;
+
+class I18n {
 
 
 	/**

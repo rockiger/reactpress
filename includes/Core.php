@@ -30,11 +30,16 @@
 
 namespace ReactPress\Includes;
 
-/**
- * The class responsible for orchestrating the actions and filters of the
- * core plugin.
- */
 
+//* The class responsible for defining all actions that occur in the admin area.
+use ReactPress\Admin\Admin;
+
+//* The class responsible for defining internationalization functionality
+//* of the plugin.
+use ReactPress\Includes\I18n;
+
+//* The class responsible for orchestrating the actions and filters of the 
+//* core plugin.
 use ReactPress\Includes\Loader;
 
 class Core {
@@ -109,17 +114,6 @@ class Core {
 	private function load_dependencies() {
 
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-reactpress-i18n.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-reactpress-admin.php';
-
-		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -139,7 +133,7 @@ class Core {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new \Reactpress_i18n();
+		$plugin_i18n = new I18n();
 
 		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
@@ -153,7 +147,7 @@ class Core {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new \Reactpress_Admin($this->get_plugin_name(), $this->get_version());
+		$plugin_admin = new Admin($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
