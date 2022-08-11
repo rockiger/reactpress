@@ -27,7 +27,10 @@
  * @subpackage Reactpress/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress {
+
+namespace ReactPress\Includes;
+
+class Core {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -121,7 +124,7 @@ class Reactpress {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-reactpress-public.php';
 
-		$this->loader = new Reactpress_Loader();
+		$this->loader = new \Reactpress_Loader();
 	}
 
 	/**
@@ -135,7 +138,7 @@ class Reactpress {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Reactpress_i18n();
+		$plugin_i18n = new \Reactpress_i18n();
 
 		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
@@ -149,7 +152,7 @@ class Reactpress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Reactpress_Admin($this->get_plugin_name(), $this->get_version());
+		$plugin_admin = new \Reactpress_Admin($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -172,7 +175,7 @@ class Reactpress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Reactpress_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public = new \Reactpress_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');

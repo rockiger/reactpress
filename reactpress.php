@@ -36,6 +36,13 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 use ReactPress\Includes\Activator;
+
+/**
+ * The core plugin class that is used to define internationalization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+
+use ReactPress\Includes\Core;
 use ReactPress\Includes\Deactivator;
 
 
@@ -72,12 +79,6 @@ register_activation_hook(__FILE__, 'activate_reactpress');
 register_deactivation_hook(__FILE__, 'deactivate_reactpress');
 
 /**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path(__FILE__) . 'includes/class-reactpress.php';
-
-/**
  * Begins execution of the plugin.
  *
  * Since everything within the plugin is registered via hooks,
@@ -88,7 +89,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-reactpress.php';
  */
 function run_reactpress() {
 
-	$plugin = new Reactpress();
+	$plugin = new Core();
 	$plugin->run();
 }
 run_reactpress();
