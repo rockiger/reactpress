@@ -20,7 +20,10 @@
  * @subpackage Reactpress/public
  * @author     Marco Laspe <marco@rockiger.com>
  */
-class Reactpress_Public {
+
+namespace ReactPress\User;
+
+class User {
 
 	/**
 	 * The ID of this plugin.

@@ -42,6 +42,10 @@ use ReactPress\Includes\I18n;
 //* core plugin.
 use ReactPress\Includes\Loader;
 
+//* The class responsible for defining all actions that occur in the public-facing
+//* side of the site.
+use ReactPress\User\User;
+
 class Core {
 
 	/**
@@ -112,13 +116,6 @@ class Core {
 	 * @access   private
 	 */
 	private function load_dependencies() {
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-reactpress-public.php';
-
 		$this->loader = new Loader();
 	}
 
@@ -170,7 +167,7 @@ class Core {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new \Reactpress_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public = new User($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
