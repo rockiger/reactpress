@@ -91,6 +91,55 @@ class Admin {
 				'ajaxurl' => admin_url('admin-ajax.php'),
 				'apps' => get_option(('repr_apps'))
 			));
+
+			// React app
+			$plugin_app_dir_url = plugin_dir_url(__FILE__) . 'js/reactpress-admin/';
+			$react_app_build = $plugin_app_dir_url . 'build/';
+			$manifest_url = $react_app_build . 'asset-manifest.json';
+
+			// Request manifest file.
+			$request = file_get_contents($manifest_url);
+
+			// If the remote request fails, wp_remote_get() will return a WP_Error, so let’s check if the $request variable is an error:
+			if (!$request)
+				return false;
+
+			// Convert json to php array.
+			$files_data = json_decode($request);
+			if ($files_data === null)
+				return;
+
+			if (!property_exists($files_data, 'entrypoints'))
+				return false;
+
+			// Get assets links.
+			$assets_files = $files_data->entrypoints;
+
+			$js_files = array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+			);
+			$css_files = array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+			);
+
+			// Load css files.
+			foreach ($css_files as $index => $css_file) {
+				wp_enqueue_style('react-plugin-' . $index, $react_app_build . $css_file);
+			}
+
+			// Load js files.
+			foreach ($js_files as $index => $js_file) {
+				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array(), 1, true);
+			}
+
+			// Variables for app use.
+			wp_localize_script(
+				'react-plugin-0',
+				'rpReactPlugin',
+				array('appSelector' => '#wpbody .wrap')
+			);
 		}
 	}
 

@@ -70,6 +70,7 @@ $types = ['deployment' => 'Production', 'development' => 'Development', 'empty' 
     </div>
   </div>
 </div>
+<div id="root"></div>
 <div id="rp-snackbar" class="rp-snackbar">Test</div>
 <pre>
   <?php
