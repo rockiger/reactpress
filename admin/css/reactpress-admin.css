@@ -204,7 +204,7 @@ label.error {
   color: #dc3232;
 }
 
-svg.logo {
+svg {
   height: 48px;
   width: 48px;
   margin: 0 0.5rem 0 -0.1rem;

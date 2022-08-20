@@ -40,5 +40,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "/wp-content/plugins/reactpress/admin/js/reactpress-admin/build"
+  "homepage": "/wp-content/plugins/reactpress/admin/js/reactpress-admin/build",
+  "devDependencies": {
+    "@types/lodash": "^4.14.184"
+  }
 }

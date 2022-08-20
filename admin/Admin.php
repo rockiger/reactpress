@@ -89,7 +89,8 @@ class Admin {
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
-				'apps' => get_option(('repr_apps'))
+				'apps' => get_option(('repr_apps')),
+				'appspath' => REPR_APPS_PATH,
 			));
 
 			// React app
@@ -133,13 +134,6 @@ class Admin {
 			foreach ($js_files as $index => $js_file) {
 				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array(), 1, true);
 			}
-
-			// Variables for app use.
-			wp_localize_script(
-				'react-plugin-0',
-				'rpReactPlugin',
-				array('appSelector' => '#wpbody .wrap')
-			);
 		}
 	}
 
