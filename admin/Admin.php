@@ -171,6 +171,8 @@ class Admin {
 	public function repr_handle_admin_ajax_request() {
 		/**
 		 * Handles all request from the admin frontend.
+		 * All request must be of type POST, because the WordPress action
+		 * 'wp_ajax_repr_admin_ajax_request' requires it.
 		 * 
 		 * @since 1.0.0
 		 */
@@ -310,6 +312,9 @@ class Admin {
 							'message' => "Build failed.",
 						]);
 					}
+				} elseif ($param === "get_react_apps") {
+					$apps = $this->get_apps();
+					echo wp_json_encode(['status' => 1, 'apps' => $apps]);
 				} else {
 					echo wp_json_encode([
 						'status' => 0,

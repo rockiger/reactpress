@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 import logo from './logo.svg'
 import './App.css'
@@ -10,9 +10,25 @@ interface RP {
   appspath: string
 }
 declare var rp: RP
+declare var jQuery: any
 
 function App() {
-  console.log(rp)
+  const [apps, setApps] = useState(rp.apps)
+
+  const getApps = async () => {
+    const response = await jQuery
+      .post(rp.ajaxurl, `action=repr_admin_ajax_request&param=get_react_apps`)
+      .then()
+    const result = JSON.parse(response)
+    if (result.apps) {
+      setApps(result.apps)
+    }
+  }
+
+  useEffect(() => {
+    getApps()
+  }, [setApps])
+
   return (
     <div className="App rp-content">
       <header className="head">
@@ -23,7 +39,7 @@ function App() {
       </header>
       <div className="maxWidth80 m0auto p2">
         <h2 className="mb075">React Apps</h2>
-        {_.isEmpty(rp.apps) ? (
+        {_.isEmpty(apps) ? (
           <div className="flex gap1 row">
             <div className="col flex grow1 half">
               <p className="pb1">
