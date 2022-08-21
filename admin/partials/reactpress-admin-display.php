@@ -17,7 +17,7 @@
 
 <?php
 $apps = $this->get_apps();
-$environment_message = $this->environment_message();
+$environment_message = '';
 $types = ['deployment' => 'Production', 'development' => 'Development', 'empty' => 'Empty Folder - It seems no build folder was added.', 'orphan' => 'Orphan - It seems the app folder was deleted.']
 ?>
 <div class="rp-content">

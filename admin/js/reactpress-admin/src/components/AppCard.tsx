@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 import icon from './icon.svg'
 
@@ -10,6 +11,8 @@ export interface AppDetails {
 export interface AppCardProps {
   app: AppDetails
   appspath: string
+  deleteApp: (appname: string) => void
+  deletingApps: string[]
 }
 
 const TYPES = {
@@ -19,7 +22,7 @@ const TYPES = {
   orphan: 'Orphan - It seems the app folder was deleted.',
 }
 
-function AppCard({ app, appspath }: AppCardProps) {
+function AppCard({ app, appspath, deleteApp, deletingApps }: AppCardProps) {
   return (
     <div id={app.appname} className="AppCard card col flex fullwidth m0 p2">
       <h3 className="title flex m0 mb-05 row">
@@ -33,8 +36,7 @@ function AppCard({ app, appspath }: AppCardProps) {
             <th scope="row">App Directory</th>
             <td>
               <code className="line-break">
-                {appspath}
-                {app.appname}
+                {`${appspath}/${app.appname}`.replace('//', '/')}
               </code>
             </td>
           </tr>
@@ -141,11 +143,15 @@ function AppCard({ app, appspath }: AppCardProps) {
       <div>
         <button
           className="button-link button-delete"
-          data-appname="<?php echo $appname ?>"
-          data-pageslug="<?php echo $pageslug ?>"
+          onClick={() => deleteApp(app.appname)}
         >
           Delete App
         </button>
+        <span
+          className={`crpw-button-spinner spinner ${
+            _.includes(deletingApps, app.appname) ? 'is-active' : ''
+          }`}
+        ></span>
       </div>
     </div>
   )

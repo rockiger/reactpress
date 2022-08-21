@@ -104,48 +104,6 @@
       })
     }
 
-    function handleSubmit() {
-      const appnameField = $('#rp-appname')
-      const appname = appnameField.val()
-      const fieldset = $('#rp-create-fieldset')
-      const pageslugField = $('#rp-pageslug')
-      const pageslug = pageslugField.val()
-      const spinner = $('#rp-spinner')
-      const templateSelect = $('#rp-template-select')
-      const template = templateSelect.val()
-      const typeRadio = $('input[name=type]:checked', '#rp-create-form')
-      const type = typeRadio.val()
-      const postdata = `action=repr_admin_ajax_request&param=create_react_app&appname=${appname}&pageslug=${pageslug}&template=${template}&type=${type}`
-
-      fieldset.prop('disabled', true)
-      spinner.addClass('is-active')
-      $.post(AJAXURL, postdata, (response) => {
-        const result = JSON.parse(response)
-        if (result.status) {
-          $('#existing-apps').append(
-            appCardTemplate(result.appname, result.pageslug, type)
-          )
-          $(`#${appname} .button-update`).click(handleUpdateButton)
-          $(`#${appname} .button-build`).click(handleBuildButton)
-          $(`#${appname} .button-delete`).click(handleDeleteButton)
-
-          $(`#${appname} .button-link-to-slug`).click(handleEditSlugButton)
-          $(`#${appname} .button-edit-slug-cancel`).click(handleEditSlugButton)
-          $(`#${appname} .button-edit-slug-save`).click(
-            handleEditSlugSaveButton
-          )
-        }
-        appnameField.val('')
-        fieldset.prop('disabled', false)
-        pageslugField.val('')
-        $('#rp-template-select > option:first-child').prop('selected', true)
-        typeRadio.prop('checked', false)
-        spinner.removeClass('is-active')
-        showSnackbar(result.message)
-        location.reload()
-      })
-    }
-
     function showSnackbar(message = '') {
       $('#rp-snackbar').addClass('show').text(message)
       setTimeout(() => $('#rp-snackbar').removeClass('show').text(''), 5000)

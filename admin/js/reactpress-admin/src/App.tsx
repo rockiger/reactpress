@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import _ from 'lodash'
 import logo from './logo.svg'
 import './App.css'
@@ -13,7 +13,32 @@ declare var rp: RP
 declare var jQuery: any
 
 function App() {
-  const [apps, setApps] = useState(rp.apps)
+  console.log(rp)
+  const [apps, setApps] = useState<RP['apps']>(rp.apps)
+  const [deletingApps, setDeletingApps] = useState<string[]>([])
+
+  const deleteApp = useCallback(async (appname: string) => {
+    const is_delete = window.confirm(
+      `Do you really want to delete app ${appname}? This will delete all files and cant't be undone!`
+    )
+    if (is_delete) {
+      setDeletingApps((deletingApps) => _.concat(deletingApps, appname))
+      //call to api
+      const response = await jQuery
+        .post(
+          rp.ajaxurl,
+          `action=repr_admin_ajax_request&param=delete_react_app&appname=${appname}`
+        )
+        .then()
+      const result = JSON.parse(response)
+      if (result.status) {
+        // remove app from apps
+        setApps((apps) => _.filter(apps, (app) => app.appname !== appname))
+        showSnackbar(result.message)
+      }
+      setDeletingApps((deletingApps) => _.without(deletingApps, appname))
+    }
+  }, [])
 
   const getApps = async () => {
     const response = await jQuery
@@ -75,7 +100,12 @@ function App() {
             <div className="col flex grow1 twoThirds">
               <div id="existing-apps" className="flex flexwrap gap1 row">
                 {_.map(rp.apps, (app) => (
-                  <AppCard app={app} appspath={rp.appspath} />
+                  <AppCard
+                    app={app}
+                    appspath={rp.appspath}
+                    deleteApp={deleteApp}
+                    deletingApps={deletingApps}
+                  />
                 ))}
               </div>
             </div>
@@ -100,3 +130,8 @@ function App() {
 }
 
 export default App
+
+function showSnackbar(message = '') {
+  jQuery('#rp-snackbar').addClass('show').text(message)
+  setTimeout(() => jQuery('#rp-snackbar').removeClass('show').text(''), 5000)
+}
