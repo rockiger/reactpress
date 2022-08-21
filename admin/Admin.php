@@ -185,31 +185,7 @@ class Admin {
 
 		try {
 			if (!empty($param)) {
-				if ($param === "create_react_app" && $appname && $pageslug) {
-					$existing_appnames = array_map(fn ($el) => $el['appname'], $app_options_list);
-
-					if (in_array($appname, $existing_appnames) || $this->does_pageslug_exist($pageslug)) {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => "App name or page slug already exists.",
-						]);
-					} else {
-						$this->create_new_app($app_options_list, $appname, $pageslug, $template, $type);
-						$this->insert_react_page($appname, $pageslug);
-						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-
-						if ($type === 'development') {
-							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
-						}
-						flush_rewrite_rules();
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => "React app created.",
-							'appname' => $appname,
-							'pageslug' => $pageslug
-						]);
-					}
-				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
+				if ($param === "edit_url_slug" && $appname && $pageslug) {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					if (($app_option && $app_option['pageslug'])) {
 						$this->update_react_page($app_option['pageslug'], $pageslug);
@@ -245,43 +221,8 @@ class Admin {
 						'status' => 1,
 						'message' => 'Index.html updated.',
 					]);
-				} elseif ($param === "start_react_app" && $appname && $pageslug) {
-					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
-					$parts = $this->start_react_app($appname);
-					$parts;
-					if (empty($parts)) {
-						echo wp_json_encode(['status' => 0, 'message' => "Couldn't load app."]);
-					} else {
-						echo wp_json_encode([
-							'status' => 1,
-							'ip' => substr($parts[1], 2),
-							'message' => 'App started.',
-							'port' => $parts[2],
-							'protocol' => $parts[0],
-						]);
-					}
-				} elseif ($param === 'stop_react_app' && $appname) {
-					$this->stop_react_app($appname);
-					echo wp_json_encode([
-						'status' => 1,
-						'message' => 'App stopped.',
-					]);
-				} elseif ($param === 'is_react_app_running' && $appname) {
-					if ($this->is_react_app_running($appname)) {
-						$parts = $this->get_app_uri($this->app_path($appname), 1);
-						echo wp_json_encode([
-							'status' => 1,
-							'ip' => substr($parts[1], 2),
-							'message' => 'App is running.',
-							'port' => $parts[2],
-							'protocol' => $parts[0],
-						]);
-					}
 				} elseif ($param === 'delete_react_app' && $appname) {
 
-					if ($this->is_react_app_running($appname)) {
-						$this->stop_react_app($appname);
-					}
 					$options = get_option('repr_apps');
 					$is_option_deleted = update_option('repr_apps', array_filter(
 						$options,
@@ -297,19 +238,6 @@ class Admin {
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => "Couldn't remove files. Please remove directory by hand.",
-						]);
-					}
-				} elseif ($param === "build_react_app" && $appname && $pageslug) {
-
-					if ($this->build_react_app($appname)) {
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => "App {$appname} build. View",
-						]);
-					} else {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => "Build failed.",
 						]);
 					}
 				} elseif ($param === "get_react_apps") {
@@ -386,72 +314,6 @@ class Admin {
 	}
 
 	/**
-	 * Writes a new app to the database and starts the creation of the app
-	 * in the filesystem.
-	 *
-	 * @param mixed $app_options_list
-	 * @param string $appname
-	 * @param string $pageslug
-	 * @param string $template
-	 * @param string $type
-	 * @return void
-	 * @since 1.0.0
-	 */
-	function create_new_app(
-		$app_options_list,
-		string $appname,
-		string $pageslug,
-		string $template,
-		string $type
-	) {
-		$this->add_app_options($app_options_list, $appname, $pageslug);
-
-		if ($appname && $pageslug && $type) {
-			return $this->create_react_app($appname, $type, $template,);
-		} else {
-			return true;
-		}
-	}
-
-	/**
-	 * Start create-react-app or just creates the directory for the given 
-	 * appname.
-	 * 
-	 * @param string $appname
-	 * @param string $type
-	 * @param string $template
-	 * @return void
-	 * @since 1.0.0
-	 */
-	function create_react_app(string $appname, string $type, string $template = '') {
-		$output = [];
-		$retval = '';
-		$template_option = $template ? " --template {$template}" : '';
-		chdir(REPR_APPS_PATH);
-		if ($type === 'deployment') {
-			return mkdir($appname, 0777, true);
-		} else {
-			exec("npx create-react-app {$appname}{$template_option}", $output, $retval);
-			$this->fix_hot_reloading($appname);
-			$this->add_build_path($appname);
-			return end($output) === 'Happy hacking!' ? true : false;
-		}
-	}
-
-	/**
-	 * Add .env file to fix hot reloading in VM.
-	 * See https://stackoverflow.com/questions/43274925/development-server-of-create-react-app-does-not-auto-refresh#answer-43281575
-	 *
-	 * @param string $appname
-	 * @return void
-	 */
-	function fix_hot_reloading(string $appname) {
-		$index_html_path = sprintf("%s/%s/.env", REPR_APPS_PATH, $appname);
-		$content = "# Fix hot reloading in VMs\nCHOKIDAR_USEPOLLING=true";
-		return file_put_contents($index_html_path, $content);
-	}
-
-	/**
 	 * Reads the React app uri out of the out.log file of the
 	 * app. Which is a splash screen of create-react-app.
 	 *
@@ -483,41 +345,6 @@ class Admin {
 		} else {
 			return explode(':', $matches[0]);
 		}
-	}
-
-	/**
-	 * Builds the given react app, adds the right source path to
-	 * package.json, that react loads assets in the right way.
-	 *
-	 * @param string $appname
-	 * @return int 0 if no success
-	 * @since 1.0.0
-	 */
-	function build_react_app($appname) {
-		$apppath = $this->app_path($appname);
-		// We need the relative path, that we can deploy our
-		// build app to another server later.
-		$relative_apppath = $this->app_path($appname, true);
-		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
-		$homepage = "{$relative_apppath}/build";
-		$path_package_json = "{$apppath}/package.json";
-		$package_json_contents = file_get_contents($path_package_json);
-		if (stripos($package_json_contents, $homepage)) {
-			chdir($apppath);
-			shell_exec("npm run build");
-			return 1;
-		} else {
-			// Add a homepage attribute during the build process and remove it again, 
-			// that the developer can build with the public/index.html without WP.
-			file_put_contents(
-				$path_package_json,
-				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
-			);
-			chdir($apppath);
-			shell_exec("npm run build");
-			return 2;
-		}
-		return 0;
 	}
 
 	/**
@@ -568,17 +395,6 @@ class Admin {
 	}
 
 	/**
-	 * Checks if the given app is running
-	 *
-	 * @param string $appname
-	 * @return boolean
-	 * @since 1.0.0
-	 */
-	function is_react_app_running(string $appname) {
-		return !empty($this->get_node_pids($appname));
-	}
-
-	/**
 	 * Creates the path the app, beginning from root of filesystem
 	 * or htdocs.
 	 *
@@ -595,43 +411,6 @@ class Admin {
 		} else {
 			return $apppath;
 		}
-	}
-
-	/**
-	 * Start the react app and extracts the right url auf the development
-	 * server.
-	 *
-	 * @param string $appname
-	 * @return void
-	 * @since 1.0.0
-	 */
-	function start_react_app(string $appname) {
-		$apppath = $this->app_path($appname);
-		chdir($apppath);
-		shell_exec("npm start > out.log 2>&1 & echo $! > pid.log");
-		return $this->get_app_uri($apppath, 100);
-	}
-
-	/**
-	 * Stops all processes, that were started for the given app
-	 *
-	 * @param string $appname
-	 * @return void
-	 * @since 1.0.0
-	 */
-	function stop_react_app($appname) {
-		// end node processes based on the app path
-		$SIGHUP = 1;
-		$apppath = $this->app_path($appname);
-		foreach ($this->get_node_pids($appname) as $pid) {
-			posix_kill((int)$pid, $SIGHUP);
-		}
-		// cancel npm start
-		$npm_pid = file_get_contents("{$apppath}/pid.log");
-		posix_kill((int)$npm_pid, $SIGHUP);
-		// cleanup remove out.log and pid.log
-		unlink("{$apppath}/pid.log");
-		unlink("{$apppath}/out.log");
 	}
 
 	/**
@@ -724,28 +503,6 @@ class Admin {
 				return ['status' => 'false', 'message' => "Couldn't update page"];
 			}
 		}
-	}
-
-	/**
-	 * Checks if the dev environment is suitable. If not
-	 * produces a message for the user.
-	 *
-	 * @return string
-	 * @since 1.0.0
-	 */
-	public function environment_message(): string {
-		$has_exec = function_exists('exec');
-		$has_shell_exec = function_exists('shell_exec');
-		$is_posix = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
-
-		$message = '';
-		if (!($has_exec && $has_shell_exec)) {
-			$message .= "<li>Your WordPress installation needs access to the php functions <code>exec</code> and <code>shell_exec</code>.</li>";
-		}
-		if (!$is_posix) {
-			$message .= "<li>Right now Windows is not supported for developing apps with ReactPress. <a href=\"https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/\" title=\"Windows Survival Guide for React and Web Developers\" rel=\"noopener\" target=\"_blank\"> Windows users can use WSL. You can also go to the app directory and try <a href='https://create-react-app.dev' title='Create React App Website'  target=\"_blank\">Create React App</a> from there</li>";
-		}
-		return $message;
 	}
 
 	/**
@@ -875,10 +632,6 @@ function repr_delete_directory(string $dirname): bool {
 	return rmdir($dirname);
 }
 
-function repr_response(mixed $value, int $options = 0, int $depth = 512) {
-	echo (wp_json_encode($value, $options, $depth));
-}
-
 /**
  * Write error to a log file named debug.log in wp-content.
  * 
@@ -896,31 +649,6 @@ function repr_log($log) {
 	return $log;
 }
 
-
-function repr_thread($operator, $first, ...$args) {
-	$isThreadFirst = false;
-	switch ($operator) {
-		case '->>':
-			$isThreadFirst = false;
-			break;
-		case '->':
-			$isThreadFirst = true;
-			break;
-		default:
-			throw new \Exception('Operator not supported');
-			break;
-	}
-
-	return array_reduce($args, function ($prev, $next) use ($isThreadFirst) {
-		if (is_array($next)) {
-			$head = $next[0];
-			$tail = array_slice($next, 1);
-			return $isThreadFirst ? call_user_func_array($head, [$prev, ...$tail]) : call_user_func_array($head, [...$tail, $prev]);
-		} else {
-			return call_user_func_array($next, $prev);
-		}
-	}, $first);
-}
 
 /**
  * The html block, the react apps hook to.
