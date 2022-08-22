@@ -17,6 +17,8 @@ export interface AppCardProps {
   editSlug: (appname: string, newSlug: string) => void
   toggledSlugButtons: string[]
   toggleSlugButton: (appname: string) => void
+  updatingApps: string[]
+  updateDevEnvironment: (appname: string, pageslug: string) => void
 }
 
 const TYPES = {
@@ -35,6 +37,8 @@ function AppCard({
   editingAppSlugs,
   toggledSlugButtons,
   toggleSlugButton,
+  updateDevEnvironment,
+  updatingApps,
 }: AppCardProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
@@ -140,15 +144,19 @@ function AppCard({
                 <td>
                   <button
                     className="button button-update"
-                    data-appname={app.appname}
-                    data-pageslug={app.pageslug}
-                    disabled={!app.pageslug}
+                    disabled={
+                      !app.pageslug || _.includes(updatingApps, app.appname)
+                    }
+                    onClick={() =>
+                      updateDevEnvironment(app.appname, app.pageslug)
+                    }
                   >
                     Update Dev-Environment
                   </button>
                   <span
-                    id={`rp-start-spinner-${app.appname}`}
-                    className="crpw-button-spinner spinner"
+                    className={`crpw-button-spinner spinner ${
+                      _.includes(updatingApps, app.appname) ? 'is-active' : ''
+                    }`}
                   ></span>
                   <p className="description">
                     Update the <code>index.html</code> of your local react dev

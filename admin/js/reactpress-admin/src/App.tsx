@@ -13,11 +13,11 @@ declare var rp: RP
 declare var jQuery: any
 
 function App() {
-  console.log(rp)
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
   const [deletingApps, setDeletingApps] = useState<string[]>([])
   const [toggledSlugButtons, setToggledSlugButtons] = useState<string[]>([])
   const [editingAppSlugs, setEditingAppSlugs] = useState<string[]>([])
+  const [updatingApps, setUpdatingApps] = useState<string[]>([])
 
   const deleteApp = useCallback(async (appname: string) => {
     const is_delete = window.confirm(
@@ -96,6 +96,27 @@ function App() {
     [toggleSlugButton]
   )
 
+  const updateDevEnvironment = useCallback(
+    async (appname: string, pageslug: string) => {
+      setUpdatingApps((updatingApps) => _.concat(updatingApps, appname))
+      //call to api
+      const response = await jQuery
+        .post(
+          rp.ajaxurl,
+          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&pageslug=${pageslug}`
+        )
+        .then()
+      const result = JSON.parse(response)
+      if (result.status) {
+        showSnackbar(result.message)
+      } else {
+        showSnackbar("Couldn't update dev environment.")
+      }
+      setUpdatingApps((updatingApps) => _.without(updatingApps, appname))
+    },
+    []
+  )
+
   useEffect(() => {
     getApps()
   }, [setApps])
@@ -155,6 +176,8 @@ function App() {
                     editSlug={editSlug}
                     toggledSlugButtons={toggledSlugButtons}
                     toggleSlugButton={toggleSlugButton}
+                    updateDevEnvironment={updateDevEnvironment}
+                    updatingApps={updatingApps}
                   />
                 ))}
               </div>
