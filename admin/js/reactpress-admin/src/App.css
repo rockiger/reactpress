@@ -81,6 +81,14 @@ p {
   max-width: none;
 }
 
+.gap0125 {
+  gap: 0.125rem;
+}
+
+.gap025 {
+  gap: 0.25rem;
+}
+
 .gap1 {
   gap: 1rem;
 }

@@ -16,6 +16,8 @@ function App() {
   console.log(rp)
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
   const [deletingApps, setDeletingApps] = useState<string[]>([])
+  const [toggledSlugButtons, setToggledSlugButtons] = useState<string[]>([])
+  const [editingAppSlugs, setEditingAppSlugs] = useState<string[]>([])
 
   const deleteApp = useCallback(async (appname: string) => {
     const is_delete = window.confirm(
@@ -35,6 +37,8 @@ function App() {
         // remove app from apps
         setApps((apps) => _.filter(apps, (app) => app.appname !== appname))
         showSnackbar(result.message)
+      } else {
+        showSnackbar("Couldn't delete app.")
       }
       setDeletingApps((deletingApps) => _.without(deletingApps, appname))
     }
@@ -49,6 +53,48 @@ function App() {
       setApps(result.apps)
     }
   }
+
+  const toggleSlugButton = useCallback(
+    (appname: string) => {
+      if (_.includes(toggledSlugButtons, appname)) {
+        setToggledSlugButtons((toggledSlugButtons) =>
+          _.without(toggledSlugButtons, appname)
+        )
+      } else {
+        setToggledSlugButtons((toggledSlugButtons) =>
+          _.concat(toggledSlugButtons, appname)
+        )
+      }
+    },
+    [toggledSlugButtons]
+  )
+
+  const editSlug = useCallback(
+    async (appname: string, newSlug: string) => {
+      toggleSlugButton(appname)
+      setEditingAppSlugs((editingApps) => _.concat(editingApps, appname))
+      //call to api
+      const response = await jQuery
+        .post(
+          rp.ajaxurl,
+          `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}`
+        )
+        .then()
+      const result = JSON.parse(response)
+      if (result.status) {
+        setApps((apps) =>
+          _.map(apps, (app) =>
+            app.appname === appname ? { ...app, pageslug: newSlug } : app
+          )
+        )
+        showSnackbar(result.message)
+      } else {
+        showSnackbar("Couldn't change page slug.")
+      }
+      setEditingAppSlugs((editingApps) => _.without(editingApps, appname))
+    },
+    [toggleSlugButton]
+  )
 
   useEffect(() => {
     getApps()
@@ -99,12 +145,16 @@ function App() {
           <div className="flex gap2 row">
             <div className="col flex grow1 twoThirds">
               <div id="existing-apps" className="flex flexwrap gap1 row">
-                {_.map(rp.apps, (app) => (
+                {_.map(apps, (app) => (
                   <AppCard
                     app={app}
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
                     deletingApps={deletingApps}
+                    editingAppSlugs={editingAppSlugs}
+                    editSlug={editSlug}
+                    toggledSlugButtons={toggledSlugButtons}
+                    toggleSlugButton={toggleSlugButton}
                   />
                 ))}
               </div>
@@ -113,7 +163,8 @@ function App() {
             <div className="col flex grow1 oneThird">
               <p className="pt1">
                 You can find <b>all app sources</b> in your WordPress plugin
-                folder under:<code>{rp.appspath}[appname]</code>.
+                folder under:
+                <code>{`${rp.appspath}/[appname]`.replace('//', '/')}</code>.
               </p>
               <p className="pt1">
                 <b>For deployments</b> to work, make sure, that you{' '}

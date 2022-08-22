@@ -10,7 +10,6 @@
     $('#rp-create-form').validate()
 
     // processing event on button click
-    $(document).on('submit', '#rp-create-form', handleSubmit)
     $('.button-build').click(handleBuildButton)
     $('.button-update').click(handleUpdateButton)
     $('.button-delete').click(handleDeleteButton)

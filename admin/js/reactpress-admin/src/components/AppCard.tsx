@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React from 'react'
+import React, { useRef } from 'react'
 import icon from './icon.svg'
 
 export interface AppDetails {
@@ -13,6 +13,10 @@ export interface AppCardProps {
   appspath: string
   deleteApp: (appname: string) => void
   deletingApps: string[]
+  editingAppSlugs: string[]
+  editSlug: (appname: string, newSlug: string) => void
+  toggledSlugButtons: string[]
+  toggleSlugButton: (appname: string) => void
 }
 
 const TYPES = {
@@ -22,7 +26,17 @@ const TYPES = {
   orphan: 'Orphan - It seems the app folder was deleted.',
 }
 
-function AppCard({ app, appspath, deleteApp, deletingApps }: AppCardProps) {
+function AppCard({
+  app,
+  appspath,
+  deleteApp,
+  deletingApps,
+  editSlug,
+  editingAppSlugs,
+  toggledSlugButtons,
+  toggleSlugButton,
+}: AppCardProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
   return (
     <div id={app.appname} className="AppCard card col flex fullwidth m0 p2">
       <h3 className="title flex m0 mb-05 row">
@@ -43,46 +57,63 @@ function AppCard({ app, appspath, deleteApp, deletingApps }: AppCardProps) {
           <tr>
             <th scope="row">URL Slug</th>
             <td>
-              <div id={`link-to-slug-${app.appname}`}>
-                {!app.pageslug ? (
-                  <i className="fg-grey inline-block lh1 pt05">Not set.</i>
-                ) : (
-                  <a className="inline-block lh1 pt05" href={app.pageslug}>
-                    {app.pageslug}
-                  </a>
-                )}
-                <button
-                  className="button button-icon button-link-to-slug"
-                  data-appname={app.appname}
-                >
-                  <span
-                    className="dashicons dashicons-edit"
-                    data-appname={app.appname}
-                  ></span>
-                </button>
-              </div>
-              <div id={`edit-slug-${app.appname}`} style={{ display: 'none' }}>
-                <input
-                  id={`edit-slug-input-${app.appname}`}
-                  type="text"
-                  value={app.pageslug}
-                />
-                <button
-                  className="button button-primary button-edit-slug-save"
-                  id={`edit-slug-save-${app.appname}`}
-                  data-appname={app.appname}
-                  data-pageslug={app.pageslug}
-                >
-                  Save
-                </button>
-                <button
-                  className="button button-link button-edit-slug-cancel ml025"
-                  id={`edit-slug-cancel-${app.appname}`}
-                  data-appname={`app.appname`}
-                >
-                  Cancel
-                </button>
-              </div>
+              <span
+                className={`crpw-button-spinner spinner ${
+                  _.includes(editingAppSlugs, app.appname) ? 'is-active' : ''
+                }`}
+              ></span>
+              {!_.includes(toggledSlugButtons, app.appname) ? (
+                <div className="flex gap0125">
+                  {!app.pageslug ? (
+                    <i className="fg-grey inline-block lh1 pt05">Not set.</i>
+                  ) : (
+                    <a className="inline-block lh1 pt05" href={app.pageslug}>
+                      {app.pageslug}
+                    </a>
+                  )}
+                  <button
+                    className="button button-icon button-link-to-slug"
+                    onClick={() => toggleSlugButton(app.appname)}
+                  >
+                    <span className="dashicons dashicons-edit"></span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap025">
+                  <input
+                    autoFocus
+                    defaultValue={app.pageslug}
+                    onKeyUp={(ev) => {
+                      if (ev.key === 'Enter') {
+                        ev.preventDefault()
+                        editSlug(
+                          app.appname,
+                          _.get(inputRef, 'current.value', '')
+                        )
+                      }
+                    }}
+                    ref={inputRef}
+                    type="text"
+                  />
+                  <button
+                    className="button button-primary button-edit-slug-save"
+                    onClick={() =>
+                      editSlug(
+                        app.appname,
+                        _.get(inputRef, 'current.value', '')
+                      )
+                    }
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="button button-link button-edit-slug-cancel ml025"
+                    onClick={() => toggleSlugButton(app.appname)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               {!app.pageslug && (
                 <p className="fg-red">
                   <b>Please choose a URL slug for your app!</b>
@@ -98,7 +129,6 @@ function AppCard({ app, appspath, deleteApp, deletingApps }: AppCardProps) {
             <th scope="row">Type</th>
             <td>
               <span style={{ textTransform: 'capitalize' }}>
-                {' '}
                 {TYPES[app?.type || 'development']}
               </span>
             </td>
