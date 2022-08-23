@@ -14,9 +14,6 @@ ReactPress does 3 things:
 
 ## TODO
 
-- [ ] v1.x.0 Add post state label to signal the user a page was created by ReactPress (https://www.ibenic.com/post-states-labels/)
-- [ ] v1.x.0 validate onchange form input
-- [ ] v1.x.0 Add the ability to create admin pages
-- [ ] v1.x.0 Add PHP namespaces (https://www.ibenic.com/php-namespaces-wordpress-plugins/)
-- [ ] v1.x.0 Provide a mechanism to log in on the dev server, to have a realistic dev flow. Could be some mocking or documentation.
-- [ ] v1.x.0 Access an app on several WP pages.
+- [x] v1.4.0 Add PHP namespaces
+- [x] v1.4.0 Use create-react-app in the admin area for dogfooding
+- [x] v1.x.0 Add post state label to signal the user a page was created by ReactPress
