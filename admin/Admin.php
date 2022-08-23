@@ -83,8 +83,9 @@ class Admin {
 		$page = sanitize_title($_REQUEST['page'] ?? "");
 
 		if (in_array($page, $valid_pages)) {
-			wp_enqueue_script('rp-jquery-validate', plugin_dir_url(__FILE__)  . 'js/jquery.validate.min.js', array('jquery'), $this->version, false);
 
+			// We need to load jquery and enable wp_localize_script.
+			// Please don't ask me why!
 			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "rp", array(
@@ -132,7 +133,7 @@ class Admin {
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array(), 1, true);
+				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array('jquery'), 1, true);
 			}
 		}
 	}
