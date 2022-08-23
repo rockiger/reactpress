@@ -76,6 +76,10 @@ p {
   display: flex;
 }
 
+.float-right {
+  float: right;
+}
+
 .fullwidth {
   width: 100%;
   max-width: none;

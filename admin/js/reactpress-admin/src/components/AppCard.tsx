@@ -66,6 +66,11 @@ function AppCard({
                   _.includes(editingAppSlugs, app.appname) ? 'is-active' : ''
                 }`}
               ></span>
+              {_.includes(editingAppSlugs, app.appname) && (
+                <p className="fg-orange float-right">
+                  <b>This may take several minutes.</b>
+                </p>
+              )}
               {!_.includes(toggledSlugButtons, app.appname) ? (
                 <div className="flex gap0125">
                   {!app.pageslug ? (
@@ -158,6 +163,11 @@ function AppCard({
                       _.includes(updatingApps, app.appname) ? 'is-active' : ''
                     }`}
                   ></span>
+                  {_.includes(updatingApps, app.appname) && (
+                    <p className="fg-orange float-right">
+                      <b>This may take several minutes.</b>
+                    </p>
+                  )}
                   <p className="description">
                     Update the <code>index.html</code> of your local react dev
                     environment, to match the styles of your WordPress
