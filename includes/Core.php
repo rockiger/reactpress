@@ -155,6 +155,9 @@ class Core {
 
 		// Add our custom template to the admin's templates dropdown
 		$this->loader->add_filter('theme_page_templates', $plugin_admin, 'repr_add_page_template');
+
+		//
+		$this->loader->add_filter('display_post_states', $plugin_admin, 'add_post_state', 20, 2);
 	}
 
 

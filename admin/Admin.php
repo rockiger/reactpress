@@ -156,6 +156,24 @@ class Admin {
 	}
 
 	/**
+	 * Add your own post state (label) for pages used by apps.
+	 * (C) https://www.ibenic.com/post-states-labels/
+	 * 
+	 * @param array   $states Array of all registered states.
+	 * @param WP_Post $post   Post object that we can use.
+	 */
+	function add_post_state($states, $post) {
+		if ('page' === get_post_type($post)) {
+			$repr_apps = get_option('repr_apps') ?? [];
+			$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
+			if (in_array($post->post_name, $valid_pages)) {
+				$states['reactpress'] = __('ReactPress', 'text-domain');
+			}
+		}
+		return $states;
+	}
+
+	/**
 	 * Add page template.
 	 * (C) https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
 	 * 
