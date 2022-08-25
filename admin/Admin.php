@@ -24,6 +24,8 @@
 
 namespace ReactPress\Admin;
 
+use ReactPress\Includes\Activator;
+
 class Admin {
 
 	/**
@@ -90,7 +92,7 @@ class Admin {
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
-				'apps' => get_option(('repr_apps')),
+				'apps' => get_option('repr_apps'),
 				'appspath' => REPR_APPS_PATH,
 			));
 
@@ -156,7 +158,7 @@ class Admin {
 	}
 
 	/**
-	 * Add your own post state (label) for pages used by apps.
+	 * Add own post state (label) for pages used by apps.
 	 * (C) https://www.ibenic.com/post-states-labels/
 	 * 
 	 * @param array   $states Array of all registered states.
@@ -165,7 +167,8 @@ class Admin {
 	function add_post_state($states, $post) {
 		if ('page' === get_post_type($post)) {
 			$repr_apps = get_option('repr_apps') ?? [];
-			$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
+			$pageslugs = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+			$valid_pages = array_merge(...$pageslugs);
 			if (in_array($post->post_name, $valid_pages)) {
 				$states['reactpress'] = __('ReactPress', 'text-domain');
 			}
@@ -187,6 +190,15 @@ class Admin {
 		return $templates;
 	}
 
+	/**
+	 * https://www.sitepoint.com/wordpress-plugin-updates-right-way/
+	 */
+	public function check_plugin_version() {
+		if (REPR_VERSION !== get_option('repr_version')) {
+			Activator::activate();
+		}
+	}
+
 	public function repr_handle_admin_ajax_request() {
 		/**
 		 * Handles all request from the admin frontend.
@@ -197,6 +209,7 @@ class Admin {
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$app_options_list = $this->get_apps();
+		$old_pageslug = sanitize_title_for_query($_POST['old_pageslug'] ?? '');
 		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
@@ -205,11 +218,24 @@ class Admin {
 		try {
 			if (!empty($param)) {
 				if ($param === "edit_url_slug" && $appname && $pageslug) {
+					//! update for pageslugs
 					$app_option = $this->get_app_options($app_options_list, $appname);
-					if (($app_option && $app_option['pageslug'])) {
-						$this->update_react_page($app_option['pageslug'], $pageslug);
-						$this->change_pageslug_option($app_options_list, $appname, $pageslug);
+					$pageslug_key = array_search($old_pageslug, $app_option['pageslugs']);
+					if (($app_option && $pageslug_key !== false)) {
+						$this->update_react_page($old_pageslug, $pageslug);
+
+						$is_pageslug_changed = $this->change_pageslug_option($app_options_list, $appname, $old_pageslug, $pageslug);
+						if ($is_pageslug_changed === false) {
+							echo wp_json_encode([
+								'status' => 0,
+								'message' => 'Url Slug already taken.'
+							]);
+							return;
+						}
+
 						$this->add_build_path($appname);
+
+						//! remove rewrite rule
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -221,6 +247,7 @@ class Admin {
 						$this->insert_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
+						//! remove rewrite rule
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -573,7 +600,7 @@ class Admin {
 			}
 			return [
 				'appname' => $el,
-				'pageslug' => $app_option['pageslug'] ?? '',
+				'pageslugs' => $app_option['pageslugs'] ?? [],
 				'type' => $type
 			];
 		}, $appnames);
@@ -584,12 +611,12 @@ class Admin {
 		if (!is_array($app_options_list) && $appname && $pageslug) {
 			add_option('repr_apps', [[
 				'appname' => $appname,
-				'pageslug' => $pageslug,
+				'pageslugs' => [$pageslug],
 			]]);
 		} elseif ($appname && $pageslug) {
 			update_option('repr_apps', $this->array_add($app_options_list, [
 				'appname' => $appname,
-				'pageslug' => $pageslug,
+				'pageslugs' => [$pageslug],
 			]));
 		}
 	}
@@ -599,10 +626,15 @@ class Admin {
 	 * @param string $appname 
 	 * @return mixed
 	 */
-	public function change_pageslug_option(array $app_options_list, string $appname, string $pageslug) {
+	public function change_pageslug_option(array $app_options_list, string $appname, string $old_pageslug, string $pageslug) {
 		foreach ($app_options_list as $key => $val) {
 			if ($val['appname'] === $appname) {
-				$app_options_list[$key]['pageslug'] = $pageslug;
+				$is_pageslug_taken = in_array($pageslug, $val['pageslugs']);
+				$pageslug_key = array_search($old_pageslug, $val['pageslugs']);
+				if ($is_pageslug_taken) {
+					return false;
+				}
+				$app_options_list[$key]['pageslugs'][$key] = $pageslug;
 			}
 		}
 		update_option('repr_apps', $app_options_list);

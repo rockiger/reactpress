@@ -4,7 +4,7 @@ import icon from './icon.svg'
 
 export interface AppDetails {
   appname: string
-  pageslug: string
+  pageslugs: string[]
   type?: 'development' | 'deployment' | 'empty' | 'orphan'
 }
 

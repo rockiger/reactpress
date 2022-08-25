@@ -126,12 +126,14 @@ class User {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
 		$repr_apps = get_option('repr_apps') ?? [];
-		$valid_pages = $repr_apps ? array_map(fn ($el) => $el['pageslug'], $repr_apps) : [];
+		$pageslugs = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+
+		$valid_pages = array_merge(...$pageslugs);
 		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
 		if (is_page() && in_array($post->post_name, $valid_pages)) {
 
 			// Setting path variables.
-			$current_app = array_values(array_filter($repr_apps, fn ($el) => $el['pageslug'] === $post->post_name))[0];
+			$current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->post_name, $el['pageslugs'])))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
 
@@ -200,8 +202,11 @@ class User {
 	 */
 	public function add_repr_apps_rewrite_rules() {
 		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
-		foreach ($repr_apps as $app) {
-			add_rewrite_rule('^' . $app['pageslug'] . '/(.*)?', 'index.php?pagename=' . $app['pageslug'], 'top');
+		$pageslugArrays = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+		$pageslugs = array_merge(...$pageslugArrays);
+
+		foreach ($pageslugs as $pageslug) {
+			add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 		}
 	}
 
