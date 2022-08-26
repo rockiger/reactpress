@@ -15,8 +15,6 @@ declare var jQuery: any
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
   const [deletingApps, setDeletingApps] = useState<string[]>([])
-  const [toggledSlugButtons, setToggledSlugButtons] = useState<string[]>([])
-  const [editingAppSlugs, setEditingAppSlugs] = useState<string[]>([])
   const [updatingApps, setUpdatingApps] = useState<string[]>([])
 
   const deleteApp = useCallback(async (appname: string) => {
@@ -54,46 +52,38 @@ function App() {
     }
   }
 
-  const toggleSlugButton = useCallback(
-    (appname: string) => {
-      if (_.includes(toggledSlugButtons, appname)) {
-        setToggledSlugButtons((toggledSlugButtons) =>
-          _.without(toggledSlugButtons, appname)
-        )
-      } else {
-        setToggledSlugButtons((toggledSlugButtons) =>
-          _.concat(toggledSlugButtons, appname)
-        )
-      }
-    },
-    [toggledSlugButtons]
-  )
-
   const editSlug = useCallback(
-    async (appname: string, newSlug: string) => {
-      toggleSlugButton(appname)
-      setEditingAppSlugs((editingApps) => _.concat(editingApps, appname))
+    async (appname: string, newSlug: string, oldSlug: string) => {
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}`
+          `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}&old_pageslug=${oldSlug}`
         )
         .then()
       const result = JSON.parse(response)
       if (result.status) {
         setApps((apps) =>
-          _.map(apps, (app) =>
-            app.appname === appname ? { ...app, pageslug: newSlug } : app
-          )
+          _.map(apps, (app) => {
+            if (app.appname !== appname) return app
+            if (_.isEmpty(app.pageslugs)) {
+              return { ...app, pageslugs: [newSlug] }
+            }
+            if (_.includes(app.pageslugs, oldSlug)) {
+              const pageslugs = _.map(app.pageslugs, (pageslug) =>
+                pageslug === oldSlug ? newSlug : pageslug
+              )
+              return { ...app, pageslugs }
+            }
+            return app
+          })
         )
         showSnackbar(result.message)
       } else {
         showSnackbar("Couldn't change page slug.")
       }
-      setEditingAppSlugs((editingApps) => _.without(editingApps, appname))
     },
-    [toggleSlugButton]
+    []
   )
 
   const updateDevEnvironment = useCallback(
@@ -172,10 +162,7 @@ function App() {
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
                     deletingApps={deletingApps}
-                    editingAppSlugs={editingAppSlugs}
                     editSlug={editSlug}
-                    toggledSlugButtons={toggledSlugButtons}
-                    toggleSlugButton={toggleSlugButton}
                     updateDevEnvironment={updateDevEnvironment}
                     updatingApps={updatingApps}
                   />
