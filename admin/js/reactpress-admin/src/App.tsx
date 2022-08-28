@@ -43,12 +43,16 @@ function App() {
   }, [])
 
   const getApps = async () => {
-    const response = await jQuery
-      .post(rp.ajaxurl, `action=repr_admin_ajax_request&param=get_react_apps`)
-      .then()
-    const result = JSON.parse(response)
-    if (result.apps) {
-      setApps(result.apps)
+    try {
+      const response = await jQuery
+        .post(rp.ajaxurl, `action=repr_admin_ajax_request&param=get_react_apps`)
+        .then()
+      const result = JSON.parse(response)
+      if (result.apps) {
+        setApps(result.apps)
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 

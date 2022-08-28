@@ -221,7 +221,7 @@ class Admin {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					if ($app_option) {
 						// add slug to existing app_options
-						$this->insert_react_page($appname, $pageslug); //! update existing react_page
+						$this->update_react_page($appname, $pageslug);
 						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageslug);
 						// only update app data for succesfull slug updates
 						if ($is_pageslug_updated) {
@@ -241,7 +241,7 @@ class Admin {
 						}
 					} else {
 						// create new app option
-						$this->insert_react_page($appname, $pageslug);
+						$this->update_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
@@ -256,7 +256,7 @@ class Admin {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					$pageslug_key = array_search($old_pageslug, $app_option['pageslugs']);
 					if (($app_option && $pageslug_key !== false)) {
-						$this->update_react_page($old_pageslug, $pageslug);
+						$this->update_react_page_slug($old_pageslug, $pageslug);
 
 						$is_pageslug_changed = $this->update_pageslug($app_options_list, $appname, $old_pageslug, $pageslug);
 						if ($is_pageslug_changed === false) {
@@ -278,7 +278,7 @@ class Admin {
 							'message' => 'Url Slug changed.'
 						]);
 					} elseif (!$this->does_pageslug_exist($pageslug) && $pageslug) {
-						$this->insert_react_page($appname, $pageslug);
+						$this->update_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
 						//! remove rewrite rule
@@ -507,27 +507,35 @@ class Admin {
 	}
 
 	/**
-	 * Creates a new page with the given name and slug. Rejects if the slug is already
-	 * taken
+	 * Creates or updates a page with the given name and slug.
 	 *
 	 * @param string $appname
 	 * @param string $pageslug
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function insert_react_page(string $appname, string $pageslug) {
+	public function update_react_page(string $appname, string $pageslug) {
 		global $wpdb;
 		// check if post_name (which is the slug and should be unique) exist
 		$get_data = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
+				"SELECT `ID`, `post_content` FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
 				$pageslug
 			)
 		);
 
 		if (!empty($get_data)) {
-			// alreade we have data with this post name
-			return ['status' => 'false', 'message' => 'Page already exists.'];
+			// already we have data with this post name
+			if (strpos($get_data->post_content, '<div id="root"></div>') !== false) {
+				return ['status' => 'true', 'message' => 'Page with app already exists.'];
+			}
+			$result = wp_update_post(
+				[
+					'ID' => $get_data->ID,
+					'post_content' => $get_data->post_content . '\n' . REPR_REACT_ROOT_TAG
+				]
+			);
+			return ['status' => 'true', 'message' => 'Add app to page.'];
 		} else {
 			$result = wp_insert_post(
 				array(
@@ -544,7 +552,7 @@ class Admin {
 			if ($result) {
 				return ['status' => 'true', 'message' => 'Page created.'];
 			} else {
-				return ['status' => 'false', 'message' => "Couldn't create page"];
+				return ['status' => 'false', 'message' => "Couldn't create page."];
 			}
 		}
 	}
@@ -557,23 +565,23 @@ class Admin {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function update_react_page(string $oldSlug, string $newSlug) {
+	public function update_react_page_slug(string $oldSlug, string $newSlug) {
 		global $wpdb;
 		// check if post_name (which is the slug and should be unique) exist
 		$get_data = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
+				"SELECT `ID`, `post_content` FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
 				$oldSlug
 			)
 		);
 
 		if (empty($get_data)) {
-			// alreade we have data with this post name
 			return ['status' => 'false', 'message' => 'Couldn\'t find page.'];
 		} else {
 			$result = wp_update_post(
 				array(
 					'ID' => $get_data->ID,
+					'post_content' => $get_data->post_content . '\n' . REPR_REACT_ROOT_TAG,
 					'post_name' => $newSlug,
 				)
 			);
