@@ -97,6 +97,10 @@ p {
   gap: 1rem;
 }
 
+.gap05 {
+  gap: 0.5rem;
+}
+
 .gap2 {
   gap: 2rem;
 }
@@ -145,6 +149,11 @@ p {
 .ml025 {
   margin-left: 0.25rem;
 }
+
+.mt05 {
+  margin-top: 0.5rem;
+}
+
 .mr025,
 .wp-core-ui .button.mr025,
 .wp-core-ui .button-build.mr025 {
@@ -210,7 +219,6 @@ p {
  ***************************/
 .button.button-icon {
   line-height: 1;
-  margin-left: 0.25rem;
 }
 .card {
   margin-top: 0;

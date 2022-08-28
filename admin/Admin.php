@@ -92,7 +92,7 @@ class Admin {
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
-				'apps' => get_option('repr_apps'),
+				'apps' => $this->get_apps(),
 				'appspath' => REPR_APPS_PATH,
 			));
 
@@ -217,14 +217,48 @@ class Admin {
 
 		try {
 			if (!empty($param)) {
-				if ($param === "edit_url_slug" && $appname && $pageslug) {
-					//! update for pageslugs
+				if ($param === "add_url_slug" && $appname && $pageslug) {
+					$app_option = $this->get_app_options($app_options_list, $appname);
+					if ($app_option) {
+						// add slug to existing app_options
+						$this->insert_react_page($appname, $pageslug); //! update existing react_page
+						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageslug);
+						// only update app data for succesfull slug updates
+						if ($is_pageslug_updated) {
+							$this->add_build_path($appname);
+							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+							flush_rewrite_rules();
+							echo wp_json_encode([
+								'status' => 1,
+								'message' => 'Url Slug created.'
+							]);
+						} else {
+							echo wp_json_encode([
+								'status' => 0,
+								'message' => 'Url Slug already exists. Slugs must be unique for ALL apps.'
+							]);
+						}
+					} else {
+						// create new app option
+						$this->insert_react_page($appname, $pageslug);
+						$this->add_app_options($app_options_list, $appname, $pageslug);
+						$this->add_build_path($appname);
+						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						flush_rewrite_rules();
+						echo wp_json_encode([
+							'status' => 1,
+							'message' => 'Url Slug created.'
+						]);
+					}
+				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					$pageslug_key = array_search($old_pageslug, $app_option['pageslugs']);
 					if (($app_option && $pageslug_key !== false)) {
 						$this->update_react_page($old_pageslug, $pageslug);
 
-						$is_pageslug_changed = $this->change_pageslug_option($app_options_list, $appname, $old_pageslug, $pageslug);
+						$is_pageslug_changed = $this->update_pageslug($app_options_list, $appname, $old_pageslug, $pageslug);
 						if ($is_pageslug_changed === false) {
 							echo wp_json_encode([
 								'status' => 0,
@@ -622,19 +656,31 @@ class Admin {
 	}
 
 	/**
-	 * Get the option for the given app name.
+	 * Updates the given pagesslug with a new one. 
+	 * Returns false if pageslug already taken.
+	 * @param array $app_options_list
 	 * @param string $appname 
-	 * @return mixed
+	 * @param string $old_pageslug 
+	 * @param string $pageslug 
+	 * @return false|array 
 	 */
-	public function change_pageslug_option(array $app_options_list, string $appname, string $old_pageslug, string $pageslug) {
+	public function update_pageslug(array $app_options_list, string $appname, string $old_pageslug, string $pageslug) {
 		foreach ($app_options_list as $key => $val) {
+			// pageslug already exists in an app
+			$is_pageslug_taken = in_array($pageslug, $val['pageslugs']);
+			if ($is_pageslug_taken) {
+				return false;
+			}
+
 			if ($val['appname'] === $appname) {
-				$is_pageslug_taken = in_array($pageslug, $val['pageslugs']);
 				$pageslug_key = array_search($old_pageslug, $val['pageslugs']);
-				if ($is_pageslug_taken) {
-					return false;
+				if ($pageslug_key === false) {
+					// create new pageslug
+					array_push($app_options_list[$key]['pageslugs'], $pageslug);
+				} else {
+					// replace old pageslug with new one
+					$app_options_list[$key]['pageslugs'][$pageslug_key] = $pageslug;
 				}
-				$app_options_list[$key]['pageslugs'][$key] = $pageslug;
 			}
 		}
 		update_option('repr_apps', $app_options_list);

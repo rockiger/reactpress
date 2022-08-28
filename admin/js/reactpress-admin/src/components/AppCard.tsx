@@ -14,7 +14,7 @@ export interface AppCardProps {
   appspath: string
   deleteApp: (appname: string) => void
   deletingApps: string[]
-  editSlug: (appname: string, newSlug: string, oldSlug: string) => void
+  updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
   updatingApps: string[]
   updateDevEnvironment: (appname: string, pageslug: string) => void
 }
@@ -31,7 +31,7 @@ function AppCard({
   appspath,
   deleteApp,
   deletingApps,
-  editSlug,
+  updateSlug,
   updateDevEnvironment,
   updatingApps,
 }: AppCardProps) {
@@ -58,26 +58,26 @@ function AppCard({
               {_.map(app.pageslugs, (pageslug) => (
                 <UrlSlugForm
                   appname={app.appname}
-                  editSlug={editSlug}
+                  updateSlug={updateSlug}
                   pageslug={pageslug}
                 />
               ))}
+              <UrlSlugForm
+                appname={app.appname}
+                updateSlug={updateSlug}
+                pageslug={''}
+              />
               {_.isEmpty(app.pageslugs) && (
                 <>
-                  <UrlSlugForm
-                    appname={app.appname}
-                    editSlug={editSlug}
-                    pageslug={''}
-                  />
                   <p className="fg-red">
                     <b>Please choose a URL slug for your app!</b>
                   </p>
+                  <p className="description">
+                    Set the page slug for your React app. The URL slug must not
+                    be used by another page.
+                  </p>
                 </>
               )}
-              <p className="description">
-                Set the page slug for your React app. The URL slug must not be
-                used by another page.
-              </p>
             </td>
           </tr>
           <tr>

@@ -52,13 +52,13 @@ function App() {
     }
   }
 
-  const editSlug = useCallback(
-    async (appname: string, newSlug: string, oldSlug: string) => {
+  const addSlug = useCallback(async (appname: string, newSlug: string) => {
+    try {
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}&old_pageslug=${oldSlug}`
+          `action=repr_admin_ajax_request&param=add_url_slug&appname=${appname}&pageslug=${newSlug}`
         )
         .then()
       const result = JSON.parse(response)
@@ -66,24 +66,63 @@ function App() {
         setApps((apps) =>
           _.map(apps, (app) => {
             if (app.appname !== appname) return app
-            if (_.isEmpty(app.pageslugs)) {
-              return { ...app, pageslugs: [newSlug] }
-            }
-            if (_.includes(app.pageslugs, oldSlug)) {
-              const pageslugs = _.map(app.pageslugs, (pageslug) =>
-                pageslug === oldSlug ? newSlug : pageslug
-              )
-              return { ...app, pageslugs }
-            }
-            return app
+            return { ...app, pageslugs: [...app.pageslugs, newSlug] }
           })
         )
+      }
+      showSnackbar(result.message)
+    } catch (e) {
+      console.error(e)
+      showSnackbar("Couldn't change page slug.")
+    }
+  }, [])
+
+  const editSlug = useCallback(
+    async (appname: string, newSlug: string, oldSlug: string) => {
+      try {
+        //call to api
+        const response = await jQuery
+          .post(
+            rp.ajaxurl,
+            `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}&old_pageslug=${oldSlug}`
+          )
+          .then()
+        const result = JSON.parse(response)
+        if (result.status) {
+          setApps((apps) =>
+            _.map(apps, (app) => {
+              if (app.appname !== appname) return app
+              if (_.isEmpty(app.pageslugs)) {
+                return { ...app, pageslugs: [newSlug] }
+              }
+              if (_.includes(app.pageslugs, oldSlug)) {
+                const pageslugs = _.map(app.pageslugs, (pageslug) =>
+                  pageslug === oldSlug ? newSlug : pageslug
+                )
+                return { ...app, pageslugs }
+              }
+              return app
+            })
+          )
+        }
         showSnackbar(result.message)
-      } else {
+      } catch (e) {
+        console.log(e)
         showSnackbar("Couldn't change page slug.")
       }
     },
     []
+  )
+
+  const updateSlug = useCallback(
+    async (appname: string, newSlug: string, oldSlug: string) => {
+      if (oldSlug) {
+        await editSlug(appname, newSlug, oldSlug)
+      } else {
+        await addSlug(appname, newSlug)
+      }
+    },
+    [addSlug, editSlug]
   )
 
   const updateDevEnvironment = useCallback(
@@ -162,7 +201,7 @@ function App() {
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
                     deletingApps={deletingApps}
-                    editSlug={editSlug}
+                    updateSlug={updateSlug}
                     updateDevEnvironment={updateDevEnvironment}
                     updatingApps={updatingApps}
                   />

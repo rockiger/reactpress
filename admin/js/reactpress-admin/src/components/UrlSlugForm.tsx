@@ -4,12 +4,16 @@ import type { AppCardProps } from './AppCard'
 
 interface UrlSlugFormProps {
   appname: string
-  editSlug: AppCardProps['editSlug']
+  updateSlug: AppCardProps['updateSlug']
   pageslug: string
 }
 
 export default UrlSlugForm
-export function UrlSlugForm({ appname, editSlug, pageslug }: UrlSlugFormProps) {
+export function UrlSlugForm({
+  appname,
+  updateSlug,
+  pageslug,
+}: UrlSlugFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [showInput, setShowInput] = useState<Boolean>(false)
   const [showSpinner, setShowSpinner] = useState<Boolean>(false)
@@ -26,7 +30,7 @@ export function UrlSlugForm({ appname, editSlug, pageslug }: UrlSlugFormProps) {
           <b>This may take several minutes.</b>
         </p>
       )}
-      <div className="flex gap025 mb025">
+      <div className="flex gap05 mb025">
         {showInput ? (
           <>
             <input
@@ -56,9 +60,7 @@ export function UrlSlugForm({ appname, editSlug, pageslug }: UrlSlugFormProps) {
           </>
         ) : (
           <>
-            {_.isEmpty(pageslug) ? (
-              <i className="fg-grey inline-block lh1 pt05">Not set.</i>
-            ) : (
+            {!_.isEmpty(pageslug) && (
               <a className="inline-block lh1 pt05" href={pageslug}>
                 {pageslug}
               </a>
@@ -69,7 +71,11 @@ export function UrlSlugForm({ appname, editSlug, pageslug }: UrlSlugFormProps) {
               disabled={showSpinner}
               onClick={() => setShowInput(true)}
             >
-              <span className="dashicons dashicons-edit"></span>
+              {_.isEmpty(pageslug) ? (
+                'Add slug'
+              ) : (
+                <span className="dashicons dashicons-edit"></span>
+              )}
             </button>
           </>
         )}
@@ -81,7 +87,7 @@ export function UrlSlugForm({ appname, editSlug, pageslug }: UrlSlugFormProps) {
     setShowInput(false)
     if (_.get(inputRef, 'current.value') !== pageslug) {
       setShowSpinner(true)
-      await editSlug(appname, _.get(inputRef, 'current.value', ''), pageslug)
+      await updateSlug(appname, _.get(inputRef, 'current.value', ''), pageslug)
       setShowSpinner(false)
     }
   }
