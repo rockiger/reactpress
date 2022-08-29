@@ -4,6 +4,7 @@ import icon from './icon.svg'
 import UrlSlugForm from './UrlSlugForm'
 
 export interface AppDetails {
+  allowsRouting: boolean
   appname: string
   pageslugs: string[]
   type?: 'development' | 'deployment' | 'empty' | 'orphan'
