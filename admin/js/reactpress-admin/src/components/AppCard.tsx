@@ -1,10 +1,11 @@
 import _ from 'lodash'
-import React, { useRef } from 'react'
+import React from 'react'
 import icon from './icon.svg'
+import UrlSlugForm from './UrlSlugForm'
 
 export interface AppDetails {
   appname: string
-  pageslug: string
+  pageslugs: string[]
   type?: 'development' | 'deployment' | 'empty' | 'orphan'
 }
 
@@ -13,15 +14,12 @@ export interface AppCardProps {
   appspath: string
   deleteApp: (appname: string) => void
   deletingApps: string[]
-  editingAppSlugs: string[]
-  editSlug: (appname: string, newSlug: string) => void
-  toggledSlugButtons: string[]
-  toggleSlugButton: (appname: string) => void
+  updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
   updatingApps: string[]
   updateDevEnvironment: (appname: string, pageslug: string) => void
 }
 
-const TYPES = {
+const APP_TYPES = {
   deployment: 'Production',
   development: 'Development',
   empty: 'Empty Folder - It seems no build folder was added.',
@@ -33,14 +31,10 @@ function AppCard({
   appspath,
   deleteApp,
   deletingApps,
-  editSlug,
-  editingAppSlugs,
-  toggledSlugButtons,
-  toggleSlugButton,
+  updateSlug,
   updateDevEnvironment,
   updatingApps,
 }: AppCardProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
   return (
     <div id={app.appname} className="AppCard card col flex fullwidth m0 p2">
       <h3 className="title flex m0 mb-05 row">
@@ -61,84 +55,36 @@ function AppCard({
           <tr>
             <th scope="row">URL Slug</th>
             <td>
-              <span
-                className={`crpw-button-spinner spinner ${
-                  _.includes(editingAppSlugs, app.appname) ? 'is-active' : ''
-                }`}
-              ></span>
-              {_.includes(editingAppSlugs, app.appname) && (
-                <p className="fg-orange float-right">
-                  <b>This may take several minutes.</b>
-                </p>
+              {_.map(app.pageslugs, (pageslug) => (
+                <UrlSlugForm
+                  appname={app.appname}
+                  updateSlug={updateSlug}
+                  pageslug={pageslug}
+                />
+              ))}
+              <UrlSlugForm
+                appname={app.appname}
+                updateSlug={updateSlug}
+                pageslug={''}
+              />
+              {_.isEmpty(app.pageslugs) && (
+                <>
+                  <p className="fg-red">
+                    <b>Please choose a URL slug for your app!</b>
+                  </p>
+                  <p className="description">
+                    Set the page slug for your React app. The URL slug must not
+                    be used by another page.
+                  </p>
+                </>
               )}
-              {!_.includes(toggledSlugButtons, app.appname) ? (
-                <div className="flex gap0125">
-                  {!app.pageslug ? (
-                    <i className="fg-grey inline-block lh1 pt05">Not set.</i>
-                  ) : (
-                    <a className="inline-block lh1 pt05" href={app.pageslug}>
-                      {app.pageslug}
-                    </a>
-                  )}
-                  <button
-                    className="button button-icon button-link-to-slug"
-                    onClick={() => toggleSlugButton(app.appname)}
-                  >
-                    <span className="dashicons dashicons-edit"></span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap025">
-                  <input
-                    autoFocus
-                    defaultValue={app.pageslug}
-                    onKeyUp={(ev) => {
-                      if (ev.key === 'Enter') {
-                        ev.preventDefault()
-                        editSlug(
-                          app.appname,
-                          _.get(inputRef, 'current.value', '')
-                        )
-                      }
-                    }}
-                    ref={inputRef}
-                    type="text"
-                  />
-                  <button
-                    className="button button-primary button-edit-slug-save"
-                    onClick={() =>
-                      editSlug(
-                        app.appname,
-                        _.get(inputRef, 'current.value', '')
-                      )
-                    }
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="button button-link button-edit-slug-cancel ml025"
-                    onClick={() => toggleSlugButton(app.appname)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-              {!app.pageslug && (
-                <p className="fg-red">
-                  <b>Please choose a URL slug for your app!</b>
-                </p>
-              )}
-              <p className="description">
-                Set the page slug for your React app. The URL slug must not be
-                used by another page.
-              </p>
             </td>
           </tr>
           <tr>
             <th scope="row">Type</th>
             <td>
               <span style={{ textTransform: 'capitalize' }}>
-                {TYPES[app?.type || 'development']}
+                {APP_TYPES[app?.type || 'development']}
               </span>
             </td>
           </tr>
@@ -150,10 +96,14 @@ function AppCard({
                   <button
                     className="button button-update"
                     disabled={
-                      !app.pageslug || _.includes(updatingApps, app.appname)
+                      _.isEmpty(app.pageslugs) ||
+                      _.includes(updatingApps, app.appname)
                     }
                     onClick={() =>
-                      updateDevEnvironment(app.appname, app.pageslug)
+                      updateDevEnvironment(
+                        app.appname,
+                        _.first(app.pageslugs) || ''
+                      )
                     }
                   >
                     Update Dev-Environment
