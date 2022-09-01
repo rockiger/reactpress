@@ -14,6 +14,27 @@ namespace ReactPress\Admin;
 class Utils {
 
   /**
+   * Delete an app slug from an app. Returns the new options list
+   * @param array $app_options_list
+   * @param string $appname 
+   * @param string $pageslug 
+   * @return array
+   */
+  public static function delete_pageslug(array $app_options_list, string $appname, string $pageslug) {
+    $new_app_options_list = array_map(function ($app_option) use ($appname, $pageslug) {
+      if ($app_option['appname'] === $appname) {
+        $app_option['pageslugs'] = array_filter(
+          $app_option['pageslugs'],
+          fn ($ps) => $ps !== $pageslug
+        );
+      }
+      return $app_option;
+    }, $app_options_list);
+    update_option('repr_apps', $new_app_options_list);
+    return $new_app_options_list;
+  }
+
+  /**
    * Get all folders in the apps directory and return them as an array
    *
    * @return array
@@ -35,7 +56,6 @@ class Utils {
    */
   public static function get_apps() {
     $app_options = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
-
 
     // combine apps from directory and from settings to get a complete list
     // event when the user deletes an app from the directory
@@ -74,11 +94,10 @@ class Utils {
    * Removes a rewrite rule from $wp_rewrite->extra_rules_top
    *
    * @param $regex the regex given to add_rewrite_rule
+   * @since 2.0.0
    */
   public static function remove_rewrite_rule(string $regex) {
     global $wp_rewrite;
-    repr_log(array_keys($wp_rewrite->extra_rules_top));
     unset($wp_rewrite->extra_rules_top[$regex]);
-    repr_log(array_keys($wp_rewrite->extra_rules_top));
   }
 }

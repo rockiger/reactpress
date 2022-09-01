@@ -265,6 +265,8 @@ class Admin {
 							'message' => 'Url Slug created.'
 						]);
 					}
+				} elseif ($param === "delete_url_slug" && $appname && $pageslug) {
+					Controller::delete_url_slug($app_options_list, $appname, $pageslug);
 				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					$pageslug_key = array_search($old_pageslug, $app_option['pageslugs']);
@@ -634,6 +636,7 @@ class Admin {
 	 * @param string $old_pageslug 
 	 * @param string $pageslug 
 	 * @return false|array 
+	 * @since 2.0.0
 	 */
 	public function update_pageslug(array $app_options_list, string $appname, string $old_pageslug, string $pageslug) {
 		foreach ($app_options_list as $key => $val) {

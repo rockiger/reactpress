@@ -4,6 +4,7 @@ import type { AppCardProps } from './AppCard'
 
 interface UrlSlugFormProps {
   appname: string
+  deleteSlug?: AppCardProps['deleteSlug']
   isDisabled?: boolean
   pageslug: string
   updateSlug: AppCardProps['updateSlug']
@@ -12,6 +13,7 @@ interface UrlSlugFormProps {
 export default UrlSlugForm
 export function UrlSlugForm({
   appname,
+  deleteSlug,
   isDisabled = false,
   pageslug,
   updateSlug,
@@ -19,7 +21,7 @@ export function UrlSlugForm({
   const inputRef = useRef<HTMLInputElement>(null)
   const [showInput, setShowInput] = useState<Boolean>(false)
   const [showSpinner, setShowSpinner] = useState<Boolean>(false)
-
+  console.log(deleteSlug, !_.isEmpty(pageslug))
   return (
     <>
       <span
@@ -80,6 +82,14 @@ export function UrlSlugForm({
               )}
             </button>
           </>
+        )}
+        {deleteSlug && !_.isEmpty(pageslug) && (
+          <button
+            className="bd-none bg-none fg-red hover:fg-red pointer"
+            onClick={() => deleteSlug(appname, pageslug)}
+          >
+            <span className="dashicons dashicons-trash"></span>
+          </button>
         )}
       </div>
     </>

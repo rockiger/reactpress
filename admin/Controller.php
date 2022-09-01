@@ -14,8 +14,19 @@
 namespace ReactPress\Admin;
 
 use LengthException;
+use ReactPress\Admin\Utils;
 
 class Controller {
+
+  public static function delete_url_slug(array $app_options_list, string $appname, string $pageslug) {
+    try {
+      Utils::delete_pageslug($app_options_list, $appname, $pageslug);
+      echo wp_json_encode(['status' => 1]);
+    } catch (\Exception $e) {
+      repr_log($e);
+      echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
+    }
+  }
 
   public static function toggle_react_routing(string $appname) {
     try {
@@ -26,9 +37,7 @@ class Controller {
           repr_log($el);
           //# create new allowsRouting state
           $allowsRouting = $el['allowsRouting'] ?? false;
-          repr_log($allowsRouting);
           $el['allowsRouting'] = !$allowsRouting;
-          repr_log($el);
 
           //# change rewrite rules in wordpress
           if ($el['allowsRouting']) {

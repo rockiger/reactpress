@@ -14,6 +14,7 @@ export interface AppCardProps {
   app: AppDetails
   appspath: string
   deleteApp: (appname: string) => void
+  deleteSlug: (appname: string, pageslug: string) => void
   deletingApps: string[]
   toggleRouting: (appname: string) => void
   updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
@@ -32,6 +33,7 @@ function AppCard({
   app,
   appspath,
   deleteApp,
+  deleteSlug,
   deletingApps,
   toggleRouting,
   updateSlug,
@@ -61,6 +63,7 @@ function AppCard({
               {_.map(app.pageslugs, (pageslug) => (
                 <UrlSlugForm
                   appname={app.appname}
+                  deleteSlug={deleteSlug}
                   key={pageslug}
                   updateSlug={updateSlug}
                   pageslug={pageslug}
