@@ -235,7 +235,9 @@ class Admin {
 						// only update app data for succesfull slug updates
 						if ($is_pageslug_updated) {
 							$this->add_build_path($appname);
-							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							if ($app_option['allowsRouting']) {
+								add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							}
 							flush_rewrite_rules();
 							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 							echo wp_json_encode([
@@ -253,7 +255,9 @@ class Admin {
 						$this->update_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
-						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						if ($app_option['allowsRouting']) {
+							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						}
 						flush_rewrite_rules();
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						echo wp_json_encode([
@@ -279,7 +283,9 @@ class Admin {
 						$this->add_build_path($appname);
 
 						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
-						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						if ($app_option['allowsRouting']) {
+							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						}
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
 						echo wp_json_encode([
@@ -291,7 +297,9 @@ class Admin {
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
 						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
-						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						if ($app_option['allowsRouting']) {
+							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+						}
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
 						echo wp_json_encode([
