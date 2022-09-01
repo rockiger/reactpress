@@ -4,15 +4,17 @@ import type { AppCardProps } from './AppCard'
 
 interface UrlSlugFormProps {
   appname: string
-  updateSlug: AppCardProps['updateSlug']
+  isDisabled?: boolean
   pageslug: string
+  updateSlug: AppCardProps['updateSlug']
 }
 
 export default UrlSlugForm
 export function UrlSlugForm({
   appname,
-  updateSlug,
+  isDisabled = false,
   pageslug,
+  updateSlug,
 }: UrlSlugFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [showInput, setShowInput] = useState<Boolean>(false)
@@ -68,7 +70,7 @@ export function UrlSlugForm({
             <button
               className="button button-icon button-link-to-slug"
               //@ts-ignore
-              disabled={showSpinner}
+              disabled={showSpinner || isDisabled}
               onClick={() => setShowInput(true)}
             >
               {_.isEmpty(pageslug) ? (

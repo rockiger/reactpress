@@ -68,9 +68,15 @@ function AppCard({
               ))}
               <UrlSlugForm
                 appname={app.appname}
-                updateSlug={updateSlug}
+                isDisabled={!_.isEmpty(app.pageslugs) && app.allowsRouting}
                 pageslug={''}
-              />
+                updateSlug={updateSlug}
+              />{' '}
+              {!_.isEmpty(app.pageslugs) && app.allowsRouting && (
+                <span className="fg-orange">
+                  Apps with client-side routing can only have URL slug.
+                </span>
+              )}
               {_.isEmpty(app.pageslugs) && (
                 <>
                   <p className="fg-red">

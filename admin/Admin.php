@@ -221,6 +221,14 @@ class Admin {
 				if ($param === "add_url_slug" && $appname && $pageslug) {
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					if ($app_option) {
+						//# Check if the app allows adding of more URL slugs
+						if ($app_option['allowsRouting'] && count($app_option['pageslugs'])) {
+							echo wp_json_encode([
+								'status' => 0,
+								'message' => 'Apps with client-side routing can only have URL slug.'
+							]);
+							return;
+						}
 						// add slug to existing app_options
 						$this->update_react_page($appname, $pageslug);
 						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageslug);
