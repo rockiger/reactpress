@@ -24,6 +24,7 @@
 
 namespace ReactPress\Admin;
 
+use ReactPress\Admin\Controller;
 use ReactPress\Includes\Activator;
 
 class Admin {
@@ -92,7 +93,7 @@ class Admin {
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
-				'apps' => $this->get_apps(),
+				'apps' => Utils::get_apps(),
 				'appspath' => REPR_APPS_PATH,
 			));
 
@@ -208,7 +209,7 @@ class Admin {
 		 * @since 1.0.0
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$app_options_list = $this->get_apps();
+		$app_options_list = Utils::get_apps();
 		$old_pageslug = sanitize_title_for_query($_POST['old_pageslug'] ?? '');
 		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
@@ -227,8 +228,8 @@ class Admin {
 						if ($is_pageslug_updated) {
 							$this->add_build_path($appname);
 							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 							flush_rewrite_rules();
+							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 							echo wp_json_encode([
 								'status' => 1,
 								'message' => 'Url Slug created.'
@@ -245,8 +246,8 @@ class Admin {
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
+						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
@@ -269,7 +270,7 @@ class Admin {
 
 						$this->add_build_path($appname);
 
-						//! remove rewrite rule
+						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -281,7 +282,7 @@ class Admin {
 						$this->update_react_page($appname, $pageslug);
 						$this->add_app_options($app_options_list, $appname, $pageslug);
 						$this->add_build_path($appname);
-						//! remove rewrite rule
+						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
 						add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -295,6 +296,8 @@ class Admin {
 							'message' => "There exists another page that already has this page slug.",
 						]);
 					}
+				} elseif ($param === "toggle_react_routing" && $appname) {
+					Controller::toggle_react_routing($appname);
 				} elseif ($param === "update_index_html" && $appname && $pageslug) {
 					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 					echo wp_json_encode([
@@ -321,7 +324,7 @@ class Admin {
 						]);
 					}
 				} elseif ($param === "get_react_apps") {
-					$apps = $this->get_apps();
+					$apps = Utils::get_apps();
 					echo wp_json_encode(['status' => 1, 'apps' => $apps]);
 				} else {
 					echo wp_json_encode([
@@ -591,62 +594,6 @@ class Admin {
 				return ['status' => 'false', 'message' => "Couldn't update page"];
 			}
 		}
-	}
-
-	/**
-	 * Get all folders in the apps directory and return them as an array
-	 *
-	 * @return array
-	 * @since 1.2.0
-	 */
-	public function get_app_names() {
-		// check im reactpress directory exists if not create it
-		wp_mkdir_p(REPR_APPS_PATH);
-		chdir(REPR_APPS_PATH);
-		$appnames = scandir(REPR_APPS_PATH);
-		return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
-	}
-
-	/**
-	 * Return all apps as an array
-	 *
-	 * @return array
-	 * @since 1.2.0
-	 */
-	public function get_apps() {
-		$app_options = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
-
-
-		// combine apps from directory and from settings to get a complete list
-		// event when the user deletes an app from the directory
-		$appnames_from_opts = array_map(fn ($el) => $el['appname'], $app_options);
-		$appnames_from_dir = $this->get_app_names();
-		$appnames = array_unique(array_merge($appnames_from_opts, $appnames_from_dir));
-
-		$apps = array_map(function ($el) use ($app_options) {
-			$app_option = array_reduce(
-				$app_options ? $app_options : [],
-				fn ($carry, $item) =>
-				$item['appname'] === $el ? $item : $carry,
-				[]
-			);
-			$type = '';
-			if (is_file(REPR_APPS_PATH . '/' . $el . '/package.json')) {
-				$type = 'development';
-			} elseif (is_dir(REPR_APPS_PATH . '/' . $el . '/build')) {
-				$type = 'deployment';
-			} elseif (is_dir(REPR_APPS_PATH . '/' . $el)) {
-				$type = 'empty';
-			} else {
-				$type = 'orphan';
-			}
-			return [
-				'appname' => $el,
-				'pageslugs' => $app_option['pageslugs'] ?? [],
-				'type' => $type
-			];
-		}, $appnames);
-		return $apps;
 	}
 
 	public function add_app_options(array $app_options_list, string $appname, string $pageslug) {

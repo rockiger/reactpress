@@ -15,6 +15,7 @@ export interface AppCardProps {
   appspath: string
   deleteApp: (appname: string) => void
   deletingApps: string[]
+  toggleRouting: (appname: string) => void
   updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
   updatingApps: string[]
   updateDevEnvironment: (appname: string, pageslug: string) => void
@@ -32,6 +33,7 @@ function AppCard({
   appspath,
   deleteApp,
   deletingApps,
+  toggleRouting,
   updateSlug,
   updateDevEnvironment,
   updatingApps,
@@ -59,6 +61,7 @@ function AppCard({
               {_.map(app.pageslugs, (pageslug) => (
                 <UrlSlugForm
                   appname={app.appname}
+                  key={pageslug}
                   updateSlug={updateSlug}
                   pageslug={pageslug}
                 />
@@ -79,6 +82,36 @@ function AppCard({
                   </p>
                 </>
               )}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Routing</th>
+            <td>
+              <fieldset>
+                <label htmlFor="allow_routing">
+                  <input
+                    id="allow_routing"
+                    name="allow_routing"
+                    onChange={() => toggleRouting(app.appname)}
+                    type="checkbox"
+                    checked={app.allowsRouting}
+                  />
+                  Use client-side routing
+                </label>
+              </fieldset>
+
+              <p className="description">
+                Check if you want to use a routing library like React Router.
+                That means your React pages can't have sub pages and only one
+                slug will work properly.{' '}
+                <a
+                  href="https://rockiger.com/en/reactpress/client-side-routing/"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Learn more
+                </a>
+              </p>
             </td>
           </tr>
           <tr>

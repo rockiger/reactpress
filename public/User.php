@@ -202,7 +202,8 @@ class User {
 	 */
 	public function add_repr_apps_rewrite_rules() {
 		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
-		$pageslugArrays = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+		$repr_apps_with_routing = array_filter($repr_apps, fn ($el) => $el['allowsRouting']);
+		$pageslugArrays = array_map(fn ($el) => $el['pageslugs'], $repr_apps_with_routing);
 		$pageslugs = array_merge(...$pageslugArrays);
 
 		foreach ($pageslugs as $pageslug) {
