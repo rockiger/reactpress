@@ -32,6 +32,10 @@ class Controller {
 
           //# change rewrite rules in wordpress
           if ($el['allowsRouting']) {
+            // routing is only allowed for one pageslug
+            if (count($el['pageslugs']) > 1) {
+              throw new LengthException('Client-side routing is only allowed for apps with one page slug.');
+            }
             foreach ($el['pageslugs'] as $pageslug) {
               add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
             }

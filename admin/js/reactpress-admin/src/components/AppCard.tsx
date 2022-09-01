@@ -90,13 +90,26 @@ function AppCard({
               <fieldset>
                 <label htmlFor="allow_routing">
                   <input
+                    checked={app.allowsRouting}
+                    disabled={app.pageslugs.length !== 1}
                     id="allow_routing"
                     name="allow_routing"
                     onChange={() => toggleRouting(app.appname)}
                     type="checkbox"
-                    checked={app.allowsRouting}
                   />
-                  Use client-side routing
+                  <span
+                    className={
+                      app.pageslugs.length !== 1 ? 'disabled fg-grey' : ''
+                    }
+                  >
+                    Use client-side routing
+                  </span>{' '}
+                  {app.pageslugs.length !== 1 && (
+                    <span className="fg-orange">
+                      Client-side routing can only be activated for apps with
+                      one page slug.
+                    </span>
+                  )}
                 </label>
               </fieldset>
 

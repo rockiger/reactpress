@@ -51,6 +51,9 @@ p {
 .col {
   flex-direction: column;
 }
+.disabled {
+  opacity: 0.7;
+}
 .disc {
   list-style: disc;
 }
@@ -60,6 +63,10 @@ p {
 }
 .fg-grey {
   color: #646970 !important;
+}
+
+.fg-light-grey {
+  color: #f0f0f1 !important;
 }
 
 .fg-orange {

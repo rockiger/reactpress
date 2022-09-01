@@ -42,7 +42,7 @@ function App() {
     }
   }, [])
 
-  const getApps = async () => {
+  const getApps = useCallback(async () => {
     if (isDevEnvironment()) return
     try {
       const response = await jQuery
@@ -55,7 +55,7 @@ function App() {
     } catch (e) {
       console.error(e)
     }
-  }
+  }, [setApps])
 
   const addSlug = useCallback(async (appname: string, newSlug: string) => {
     try {
@@ -161,6 +161,7 @@ function App() {
       const result = JSON.parse(response)
       if (!result.status) {
         changeState()
+        showSnackbar(result.message)
       }
     } catch (e) {
       console.log(e)
