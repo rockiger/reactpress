@@ -35,7 +35,6 @@ class Controller {
 
       $new_options = array_map(function ($el) use ($appname) {
         if ($el['appname'] === $appname) {
-          repr_log($el);
           //# create new allowsRouting state
           $allowsRouting = $el['allowsRouting'] ?? false;
           $el['allowsRouting'] = !$allowsRouting;

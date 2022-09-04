@@ -46,7 +46,7 @@ class Activator {
 		$repr_apps_with_app_routing = array_map(function ($el) {
 			if (!array_key_exists('allowsRouting', $el)) {
 				$new_el = $el;
-				$new_el['allowsRouting'] = false;
+				$new_el['allowsRouting'] = true;
 				return $new_el;
 			} else {
 				return $el;

@@ -604,11 +604,13 @@ class Admin {
 	public function add_app_options(array $app_options_list, string $appname, string $pageslug) {
 		if (!is_array($app_options_list) && $appname && $pageslug) {
 			add_option('repr_apps', [[
+				'allowsRouting' => false,
 				'appname' => $appname,
 				'pageslugs' => [$pageslug],
 			]]);
 		} elseif ($appname && $pageslug) {
 			update_option('repr_apps', $this->array_add($app_options_list, [
+				'allowsRouting' => false,
 				'appname' => $appname,
 				'pageslugs' => [$pageslug],
 			]));
