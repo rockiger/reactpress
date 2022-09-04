@@ -21,6 +21,7 @@ class Controller {
   public static function delete_url_slug(array $app_options_list, string $appname, string $pageslug) {
     try {
       Utils::delete_pageslug($app_options_list, $appname, $pageslug);
+      Utils::unset_public_url_for_dev_server($appname, $pageslug);
       echo wp_json_encode(['status' => 1]);
     } catch (\Exception $e) {
       repr_log($e);
@@ -47,11 +48,13 @@ class Controller {
             }
             foreach ($el['pageslugs'] as $pageslug) {
               add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+              Utils::set_public_url_for_dev_server($appname, $pageslug);
             }
             flush_rewrite_rules();
           } else {
             foreach ($el['pageslugs'] as $pageslug) {
               Utils::remove_rewrite_rule('^' . $pageslug . '/(.*)?');
+              Utils::unset_public_url_for_dev_server($appname, $pageslug);
             }
             flush_rewrite_rules();
           }

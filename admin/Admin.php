@@ -237,6 +237,7 @@ class Admin {
 							$this->add_build_path($appname);
 							if ($app_option['allowsRouting']) {
 								add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+								Utils::set_public_url_for_dev_server($appname, $pageslug);
 							}
 							flush_rewrite_rules();
 							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
@@ -257,6 +258,7 @@ class Admin {
 						$this->add_build_path($appname);
 						if ($app_option['allowsRouting']) {
 							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							Utils::set_public_url_for_dev_server($appname, $pageslug);
 						}
 						flush_rewrite_rules();
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
@@ -287,6 +289,8 @@ class Admin {
 						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
 						if ($app_option['allowsRouting']) {
 							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							Utils::unset_public_url_for_dev_server($appname, $pageslug);
+							Utils::set_public_url_for_dev_server($appname, $pageslug);
 						}
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -301,6 +305,8 @@ class Admin {
 						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
 						if ($app_option['allowsRouting']) {
 							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+							Utils::unset_public_url_for_dev_server($appname, $pageslug);
+							Utils::set_public_url_for_dev_server($appname, $pageslug);
 						}
 						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
 						flush_rewrite_rules();
@@ -329,7 +335,7 @@ class Admin {
 						$options,
 						fn ($el) => $el['appname'] !== $appname
 					));
-					$is_appdir_removed = repr_delete_directory($this->app_path($appname));
+					$is_appdir_removed = repr_delete_directory(Utils::app_path($appname));
 					if ($is_appdir_removed) {
 						echo wp_json_encode([
 							'status' => 1,
@@ -456,10 +462,10 @@ class Admin {
 	 * @since 1.2.0
 	 */
 	function add_build_path($appname) {
-		$apppath = $this->app_path($appname);
+		$apppath = Utils::app_path($appname);
 		// We need the relative path, that we can deploy our
 		// build app to another server later.
-		$relative_apppath = $this->app_path($appname, true);
+		$relative_apppath = Utils::app_path($appname, true);
 		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
 		$homepage = "{$relative_apppath}/build";
 		$path_package_json = "{$apppath}/package.json";
@@ -488,30 +494,11 @@ class Admin {
 	 * @since 1.0.0
 	 */
 	function get_node_pids($appname) {
-		$apppath = $this->app_path($appname);
+		$apppath = Utils::app_path($appname);
 		$command = "ps aux  | grep {$apppath} | grep -v grep";
 		$processes = [];
 		exec($command, $processes);
 		return array_map(fn ($el) => preg_split("/\ + /", $el)[1], $processes);
-	}
-
-	/**
-	 * Creates the path the app, beginning from root of filesystem
-	 * or htdocs.
-	 *
-	 * @param string $appname
-	 * @param boolean $relative_to_home_path
-	 * @return string
-	 * @since 1.0.0
-	 */
-	function app_path(string $appname, $relative_to_home_path = false): string {
-		$apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
-		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
-		if ($relative_to_home_path) {
-			return explode($document_root, $apppath)[1];
-		} else {
-			return $apppath;
-		}
 	}
 
 	/**
