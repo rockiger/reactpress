@@ -23,6 +23,8 @@
 
 namespace ReactPress\User;
 
+use function ReactPress\Admin\repr_log;
+
 class User {
 
 	/**
@@ -148,14 +150,28 @@ class User {
 			$manifest_url = $react_app_build . 'asset-manifest.json';
 
 			// Request manifest file.
-			$request = @file_get_contents($manifest_url);
+			set_error_handler(
+				// Needed to surpress pontetial errors in file_get_contents and make try/catch
+				// usable for php errors - which are much older than exceptions.
+				function ($severity, $message, $file, $line) {
+					throw new \ErrorException($message, $severity, $severity, $file, $line);
+				}
+			);
+			$request = false;
+			try {
+				$request = file_get_contents($manifest_url);
+			} catch (\Exception $e) {
+				repr_log($e->getMessage());
+			}
+			// remove error handler again.
+			restore_error_handler();
 
 			// If the remote request fails, return.
 			if (!$request)
 				return false;
 
 			// Convert json to php array.
-			$files_data = json_decode($request);
+			$files_data = json_decode(strval($request));
 			if ($files_data === null)
 				return;
 
