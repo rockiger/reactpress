@@ -12,8 +12,10 @@ ReactPress does 3 things:
 - It builds your React app in a way that it is usable from your WordPress site.
 - It makes it easy to upload your app to a live server after building.
 
-## TODO
+## System Requirements
 
-- [x] v1.4.0 Add PHP namespaces
-- [x] v1.4.0 Use create-react-app in the admin area for dogfooding
-- [x] v1.x.0 Add post state label to signal the user a page was created by ReactPress
+To develop React apps your WordPress instance needs access to:
+
+- the PHP function `shell_exec` and `exec`,
+
+- and a POSIX compatible system ([Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ 'Windows Survival Guide for React and Web Developers')).

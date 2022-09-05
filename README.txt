@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 6.0.1
+Tested up to: 6.0.2
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,7 +17,6 @@ Easily create, build and deploy React apps into your existing WordPress sites.
 Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
 
 Combine the flexibility of WordPress with the UI capabilities of React and seamlessly integrate create-react-app into your WordPress project for your next SaaS.
-
 
 ReactPress does 3 things:
 
@@ -33,17 +32,14 @@ To develop React apps your WordPress instance needs access to:
 
 * and a POSIX compatible system ([Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers")).
 
-Optionally, to create React apps directly from the WordPress admin it needs also:
-
-* the nodejs package manager `npm` version 6 or higher
-
 === Development ===
 
 Active development of this plugin is handled [on GitHub](https://github.com/rockiger/reactpress/).
 
 === Documentation ===
 
-If you need more information than the following, you can have a look at the [Documentation page](https://rockiger.com/en/easily-embed-react-apps-into-wordpress-with-reactpress-plugin/).
+You find a more detailed getting started guide at: [
+Getting Started With ReactPress](https://rockiger.com/en/reactpress/getting-started/) ).
 
 To create and deploy your first app:
 
@@ -79,32 +75,51 @@ Repeat steps 6 to 10 when you have new releases you want to deploy.
 
 == Upgrade Notice ==
 
-Release 1.3.0+ does change to way to use ReactPress and gives you much more control. It should solve a lot of issues with using ReactPress in local development environments like Local, DevKinsta, and similar.
+Release 2.0.0+ does change to way to use ReactPress and gives you much more control. It make the use of client-side routing much more transparent.
 
-Nonetheless, backward compatibility should be given.
+Upgrades should be smoothless. Unfortunately, backward compatibility has to be broken for that. Downgrading could be problematic.
 
 == Frequently Asked Questions ==
 
 = How do I make react-router work =
 
-To make sure that react-router works you have to go to your WP permalink setting and click on save chang after every react app you install. This will rebuild the internal router of your WP installation.
+To make client-side routing work, follow this guide: [Client-Side Routing with ReactPress](https://rockiger.com/en/reactpress/client-side-routing/)
+
+= Where do I go for support on your plugin? =
+
+Please visit our [support forum](https://wordpress.org/support/plugin/reactpress/) and search for your problem. If you can't find any help there, feel free to create another topic. 
+
+= Is ReactPress compatible with my theme? =
+
+ReactPress should work with every theme. Depending on the page template you choose you will have a clean slate without any styling or a normal page that inherits the styling of your theme.
+
+You can than style your React app with every styling solution for React that best fits your needs.
+
 
 == Screenshots ==
 
 
-1. Create a new React app for development called *reactino*.
+1. Empty admin view.
 
-2. The new React app is created and running.
+2. The new React app is created.
 
 3. The local React dev server is running on port: 3000. Every change will hot reload immediately.
 
-4. Create a new React app for deployment on the server.
-
-5. The new React app is created, but no dev server is running.
-
-6. The React app is deployed on the public server.
+4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 2.0.0 =
+
+* Add an app to an existing page
+* Make client-side routing optional, thus allowing child pages of a React app
+* Improve documentation
+* Use a React app in more than one page
+* Revamp the admin page to be cleaner and a React app itself
+* Add PHP namespaces
+* Use create-react-app in the admin area for dogfooding
+* Add post state label to signal the user a page was created by ReactPress
+* Test with WordPress 6.0.2
 
 = 1.3.2 = 
 
