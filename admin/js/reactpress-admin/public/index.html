@@ -301,16 +301,12 @@
   <script src='http://reactpress.local/wp-includes/js/utils.js?ver=6.0.1' id='utils-js'></script>
   <script src='http://reactpress.local/wp-content/plugins/debug-bar/js/debug-bar-js.dev.js?ver=20111216'
     id='debug-bar-js-js'></script>
-  <script id='query-monitor-js-extra'>
-    var qm_number_format = { "thousands_sep": ",", "decimal_point": "." };
-    var qm_l10n = { "ajax_error": "PHP Errors in Ajax Response", "ajaxurl": "http:\/\/reactpress.local\/wp-admin\/admin-ajax.php", "auth_nonce": { "on": "90a40190ec", "off": "ae86f367f6", "editor-set": "7bb73f970e" }, "fatal_error": "PHP Fatal Error" };
-  </script>
   <script src='http://reactpress.local/wp-content/plugins/query-monitor/assets/query-monitor.js?ver=1660081380'
     id='query-monitor-js'></script>
   <script src='http://reactpress.local/wp-content/plugins/reactpress/admin/js/jquery.validate.min.js?ver=1.3.2'
     id='rp-jquery-validate-js'></script>
   <script id='reactpress-js-extra'>
-    var rp = { "ajaxurl": "http:\/\/reactpress.local\/wp-admin\/admin-ajax.php", "apps": [{ "appname": "demo", "type": "development", "pageslugs": ["demotest", "demo"] }, { "appname": "demo1", "type": "development", "pageslugs": [] }, { "appname": "demo2", "type": "development", "pageslugs": ["demo2"] }, { "appname": "demo3", "type": "development", "pageslugs": ["demo3"] }], "appspath": "\/home\/macco\/Local Sites\/reactpress\/app\/public\/wp-content\/reactpress\/apps" };
+    var rp = { "ajaxurl": "http:\/\/reactpress.local\/wp-admin\/admin-ajax.php", "apps": [{ "allowsRouting": false, "appname": "demo", "pageslugs": ["demob", "demoteur", "test-3"], "type": "development" }, { "allowsRouting": true, "appname": "demo1", "pageslugs": ["demotest1"], "type": "development" }, { "allowsRouting": false, "appname": "demo6", "pageslugs": ["demo6test"], "type": "development" }, { "allowsRouting": false, "appname": "demo7", "pageslugs": ["demo7test"], "type": "development" }, { "allowsRouting": false, "appname": "demo8", "pageslugs": ["demo8test"], "type": "development" }], "appspath": "\/home\/macco\/Local Sites\/reactpress\/app\/public\/wp-content\/reactpress\/apps" };
   </script>
   <script src='http://reactpress.local/wp-content/plugins/reactpress/admin/js/reactpress-admin.js?ver=1.3.2'
     id='reactpress-js'></script>
@@ -339,129 +335,9 @@
       }
     }
   </style>
-  <script>
-    //window.onload REPLACEMENT
-    // window.addEventListener ? window.addEventListener("load",yourFunction,false) : window.attachEvent && window.attachEvent("onload",yourFunction);
-    PuvoxLibrary =
-    {
-      // check for Ajax calls from front-end
-      backend_call(actName, data, callback, displayLoader) {
-        var self = this;
-
-        data["action"] = tt_ajax_action;
-        data["_wpnonce"] = '518b48320a';
-        data["act"] = actName;
-        var displayLoader = displayLoader || false;
-        if (displayLoader)
-          PuvoxLibrary.spinner(true);
-        jQuery.post
-          (
-            ajaxurl,
-            data,
-            function (response) {
-            }
-          )
-          .done(function (res) {
-            if (displayLoader)
-              PuvoxLibrary.spinner(false);
-            callback(self.responseStringify(res), true, res);
-          })
-          .fail(function (res) {
-            if (displayLoader)
-              PuvoxLibrary.spinner(false);
-            callback(self.responseStringify(res), false, res);
-          })
-        //.always(function(res) { })
-      },
-
-      reload_this_page() {
-        window.location = window.location.href;
-      },
-
-      is_object(variable) {
-        return typeof variable === 'object' && variable !== null;
-      },
-      responseStringify(obj_or_text) {
-        return !this.is_object(obj_or_text) ? obj_or_text : ('responseText' in obj_or_text ? obj_or_text.responseText : JSON.stringify(obj_or_text));
-      },
-
-      //show Spinner (loader-waiter)
-      spinner(action) {
-        var spinner_id = "tt_spinner";
-        if (action) {
-          var div =
-            '<div id="' + spinner_id + '" style="background:black; position:fixed; height:100%; width:100%; opacity:0.9; z-index:9990;   display: flex; justify-content: center; align-items: center;">' +
-            '<div style="">Please Wait...</div>' +
-            '</div>';
-          document.body.insertAdjacentHTML("afterbegin", div);
-        }
-        else {
-          var el = document.getElementById(spinner_id);
-          if (el) {
-            el.parentNode.removeChild(el);
-          }
-        }
-      },
-
-      //shorthand for jQuery dialog
-      dialog: function (message) {
-        jQuery('<div class="ttDialog">' + message + '</div>').dialog({
-          modal: true,
-          width: 500,
-          close: function (event, ui) {
-            jQuery(this).remove();	// Remove it completely on close
-          }
-        });
-      },
-      //shortand for the same, to remember easily
-      message: function (message) {
-        return PuvoxLibrary.dialog(message);
-      },
-
-
-
-      // make an element field to blink/animate
-      blink_field: function (fieldObj) {
-        fieldObj.animate({ backgroundColor: '#00bb00' }, 'slow').animate({ backgroundColor: '#FFFFFF' }, 'slow');
-      },
-
-
-      // hide content if chosen radio box not chosen  
-      radiobox_onchange_hider: function (selector, desiredvalue, target_hidding_selector, SHOW_or_hide) {
-        var SHOW_or_hide = SHOW_or_hide || false;
-        if (typeof roh_dropdown_objs == 'undefined') { roh_dropdown_objs = {}; }
-        if (typeof roh_dropdown_objs[selector] == 'undefined') {
-          roh_dropdown_objs[selector] = true; var funcname = arguments.callee.name;
-          //jQuery(selector).change(function() { window[funcname](selector,desiredvalue, target_hidding_selector, SHOW_or_hide);	});
-          jQuery(selector).change(function () { PuvoxLibrary.radiobox_onchange_hider(selector, desiredvalue, target_hidding_selector, SHOW_or_hide); });
-        }
-        var x = jQuery(target_hidding_selector);
-        if (jQuery(selector + ':checked').val() == desiredvalue) { if (SHOW_or_hide) x.show(); else x.hide(); }
-        else { if (SHOW_or_hide) x.hide(); else x.show(); }
-      },
-
-      // hide content if chosen radio box not chosen  
-      checkbox_onchange_hider: function (selector, when_checked, destination_hidding_selector) {
-        var x = function (target, destination) {
-          if ((when_checked && jQuery(target).is(':checked')) || (!when_checked && jQuery(target).not(':checked'))) {
-            jQuery(destination).show();
-          } else {
-            jQuery(destination).hide();
-          }
-        };
-        x(selector, destination_hidding_selector);
-        jQuery(selector).click(function (e) { x(e.target, destination_hidding_selector); });
-      }
-    };
-  </script>
   <script
     type="text/javascript">var _wpColorScheme = { "icons": { "base": "#a7aaad", "focus": "#72aee6", "current": "#fff" } };</script>
   <link id="wp-admin-canonical" rel="canonical" href="http://reactpress.local/wp-admin/admin.php?page=reactpress" />
-  <script>
-    if (window.history.replaceState) {
-      window.history.replaceState(null, null, document.getElementById('wp-admin-canonical').href + window.location.hash);
-    }
-  </script>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style media="print">
     #wpadminbar {
@@ -890,33 +766,7 @@
 		Version 6.0.1	</p>
 	<div class="clear"></div>
 </div>
-			<script>
-        (function ($) {
-          $(function () {
-            $(document).on('click', '.wpdi-button', function () {
-              var $this = $(this);
-              var $parent = $(this).closest('p');
-              $parent.html('Running...');
-              $.post(ajaxurl, {
-                action: 'dependency_installer',
-                method: $this.attr('data-action'),
-                slug: $this.attr('data-slug'),
-                nonce: $this.attr('data-nonce')
-              }, function (response) {
-                $parent.html(response);
-              });
-            });
-            $(document).on('click', '.dependency-installer .notice-dismiss', function () {
-              var $this = $(this);
-              $.post(ajaxurl, {
-                action: 'dependency_installer',
-                method: 'dismiss',
-                slug: $this.attr('data-slug')
-              });
-            });
-          });
-        })(jQuery);
-      </script>
+			
 					<div id='querylist'>
 
 			<div id="debug-bar-actions">
@@ -1121,7 +971,6 @@
 </script>
 <script src='http://reactpress.local/wp-includes/js/heartbeat.js?ver=6.0.1' id='heartbeat-js'></script>
 <script src='http://reactpress.local/wp-includes/js/wp-auth-check.js?ver=6.0.1' id='wp-auth-check-js'></script>
-<script src='http://reactpress.local/wp-content/plugins/reactpress/admin/js/reactpress-admin/build/static/js/main.5087a711.js?ver=1' id='react-plugin-1-js'></script>
 <script id='dismissible-notices-js-extra'>
   var wp_dismiss_notice = { "nonce": "fc59f1b600", "ajaxurl": "http:\/\/reactpress.local\/wp-admin\/admin-ajax.php" };
 </script>

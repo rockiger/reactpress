@@ -15,6 +15,5 @@
 
 <!-- This file contains the anchor for react and the snackbar element -->
 
-
 <div id="root"></div>
 <div id="rp-snackbar" class="rp-snackbar">Test</div>

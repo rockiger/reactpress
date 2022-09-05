@@ -167,6 +167,9 @@ p {
 .pt1 {
   padding-top: 1rem;
 }
+.pointer {
+  cursor: pointer;
+}
 .row {
   flex-direction: row;
 }

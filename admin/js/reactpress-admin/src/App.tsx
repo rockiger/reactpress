@@ -42,7 +42,8 @@ function App() {
     }
   }, [])
 
-  const getApps = async () => {
+  const getApps = useCallback(async () => {
+    if (isDevEnvironment()) return
     try {
       const response = await jQuery
         .post(rp.ajaxurl, `action=repr_admin_ajax_request&param=get_react_apps`)
@@ -54,7 +55,7 @@ function App() {
     } catch (e) {
       console.error(e)
     }
-  }
+  }, [setApps])
 
   const addSlug = useCallback(async (appname: string, newSlug: string) => {
     try {
@@ -81,8 +82,77 @@ function App() {
     }
   }, [])
 
+  const deleteSlug = useCallback(async (appname: string, pageslug: string) => {
+    const changeState = (add = false) =>
+      setApps((apps) =>
+        _.map(apps, (app) => {
+          if (app.appname !== appname) return app
+          return {
+            ...app,
+            pageslugs: add
+              ? _.concat(app.pageslugs, pageslug)
+              : _.without(app.pageslugs, pageslug),
+          }
+        })
+      )
+
+    //optimistically update state
+    changeState()
+
+    if (isDevEnvironment()) return
+    try {
+      //call to api
+      const response = await jQuery
+        .post(
+          rp.ajaxurl,
+          `action=repr_admin_ajax_request&param=delete_url_slug&appname=${appname}&pageslug=${pageslug}`
+        )
+        .then()
+      const result = JSON.parse(response)
+      if (!result.status) {
+        changeState(true)
+        showSnackbar(result.message)
+      }
+    } catch (e) {
+      console.log(e)
+      changeState(true)
+      showSnackbar("Couldn't delete app slug")
+    }
+  }, [])
+
   const editSlug = useCallback(
     async (appname: string, newSlug: string, oldSlug: string) => {
+      /**
+       * Function that makes it easy to reverse the if api call doesn't work.
+       */
+      const changeState = ({
+        appname,
+        newSlug,
+        oldSlug,
+      }: {
+        appname: string
+        newSlug: string
+        oldSlug: string
+      }) =>
+        setApps((apps) =>
+          _.map(apps, (app) => {
+            if (app.appname !== appname) return app
+            if (_.isEmpty(app.pageslugs)) {
+              return { ...app, pageslugs: [newSlug] }
+            }
+            if (_.includes(app.pageslugs, oldSlug)) {
+              const pageslugs = _.map(app.pageslugs, (pageslug) =>
+                pageslug === oldSlug ? newSlug : pageslug
+              )
+              return { ...app, pageslugs }
+            }
+            return app
+          })
+        )
+      //optimistically update state
+      changeState({ appname, newSlug, oldSlug })
+
+      if (isDevEnvironment()) return
       try {
         //call to api
         const response = await jQuery
@@ -92,31 +162,51 @@ function App() {
           )
           .then()
         const result = JSON.parse(response)
-        if (result.status) {
-          setApps((apps) =>
-            _.map(apps, (app) => {
-              if (app.appname !== appname) return app
-              if (_.isEmpty(app.pageslugs)) {
-                return { ...app, pageslugs: [newSlug] }
-              }
-              if (_.includes(app.pageslugs, oldSlug)) {
-                const pageslugs = _.map(app.pageslugs, (pageslug) =>
-                  pageslug === oldSlug ? newSlug : pageslug
-                )
-                return { ...app, pageslugs }
-              }
-              return app
-            })
-          )
+        if (!result.status) {
+          changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
         }
         showSnackbar(result.message)
       } catch (e) {
         console.log(e)
+        changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
         showSnackbar("Couldn't change page slug.")
       }
     },
     []
   )
+
+  const toggleRouting = useCallback(async (appname: string) => {
+    const changeState = () =>
+      setApps((apps) =>
+        _.map(apps, (app) => {
+          if (app.appname !== appname) return app
+          return { ...app, allowsRouting: !app.allowsRouting }
+        })
+      )
+
+    //optimistically update state
+    changeState()
+
+    if (isDevEnvironment()) return
+    try {
+      //call to api
+      const response = await jQuery
+        .post(
+          rp.ajaxurl,
+          `action=repr_admin_ajax_request&param=toggle_react_routing&appname=${appname}`
+        )
+        .then()
+      const result = JSON.parse(response)
+      if (!result.status) {
+        changeState()
+        showSnackbar(result.message)
+      }
+    } catch (e) {
+      console.log(e)
+      changeState()
+      showSnackbar("Couldn't save app routing")
+    }
+  }, [])
 
   const updateSlug = useCallback(
     async (appname: string, newSlug: string, oldSlug: string) => {
@@ -152,7 +242,7 @@ function App() {
 
   useEffect(() => {
     getApps()
-  }, [setApps])
+  }, [getApps])
 
   return (
     <div className="App rp-content">
@@ -204,7 +294,10 @@ function App() {
                     app={app}
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
+                    deleteSlug={deleteSlug}
                     deletingApps={deletingApps}
+                    key={app.appname}
+                    toggleRouting={toggleRouting}
                     updateSlug={updateSlug}
                     updateDevEnvironment={updateDevEnvironment}
                     updatingApps={updatingApps}
@@ -231,6 +324,10 @@ function App() {
       </div>
     </div>
   )
+
+  function isDevEnvironment() {
+    return process.env.NODE_ENV === 'development'
+  }
 }
 
 export default App

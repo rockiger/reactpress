@@ -30,6 +30,10 @@ p {
   border-color: #46b450 !important;
 }
 
+.bd-none {
+  border: none;
+}
+
 .bd-orange {
   border-color: #f56e28 !important;
 }
@@ -39,6 +43,10 @@ p {
 }
 .bg-green {
   background-color: #46b450 !important;
+}
+
+.bg-none {
+  background: none !important;
 }
 
 .bg-orange {
@@ -51,6 +59,9 @@ p {
 .col {
   flex-direction: column;
 }
+.disabled {
+  opacity: 0.7;
+}
 .disc {
   list-style: disc;
 }
@@ -60,6 +71,10 @@ p {
 }
 .fg-grey {
   color: #646970 !important;
+}
+
+.fg-light-grey {
+  color: #f0f0f1 !important;
 }
 
 .fg-orange {
@@ -72,6 +87,10 @@ p {
 .fg-white {
   color: white !important;
 }
+.hover\:fg-red:hover {
+  color: darkred !important;
+}
+
 .flex {
   display: flex;
 }
@@ -196,6 +215,9 @@ p {
 }
 .pt1 {
   padding-top: 1rem;
+}
+.pointer {
+  cursor: pointer;
 }
 .row {
   flex-direction: row;

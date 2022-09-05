@@ -4,6 +4,7 @@ import icon from './icon.svg'
 import UrlSlugForm from './UrlSlugForm'
 
 export interface AppDetails {
+  allowsRouting: boolean
   appname: string
   pageslugs: string[]
   type?: 'development' | 'deployment' | 'empty' | 'orphan'
@@ -13,7 +14,9 @@ export interface AppCardProps {
   app: AppDetails
   appspath: string
   deleteApp: (appname: string) => void
+  deleteSlug: (appname: string, pageslug: string) => void
   deletingApps: string[]
+  toggleRouting: (appname: string) => void
   updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
   updatingApps: string[]
   updateDevEnvironment: (appname: string, pageslug: string) => void
@@ -30,7 +33,9 @@ function AppCard({
   app,
   appspath,
   deleteApp,
+  deleteSlug,
   deletingApps,
+  toggleRouting,
   updateSlug,
   updateDevEnvironment,
   updatingApps,
@@ -58,15 +63,23 @@ function AppCard({
               {_.map(app.pageslugs, (pageslug) => (
                 <UrlSlugForm
                   appname={app.appname}
+                  deleteSlug={deleteSlug}
+                  key={pageslug}
                   updateSlug={updateSlug}
                   pageslug={pageslug}
                 />
               ))}
               <UrlSlugForm
                 appname={app.appname}
-                updateSlug={updateSlug}
+                isDisabled={!_.isEmpty(app.pageslugs) && app.allowsRouting}
                 pageslug={''}
-              />
+                updateSlug={updateSlug}
+              />{' '}
+              {!_.isEmpty(app.pageslugs) && app.allowsRouting && (
+                <span className="fg-orange">
+                  Apps with client-side routing can only have URL slug.
+                </span>
+              )}
               {_.isEmpty(app.pageslugs) && (
                 <>
                   <p className="fg-red">
@@ -78,6 +91,49 @@ function AppCard({
                   </p>
                 </>
               )}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Routing</th>
+            <td>
+              <fieldset>
+                <label htmlFor="allow_routing">
+                  <input
+                    checked={app.allowsRouting}
+                    disabled={app.pageslugs.length !== 1}
+                    id="allow_routing"
+                    name="allow_routing"
+                    onChange={() => toggleRouting(app.appname)}
+                    type="checkbox"
+                  />
+                  <span
+                    className={
+                      app.pageslugs.length !== 1 ? 'disabled fg-grey' : ''
+                    }
+                  >
+                    Use client-side routing
+                  </span>{' '}
+                  {app.pageslugs.length !== 1 && (
+                    <span className="fg-orange">
+                      Client-side routing can only be activated for apps with
+                      one page slug.
+                    </span>
+                  )}
+                </label>
+              </fieldset>
+
+              <p className="description">
+                Check if you want to use a routing library like React Router.
+                That means your React pages can't have sub pages and only one
+                slug will work properly.{' '}
+                <a
+                  href="https://rockiger.com/en/reactpress/client-side-routing/"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Learn more
+                </a>
+              </p>
             </td>
           </tr>
           <tr>
