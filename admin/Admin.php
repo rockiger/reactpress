@@ -479,7 +479,7 @@ class Admin {
 			// that the developer can build with the public/index.html without WP.
 			file_put_contents(
 				$path_package_json,
-				str_replace("react-scripts build", "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+				str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
 			);
 			return 2;
 		}

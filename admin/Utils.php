@@ -50,7 +50,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $search = "\"react-scripts start\"";
-    $replace = "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
+    $replace = IS_WINDOWS ? "\"set PUBLIC_URL={$pageslug}&&react-scripts build\"" : "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } elseif (stripos($package_json_contents, $replace)) {
@@ -82,7 +82,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $replace = "\"react-scripts start\"";
-    $search = "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
+    $search = IS_WINDOWS ? "\"set PUBLIC_URL={$pageslug}&&react-scripts build\"" : "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } else {
