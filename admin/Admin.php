@@ -487,21 +487,6 @@ class Admin {
 	}
 
 	/**
-	 * Get the pid of the processes start by npm start.
-	 *
-	 * @param string $appname
-	 * @return array of the pids
-	 * @since 1.0.0
-	 */
-	function get_node_pids($appname) {
-		$apppath = Utils::app_path($appname);
-		$command = "ps aux  | grep {$apppath} | grep -v grep";
-		$processes = [];
-		exec($command, $processes);
-		return array_map(fn ($el) => preg_split("/\ + /", $el)[1], $processes);
-	}
-
-	/**
 	 * Helper function to add an element to an array
 	 * without mutationg the original array.
 	 *

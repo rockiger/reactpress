@@ -28,9 +28,7 @@ ReactPress does 3 things:
 
 To develop React apps your WordPress instance needs access to:
 
-* the PHP function `shell_exec` and `exec`,
-
-* and a POSIX compatible system ([Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers")).
+* POSIX compatible system, Windows support is experimental. ([Alternatively Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers"))
 
 === Development ===
 
