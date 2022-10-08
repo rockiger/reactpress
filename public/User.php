@@ -182,10 +182,11 @@ class User {
 			// Get assets links.
 			$assets_files = $files_data->entrypoints;
 
-			$js_files = array_filter(
+			// We use array_values to reindex the array (because PHP)
+			$js_files = array_values(array_filter(
 				$assets_files,
 				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
-			);
+			));
 			$css_files = array_filter(
 				$assets_files,
 				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
@@ -203,10 +204,15 @@ class User {
 
 			// Variables for app use
 			wp_localize_script('rp-react-app-asset-0', 'reactPress', array(
+				'api' => [
+					'nonce' => wp_create_nonce('wp_rest'),
+					'rest_url' => esc_url_raw(rest_url()),
+
+				],
 				'user' => wp_get_current_user(),
 				'usermeta' => get_user_meta(
 					get_current_user_id()
-				)
+				),
 			));
 		}
 	}
