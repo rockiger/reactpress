@@ -186,7 +186,8 @@ class Admin {
 	 * @since 1.0.0
 	 */
 	public function repr_add_page_template($templates) {
-		$templates[REPR_PLUGIN_PATH . 'templates/react-page-template.php'] = __('Page Template From ReactPress', 'text-domain');
+		$templates[REPR_PLUGIN_PATH . 'templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
+		$templates[REPR_PLUGIN_PATH . 'templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
 
 		return $templates;
 	}
