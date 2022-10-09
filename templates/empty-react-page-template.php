@@ -114,11 +114,10 @@ function repr_write_react_app_into_template() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
-  <link rel="apple-touch-icon" href="" />
+  <link rel="apple-touch-icon" href="<?php echo wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0] ?? '/favicon.ico'; ?>" />
   <link rel="manifest" href="/<?php echo $post->post_name; ?>/manifest.json" />
   <title>React App</title>
-  <?php echo wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0] ?? '/favicon.ico';
-  ?>
+
   <?php repr_write_react_app_into_template() ?>
 </head>
 
