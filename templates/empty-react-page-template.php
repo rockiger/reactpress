@@ -87,7 +87,8 @@ function repr_write_react_app_into_template() {
     }
 
     // Variables for app use
-    echo '<script>' . wp_json_encode(
+    echo '<script> 
+            var reactPress = ' . wp_json_encode(
       [
         'api' => [
           'nonce' => wp_create_nonce('wp_rest'),
@@ -116,7 +117,7 @@ function repr_write_react_app_into_template() {
   <meta name="description" content="Web site created using create-react-app" />
   <link rel="apple-touch-icon" href="<?php echo wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0] ?? '/favicon.ico'; ?>" />
   <link rel="manifest" href="/<?php echo $post->post_name; ?>/manifest.json" />
-  <title>React App</title>
+  <title><?php echo $post->post_title; ?></title>
 
   <?php repr_write_react_app_into_template() ?>
 </head>
