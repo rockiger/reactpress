@@ -16,7 +16,7 @@
  * Plugin Name:       ReactPress
  * Plugin URI:        https://rockiger.com/en/reactpress
  * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
- * Version:           2.1.0
+ * Version:           2.1.1
  * Author:            Rockiger
  * Author URI:        https://rockiger.com/en/reactpress
  * License:           GPL-2.0+
@@ -56,7 +56,7 @@ define('REPR_VERSION', '2.1.0');
 define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
 define('REPR_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_url(__FILE__));
-define('REPR_PLUGIN_PATH', plugin_dir_path(__FILE__));
+define('REPR_PLUGIN_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
 
 define('REPR_APPS_PATH', IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
 define('REPR_APPS_URL', content_url() . '/reactpress/apps');
