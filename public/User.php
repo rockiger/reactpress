@@ -106,11 +106,27 @@ class User {
 		if (is_page()) {
 			$meta = get_post_meta(get_the_ID());
 
-			if (
-				!empty($meta['_wp_page_template'][0]) && $meta['_wp_page_template'][0] != $template && 'default' !== $meta['_wp_page_template'][0] &&	strpos($meta['_wp_page_template'][0], 'react-page-template.php')
-			) {
-				$template = $meta['_wp_page_template'][0];
-			}
+			// Check if the page template is a Reactpress template
+			if (!empty($meta['_wp_page_template'][0]) &&
+			    $meta['_wp_page_template'][0] != $template &&
+			    'default' !== $meta['_wp_page_template'][0] &&
+			    strpos($meta['_wp_page_template'][0], 'react-page-template.php')
+			    ) {
+			        // At this point we know it's a Reactpress template
+			        $template = $meta['_wp_page_template'][0];
+
+			        // determine the location of the templates folder reference
+			        $ndx = strpos($template, 'templates/');
+
+			        // If it's not at the beginning
+			        if (0 != $ndx) {
+			            // change the template to be relative to the plugin's folder (i.e., templates/react-page-template.php)
+			            $template = substr($template, $ndx);
+			        }
+
+			        // Prepend the real path at runtime
+			        $template = REPR_PLUGIN_PATH . $template;
+			    }
 		}
 
 		return $template;

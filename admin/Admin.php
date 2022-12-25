@@ -186,8 +186,9 @@ class Admin {
 	 * @since 1.0.0
 	 */
 	public function repr_add_page_template($templates) {
-		$templates[REPR_PLUGIN_PATH . 'templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
-		$templates[REPR_PLUGIN_PATH . 'templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
+	    // Use relative paths for the templates and then resolve them at runtime.
+	    $templates['templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
+	    $templates['templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
 
 		return $templates;
 	}
@@ -539,8 +540,9 @@ class Admin {
 					'post_author' => '1',
 					'post_content' => REPR_REACT_ROOT_TAG,
 					'post_type' => "page",
-					// Assign page template
-					'page_template'  => REPR_PLUGIN_PATH . 'templates/react-page-template.php',
+				    // Assign page template using the relative path, it will be
+				    // resolved to the fully qualified name at run-time
+				    'page_template'  => 'templates/react-page-template.php',
 				)
 			);
 			if ($result) {
