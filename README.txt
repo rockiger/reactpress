@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 6.1.1
 Requires PHP: 7.4
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,7 @@ ReactPress does 3 things:
 
 To develop React apps your WordPress instance needs access to:
 
+* Access to the PHP function `file_get_contents`. Some hosting providers deactivate `fopen` on which `file_get_contents` depends. Access to `file_get_contents` is neccessary on your dev and your live system!
 * POSIX compatible system, Windows support is experimental. ([Alternatively Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers"))
 
 === Development ===
@@ -106,6 +107,11 @@ You can than style your React app with every styling solution for React that bes
 4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 2.1.3 =
+
+* Use relative file names for templates, to  allow different folder configurations. Thanks to https://github.com/BlairCooper.
+* Improve system requirements
 
 = 2.1.2 =
 
