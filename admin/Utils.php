@@ -170,7 +170,21 @@ class Utils {
         'type' => $type
       ];
     }, $appnames);
-    return $apps;
+
+    //# Enrich the apps with page data
+    $apps_enriched = array_map(function($app) {
+    $newApp = $app;
+    $newApp['pages'] = array_map(function($id) {
+        $p = get_post(100);
+        return [
+          'ID' => $p->ID ?? 0,
+          'permalink' => get_permalink( $p ),
+          'title' => $p->post_title ?? '', 
+        ];
+      }, $app['pageIds']);
+      return $newApp;
+    }, $apps);
+    return $apps_enriched;
   }
 
   /**
