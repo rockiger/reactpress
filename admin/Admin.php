@@ -213,8 +213,9 @@ class Admin {
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$app_options_list = Utils::get_apps();
 		$old_pageslug = sanitize_title_for_query($_POST['old_pageslug'] ?? '');
-		$pageId = sanitize_title_for_query($_POST['pageslug'] ?? '');
+		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$pageId = sanitize_title_for_query($_POST['pageId'] ?? '');
+		$page_title = sanitize_title_for_query($_POST['page_title'] ?? '');
 		$permalink = sanitize_title_for_query($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
@@ -236,7 +237,8 @@ class Admin {
 						}
 						// add slug to existing app_options
 						$this->update_react_page($appname, $pageId);
-						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageId);
+						$is_pageslug_updated = true; 
+						//$this->update_pageslug($app_options_list, $appname, '', $pageId);
 						// only update app data for succesfull slug updates
 						if ($is_pageslug_updated) {
 							$this->add_build_path($appname);
@@ -245,10 +247,13 @@ class Admin {
 								Utils::set_public_url_for_dev_server($appname, $pageId);
 							}
 							flush_rewrite_rules();
-							$this->write_index_html($appname, $this->get_index_html_content($pageId));
+							$this->write_index_html($appname, $this->get_index_html_content($permalink));
 							echo wp_json_encode([
 								'status' => 1,
-								'message' => 'Url Slug created.'
+								'message' => 'Page added.',
+								'pageId' => 0,
+								'page_title' => 'Page Title',
+								'permalink' => 'test'
 							]);
 						} else {
 							echo wp_json_encode([
@@ -266,7 +271,7 @@ class Admin {
 							Utils::set_public_url_for_dev_server($appname, $pageId);
 						}
 						flush_rewrite_rules();
-						$this->write_index_html($appname, $this->get_index_html_content($pageId));
+						$this->write_index_html($appname, $this->get_index_html_content($permalink));
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
@@ -277,7 +282,7 @@ class Admin {
 				} elseif ($param === "toggle_react_routing" && $appname) {
 					Controller::toggle_react_routing($appname);
 				} elseif ($param === "update_index_html" && $appname && $pageId) {
-					$this->write_index_html($appname, $this->get_index_html_content($pageId));
+					$this->write_index_html($appname, $this->get_index_html_content($permalink));
 					echo wp_json_encode([
 						'status' => 1,
 						'message' => 'Index.html updated.',
@@ -340,17 +345,17 @@ class Admin {
 	}
 
 	/**
-	 * Downloads the content of the page with the given pageslug and removes the
+	 * Downloads the content of the page with the given permalink and removes the
 	 * the react assets of the build page, that we can use the content for our
 	 * development server.
 	 *
-	 * @param string $pageslug
+	 * @param $permalink
 	 * @return string
 	 * @since 1.0.0
 	 */
-	public function get_index_html_content(string $pageslug) {
+	public function get_index_html_content(string $permalink) {
 		$file_contents = wp_remote_retrieve_body(
-			wp_remote_get(site_url() . '/' . $pageslug, ['timeout' => 1000])
+			wp_remote_get($permalink, ['timeout' => 1000])
 		);
 		$file_contents_arr = explode(PHP_EOL, $file_contents);
 		// filter all build assets out of the file, that they don't conflict

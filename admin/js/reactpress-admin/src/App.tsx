@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import _ from 'lodash'
 import logo from './logo.svg'
 import './App.css'
-import AppCard, { AppDetails } from './components/AppCard'
+import AppCard from './components/AppCard'
+import type { AppDetails, Page } from './components/AppCard'
 
 interface RP {
   ajaxurl: string
@@ -11,6 +12,8 @@ interface RP {
 }
 declare var rp: RP
 declare var jQuery: any
+
+console.log(rp)
 
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
@@ -57,126 +60,83 @@ function App() {
     }
   }, [setApps])
 
-  const addSlug = useCallback(async (appname: string, newSlug: string) => {
+  const addPage = useCallback(
+    async (appname: string, pageId: number, pageTitle: string) => {
+      try {
+        //call to api
+        const response = await jQuery
+          .post(
+            rp.ajaxurl,
+            `action=repr_admin_ajax_request&param=add_page&appname=${appname}&pageId=${pageId}&page_title=${pageTitle}`
+          )
+          .then()
+        const result = JSON.parse(response)
+        if (result.status) {
+          setApps((apps) =>
+            _.map(apps, (app) => {
+              if (app.appname !== appname) return app
+              return {
+                ...app,
+                pageIds: [...app.pageIds, result.pageId],
+                pages: [
+                  ...app.pages,
+                  {
+                    ID: result.pageId,
+                    permalink: result.permalink,
+                    title: result.page_title,
+                  },
+                ],
+              }
+            })
+          )
+        }
+        showSnackbar(result.message)
+      } catch (e) {
+        console.error(e)
+        showSnackbar("Couldn't add page.")
+      }
+    },
+    []
+  )
+
+  const deletePage = useCallback(async (appname: string, page: Page) => {
+    const changeState = (add = false) =>
+      setApps((apps) =>
+        _.map(apps, (app) => {
+          if (app.appname !== appname) return app
+          return {
+            ...app,
+            pageIds: add
+              ? _.concat(app.pageIds, page.ID)
+              : _.without(app.pageIds, page.ID),
+            pages: add ? _.concat(app.pages, page) : _.without(app.pages, page),
+          }
+        })
+      )
+
+    //optimistically update state
+    changeState()
+
+    if (isDevEnvironment()) return
     try {
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=add_page&appname=${appname}&pageslug=${newSlug}`
+          `action=repr_admin_ajax_request&param=delete_page&appname=${appname}&pageId=${page.ID}`
         )
         .then()
       const result = JSON.parse(response)
-      if (result.status) {
-        setApps((apps) =>
-          _.map(apps, (app) => {
-            if (app.appname !== appname) return app
-            return { ...app, pageslugs: [...app.pageslugs, newSlug] }
-          })
-        )
+      if (!result.status) {
+        changeState(true)
+        showSnackbar(result.message)
       }
-      showSnackbar(result.message)
     } catch (e) {
-      console.error(e)
-      showSnackbar("Couldn't change page slug.")
+      console.log(e)
+      changeState(true)
+      showSnackbar("Couldn't delete app.")
     }
   }, [])
-
-  const deletePage = useCallback(
-    async (appname: string, pageId: number, permalink: string) => {
-      const changeState = (add = false) =>
-        setApps((apps) =>
-          _.map(apps, (app) => {
-            if (app.appname !== appname) return app
-            return {
-              ...app,
-              pageslugs: add
-                ? _.concat(app.pageslugs, pageslug)
-                : _.without(app.pageslugs, pageslug),
-            }
-          })
-        )
-
-      //optimistically update state
-      changeState()
-
-      if (isDevEnvironment()) return
-      try {
-        //call to api
-        const response = await jQuery
-          .post(
-            rp.ajaxurl,
-            `action=repr_admin_ajax_request&param=delete_page&appname=${appname}&pageId=${pageId}&permalink=${permalink}`
-          )
-          .then()
-        const result = JSON.parse(response)
-        if (!result.status) {
-          changeState(true)
-          showSnackbar(result.message)
-        }
-      } catch (e) {
-        console.log(e)
-        changeState(true)
-        showSnackbar("Couldn't delete app slug")
-      }
-    },
-    []
-  )
-
-  const editSlug = useCallback(
-    async (appname: string, newSlug: string, oldSlug: string) => {
-      /**
-       * Function that makes it easy to reverse the if api call doesn't work.
-       */
-      const changeState = ({
-        appname,
-        newSlug,
-        oldSlug,
-      }: {
-        appname: string
-        newSlug: string
-        oldSlug: string
-      }) =>
-        setApps((apps) =>
-          _.map(apps, (app) => {
-            if (app.appname !== appname) return app
-            if (_.isEmpty(app.pageslugs)) {
-              return { ...app, pageslugs: [newSlug] }
-            }
-            if (_.includes(app.pageslugs, oldSlug)) {
-              const pageslugs = _.map(app.pageslugs, (pageslug) =>
-                pageslug === oldSlug ? newSlug : pageslug
-              )
-              return { ...app, pageslugs }
-            }
-            return app
-          })
-        )
-      //optimistically update state
-      changeState({ appname, newSlug, oldSlug })
-
-      if (isDevEnvironment()) return
-      try {
-        //call to api
-        const response = await jQuery
-          .post(
-            rp.ajaxurl,
-            `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}&old_pageslug=${oldSlug}`
-          )
-          .then()
-        const result = JSON.parse(response)
-        if (!result.status) {
-          changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
-        }
-        showSnackbar(result.message)
-      } catch (e) {
-        console.log(e)
-        changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
-        showSnackbar("Couldn't change page slug.")
-      }
-    },
-    []
-  )
 
   const toggleRouting = useCallback(async (appname: string) => {
     const changeState = () =>
@@ -211,25 +171,14 @@ function App() {
     }
   }, [])
 
-  const updateSlug = useCallback(
-    async (appname: string, newSlug: string, oldSlug: string) => {
-      if (oldSlug) {
-        await editSlug(appname, newSlug, oldSlug)
-      } else {
-        await addSlug(appname, newSlug)
-      }
-    },
-    [addSlug, editSlug]
-  )
-
   const updateDevEnvironment = useCallback(
-    async (appname: string, pageslug: string) => {
+    async (appname: string, pageId: number) => {
       setUpdatingApps((updatingApps) => _.concat(updatingApps, appname))
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&pageslug=${pageslug}`
+          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&pageslug=${pageId}`
         )
         .then()
       const result = JSON.parse(response)
@@ -294,6 +243,7 @@ function App() {
               <div id="existing-apps" className="flex flexwrap gap1 row">
                 {_.map(apps, (app) => (
                   <AppCard
+                    addPage={addPage}
                     app={app}
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
@@ -301,7 +251,6 @@ function App() {
                     deletingApps={deletingApps}
                     key={app.appname}
                     toggleRouting={toggleRouting}
-                    updateSlug={updateSlug}
                     updateDevEnvironment={updateDevEnvironment}
                     updatingApps={updatingApps}
                   />

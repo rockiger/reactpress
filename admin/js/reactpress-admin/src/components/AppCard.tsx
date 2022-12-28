@@ -1,25 +1,30 @@
 import _ from 'lodash'
 import React from 'react'
 import icon from './icon.svg'
-import UrlSlugForm from './UrlSlugForm'
 
+export interface Page {
+  ID: number
+  permalink: string
+  title: string
+}
 export interface AppDetails {
   allowsRouting: boolean
   appname: string
-  pageslugs: string[]
+  pageIds: number[]
+  pages: Page[]
   type?: 'development' | 'deployment' | 'empty' | 'orphan'
 }
 
 export interface AppCardProps {
+  addPage: (appname: string, pageId: number, pageTitle: string) => void
   app: AppDetails
   appspath: string
   deleteApp: (appname: string) => void
-  deleteSlug: (appname: string, pageslug: string) => void
+  deletePage: (appname: string, page: Page) => void
   deletingApps: string[]
   toggleRouting: (appname: string) => void
-  updateSlug: (appname: string, newSlug: string, oldSlug: string) => void
   updatingApps: string[]
-  updateDevEnvironment: (appname: string, pageslug: string) => void
+  updateDevEnvironment: (appname: string, pageId: number) => void
 }
 
 const APP_TYPES = {
@@ -30,13 +35,13 @@ const APP_TYPES = {
 }
 
 function AppCard({
+  addPage,
   app,
   appspath,
   deleteApp,
   deletePage,
   deletingApps,
   toggleRouting,
-  updateSlug,
   updateDevEnvironment,
   updatingApps,
 }: AppCardProps) {
@@ -58,83 +63,27 @@ function AppCard({
             </td>
           </tr>
           <tr>
-            <th scope="row">URL Slug</th>
+            <th scope="row">Target Pages</th>
             <td>
-              {_.map(app.pageslugs, (pageslug) => (
-                <UrlSlugForm
-                  appname={app.appname}
-                  deletePage={deletePage}
-                  key={pageslug}
-                  updateSlug={updateSlug}
-                  pageslug={pageslug}
-                />
+              {_.map(app.pages, (page) => (
+                <div>{page.title}</div>
               ))}
-              <UrlSlugForm
-                appname={app.appname}
-                isDisabled={!_.isEmpty(app.pageslugs) && app.allowsRouting}
-                pageslug={''}
-                updateSlug={updateSlug}
-              />{' '}
-              {!_.isEmpty(app.pageslugs) && app.allowsRouting && (
+              <div>Add page</div>
+              {!_.isEmpty(app.pageIds) && app.allowsRouting && (
                 <span className="fg-orange">
                   Apps with client-side routing can only have URL slug.
                 </span>
               )}
-              {_.isEmpty(app.pageslugs) && (
+              {_.isEmpty(app.pageIds) && (
                 <>
                   <p className="fg-red">
-                    <b>Please choose a URL slug for your app!</b>
+                    <b>Please choose a WordPress page for your app!</b>
                   </p>
                   <p className="description">
-                    Set the page slug for your React app. The URL slug must not
-                    be used by another page.
+                    Set the target page slug for your React app.
                   </p>
                 </>
               )}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Routing</th>
-            <td>
-              <fieldset>
-                <label htmlFor="allow_routing">
-                  <input
-                    checked={app.allowsRouting}
-                    disabled={app.pageslugs.length !== 1}
-                    id="allow_routing"
-                    name="allow_routing"
-                    onChange={() => toggleRouting(app.appname)}
-                    type="checkbox"
-                  />
-                  <span
-                    className={
-                      app.pageslugs.length !== 1 ? 'disabled fg-grey' : ''
-                    }
-                  >
-                    Use clean URLs
-                  </span>{' '}
-                  {app.pageslugs.length !== 1 && (
-                    <span className="fg-orange">
-                      Clean URLs can only be activated for apps with one single
-                      page slug.
-                    </span>
-                  )}
-                </label>
-              </fieldset>
-
-              <p className="description">
-                Check if you want to use a routing library like React Router
-                with clean URLs. That means your React pages can't have sub
-                pages and only one slug will work properly.
-                <a
-                  href="https://rockiger.com/en/reactpress/client-side-routing/"
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Learn more about client-side routing
-                </a>{' '}
-                in ReactPress.
-              </p>
             </td>
           </tr>
           <tr>
@@ -153,13 +102,13 @@ function AppCard({
                   <button
                     className="button button-update"
                     disabled={
-                      _.isEmpty(app.pageslugs) ||
+                      _.isEmpty(app.pageIds) ||
                       _.includes(updatingApps, app.appname)
                     }
                     onClick={() =>
                       updateDevEnvironment(
                         app.appname,
-                        _.first(app.pageslugs) || ''
+                        _.first(app.pageIds) || 0
                       )
                     }
                   >
@@ -195,6 +144,61 @@ function AppCard({
           )}
         </tbody>
       </table>
+
+      <details className="py125">
+        <summary>
+          <h4 className="inline-block">Advanced Features</h4>
+        </summary>
+
+        <table className="form-table" role="presentation">
+          <tbody>
+            <tr>
+              <th scope="row">Routing</th>
+              <td>
+                <fieldset>
+                  <label htmlFor="allow_routing">
+                    <input
+                      checked={app.allowsRouting}
+                      disabled={app.pageIds.length !== 1}
+                      id="allow_routing"
+                      name="allow_routing"
+                      onChange={() => toggleRouting(app.appname)}
+                      type="checkbox"
+                    />
+                    <span
+                      className={
+                        app.pageIds.length !== 1 ? 'disabled fg-grey' : ''
+                      }
+                    >
+                      Use clean URLs
+                    </span>{' '}
+                    {app.pageIds.length !== 1 && (
+                      <span className="fg-orange">
+                        Clean URLs can only be activated for apps with one
+                        single page slug.
+                      </span>
+                    )}
+                  </label>
+                </fieldset>
+
+                <p className="description">
+                  Check if you want to use a routing library like React Router
+                  with clean URLs. That means your React pages can't have sub
+                  pages and only one slug will work properly.{' '}
+                  <a
+                    href="https://rockiger.com/en/reactpress/client-side-routing/"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Learn more about client-side routing
+                  </a>{' '}
+                  in ReactPress.
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
       <div>
         <button
           className="button-link button-delete"

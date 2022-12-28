@@ -1,3 +1,4 @@
+//@ts-nocheck
 import _ from 'lodash'
 import { useRef, useState } from 'react'
 import type { AppCardProps } from './AppCard'

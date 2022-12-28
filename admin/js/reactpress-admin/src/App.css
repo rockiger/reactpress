@@ -216,6 +216,10 @@ p {
 .pt1 {
   padding-top: 1rem;
 }
+.py125 {
+  padding-bottom: 1.25rem;
+  padding-top: 1.25rem;
+}
 .pointer {
   cursor: pointer;
 }
