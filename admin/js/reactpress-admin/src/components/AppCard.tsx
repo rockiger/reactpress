@@ -111,28 +111,29 @@ function AppCard({
                       app.pageslugs.length !== 1 ? 'disabled fg-grey' : ''
                     }
                   >
-                    Use client-side routing
+                    Use clean URLs
                   </span>{' '}
                   {app.pageslugs.length !== 1 && (
                     <span className="fg-orange">
-                      Client-side routing can only be activated for apps with
-                      one page slug.
+                      Clean URLs can only be activated for apps with one single
+                      page slug.
                     </span>
                   )}
                 </label>
               </fieldset>
 
               <p className="description">
-                Check if you want to use a routing library like React Router.
-                That means your React pages can't have sub pages and only one
-                slug will work properly.{' '}
+                Check if you want to use a routing library like React Router
+                with clean URLs. That means your React pages can't have sub
+                pages and only one slug will work properly.
                 <a
                   href="https://rockiger.com/en/reactpress/client-side-routing/"
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Learn more
-                </a>
+                  Learn more about client-side routing
+                </a>{' '}
+                in ReactPress.
               </p>
             </td>
           </tr>
