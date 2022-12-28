@@ -33,7 +33,7 @@ function AppCard({
   app,
   appspath,
   deleteApp,
-  deleteSlug,
+  deletePage,
   deletingApps,
   toggleRouting,
   updateSlug,
@@ -63,7 +63,7 @@ function AppCard({
               {_.map(app.pageslugs, (pageslug) => (
                 <UrlSlugForm
                   appname={app.appname}
-                  deleteSlug={deleteSlug}
+                  deletePage={deletePage}
                   key={pageslug}
                   updateSlug={updateSlug}
                   pageslug={pageslug}

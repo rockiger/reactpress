@@ -63,7 +63,7 @@ function App() {
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=add_url_slug&appname=${appname}&pageslug=${newSlug}`
+          `action=repr_admin_ajax_request&param=add_page&appname=${appname}&pageslug=${newSlug}`
         )
         .then()
       const result = JSON.parse(response)
@@ -82,43 +82,46 @@ function App() {
     }
   }, [])
 
-  const deleteSlug = useCallback(async (appname: string, pageslug: string) => {
-    const changeState = (add = false) =>
-      setApps((apps) =>
-        _.map(apps, (app) => {
-          if (app.appname !== appname) return app
-          return {
-            ...app,
-            pageslugs: add
-              ? _.concat(app.pageslugs, pageslug)
-              : _.without(app.pageslugs, pageslug),
-          }
-        })
-      )
-
-    //optimistically update state
-    changeState()
-
-    if (isDevEnvironment()) return
-    try {
-      //call to api
-      const response = await jQuery
-        .post(
-          rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=delete_url_slug&appname=${appname}&pageslug=${pageslug}`
+  const deletePage = useCallback(
+    async (appname: string, pageId: number, permalink: string) => {
+      const changeState = (add = false) =>
+        setApps((apps) =>
+          _.map(apps, (app) => {
+            if (app.appname !== appname) return app
+            return {
+              ...app,
+              pageslugs: add
+                ? _.concat(app.pageslugs, pageslug)
+                : _.without(app.pageslugs, pageslug),
+            }
+          })
         )
-        .then()
-      const result = JSON.parse(response)
-      if (!result.status) {
+
+      //optimistically update state
+      changeState()
+
+      if (isDevEnvironment()) return
+      try {
+        //call to api
+        const response = await jQuery
+          .post(
+            rp.ajaxurl,
+            `action=repr_admin_ajax_request&param=delete_page&appname=${appname}&pageId=${pageId}&permalink=${permalink}`
+          )
+          .then()
+        const result = JSON.parse(response)
+        if (!result.status) {
+          changeState(true)
+          showSnackbar(result.message)
+        }
+      } catch (e) {
+        console.log(e)
         changeState(true)
-        showSnackbar(result.message)
+        showSnackbar("Couldn't delete app slug")
       }
-    } catch (e) {
-      console.log(e)
-      changeState(true)
-      showSnackbar("Couldn't delete app slug")
-    }
-  }, [])
+    },
+    []
+  )
 
   const editSlug = useCallback(
     async (appname: string, newSlug: string, oldSlug: string) => {
@@ -294,7 +297,7 @@ function App() {
                     app={app}
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
-                    deleteSlug={deleteSlug}
+                    deletePage={deletePage}
                     deletingApps={deletingApps}
                     key={app.appname}
                     toggleRouting={toggleRouting}

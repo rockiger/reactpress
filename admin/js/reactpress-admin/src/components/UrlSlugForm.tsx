@@ -4,24 +4,25 @@ import type { AppCardProps } from './AppCard'
 
 interface UrlSlugFormProps {
   appname: string
-  deleteSlug?: AppCardProps['deleteSlug']
+  deletePage?: AppCardProps['deleteSlug']
   isDisabled?: boolean
-  pageslug: string
+  pageId: number
+  permalink: string
   updateSlug: AppCardProps['updateSlug']
 }
 
 export default UrlSlugForm
 export function UrlSlugForm({
   appname,
-  deleteSlug,
+  deletePage,
   isDisabled = false,
-  pageslug,
+  pageId,
   updateSlug,
 }: UrlSlugFormProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [showInput, setShowInput] = useState<Boolean>(false)
   const [showSpinner, setShowSpinner] = useState<Boolean>(false)
-  console.log(deleteSlug, !_.isEmpty(pageslug))
+  console.log(deletePage, !_.isEmpty(pageId))
   return (
     <>
       <span
@@ -39,7 +40,7 @@ export function UrlSlugForm({
           <>
             <input
               autoFocus
-              defaultValue={pageslug}
+              defaultValue={pageId}
               onKeyUp={async (ev) => {
                 if (ev.key === 'Enter') {
                   ev.preventDefault()
@@ -64,9 +65,9 @@ export function UrlSlugForm({
           </>
         ) : (
           <>
-            {!_.isEmpty(pageslug) && (
-              <a className="inline-block lh1 pt05" href={pageslug}>
-                {pageslug}
+            {!_.isEmpty(pageId) && (
+              <a className="inline-block lh1 pt05" href={pageId}>
+                {pageId}
               </a>
             )}
             <button
@@ -75,7 +76,7 @@ export function UrlSlugForm({
               disabled={showSpinner || isDisabled}
               onClick={() => setShowInput(true)}
             >
-              {_.isEmpty(pageslug) ? (
+              {_.isEmpty(pageId) ? (
                 'Add slug'
               ) : (
                 <span className="dashicons dashicons-edit"></span>
@@ -83,10 +84,10 @@ export function UrlSlugForm({
             </button>
           </>
         )}
-        {deleteSlug && !_.isEmpty(pageslug) && (
+        {deletePage && !_.isEmpty(pageId) && (
           <button
             className="bd-none bg-none fg-red hover:fg-red pointer"
-            onClick={() => deleteSlug(appname, pageslug)}
+            onClick={() => deletePage(appname, pageId, permalink)}
           >
             <span className="dashicons dashicons-trash"></span>
           </button>
@@ -97,9 +98,9 @@ export function UrlSlugForm({
 
   async function submitNewSlug() {
     setShowInput(false)
-    if (_.get(inputRef, 'current.value') !== pageslug) {
+    if (_.get(inputRef, 'current.value') !== pageId) {
       setShowSpinner(true)
-      await updateSlug(appname, _.get(inputRef, 'current.value', ''), pageslug)
+      await updateSlug(appname, _.get(inputRef, 'current.value', ''), pageId)
       setShowSpinner(false)
     }
   }

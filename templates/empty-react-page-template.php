@@ -1,4 +1,8 @@
-<?php /* Template Name: EmptyReactPageTemplate */ ?>
+<?php /* Template Name: EmptyReactPageTemplate */
+
+use ReactPress\Admin\Utils;
+
+ ?>
 <?php global $post;
 /**
  * Load react app files im page should contain a react app.
@@ -11,15 +15,15 @@
 function repr_write_react_app_into_template() {
   // Only load react app scripts on pages that contain our apps
   global $post;
-  $repr_apps = get_option('repr_apps') ?? [];
-  $pageslugs = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+  $repr_apps = Utils::get_apps();
+  $pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
 
-  $valid_pages = array_merge(...$pageslugs);
+  $valid_pages = array_merge(...$pageIds);
   $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
-  if (is_page() && in_array($post->post_name, $valid_pages)) {
+  if (is_page() && in_array($post->ID, $valid_pages)) {
 
     // Setting path variables.
-    $current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->post_name, $el['pageslugs'])))[0];
+    $current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])))[0];
     $appname = $current_app['appname'];
     $plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
 
@@ -87,6 +91,8 @@ function repr_write_react_app_into_template() {
     }
 
     // Variables for app use
+    $current_user = wp_get_current_user();
+			unset($current_user->user_pass); // Don't show encypted password for security reasons.
     echo '<script> 
             var reactPress = ' . wp_json_encode(
       [
@@ -95,7 +101,7 @@ function repr_write_react_app_into_template() {
           'rest_url' => esc_url_raw(rest_url()),
 
         ],
-        'user' => wp_get_current_user(),
+        'user' => $current_user,
         'usermeta' => get_user_meta(
           get_current_user_id()
         ),

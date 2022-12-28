@@ -167,10 +167,10 @@ class Admin {
 	 */
 	function add_post_state($states, $post) {
 		if ('page' === get_post_type($post)) {
-			$repr_apps = get_option('repr_apps') ?? [];
-			$pageslugs = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
-			$valid_pages = array_merge(...$pageslugs);
-			if (in_array($post->post_name, $valid_pages)) {
+			$repr_apps = Utils::get_apps();
+			$pageIds = array_map(fn ($el) => $el['pageIds'], $repr_apps);
+			$valid_pages = array_merge(...$pageIds);
+			if (in_array($post->ID, $valid_pages)) {
 				$states['reactpress'] = __('ReactPress', 'text-domain');
 			}
 		}
@@ -213,36 +213,39 @@ class Admin {
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$app_options_list = Utils::get_apps();
 		$old_pageslug = sanitize_title_for_query($_POST['old_pageslug'] ?? '');
-		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
+		$pageId = sanitize_title_for_query($_POST['pageslug'] ?? '');
+		$pageId = sanitize_title_for_query($_POST['pageId'] ?? '');
+		$permalink = sanitize_title_for_query($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 		$template = sanitize_file_name($_POST['template'] ?? '');
 		$type = sanitize_file_name($_POST['type'] ?? 'development');
 
 		try {
 			if (!empty($param)) {
-				if ($param === "add_url_slug" && $appname && $pageslug) {
+				if ($param === "add_page" && $appname && $pageId) {
+					//! needs new logic for pageId instead of pageslug
 					$app_option = $this->get_app_options($app_options_list, $appname);
 					if ($app_option) {
 						//# Check if the app allows adding of more URL slugs
-						if ($app_option['allowsRouting'] && count($app_option['pageslugs'])) {
+						if ($app_option['allowsRouting'] && count($app_option['pageIds'])) {
 							echo wp_json_encode([
 								'status' => 0,
-								'message' => 'Apps with client-side routing can only have URL slug.'
+								'message' => 'Apps with client-side routing can only be shown on one single page.'
 							]);
 							return;
 						}
 						// add slug to existing app_options
-						$this->update_react_page($appname, $pageslug);
-						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageslug);
+						$this->update_react_page($appname, $pageId);
+						$is_pageslug_updated = $this->update_pageslug($app_options_list, $appname, '', $pageId);
 						// only update app data for succesfull slug updates
 						if ($is_pageslug_updated) {
 							$this->add_build_path($appname);
 							if ($app_option['allowsRouting']) {
-								add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-								Utils::set_public_url_for_dev_server($appname, $pageslug);
+								add_rewrite_rule('^' . $pageId . '/(.*)?', 'index.php?pagename=' . $pageId, 'top');
+								Utils::set_public_url_for_dev_server($appname, $pageId);
 							}
 							flush_rewrite_rules();
-							$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+							$this->write_index_html($appname, $this->get_index_html_content($pageId));
 							echo wp_json_encode([
 								'status' => 1,
 								'message' => 'Url Slug created.'
@@ -255,77 +258,26 @@ class Admin {
 						}
 					} else {
 						// create new app option
-						$this->update_react_page($appname, $pageslug);
-						$this->add_app_options($app_options_list, $appname, $pageslug);
+						$this->update_react_page($appname, $pageId);
+						$this->add_app_options($app_options_list, $appname, $pageId);
 						$this->add_build_path($appname);
 						if ($app_option['allowsRouting']) {
-							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-							Utils::set_public_url_for_dev_server($appname, $pageslug);
+							add_rewrite_rule('^' . $pageId . '/(.*)?', 'index.php?pagename=' . $pageId, 'top');
+							Utils::set_public_url_for_dev_server($appname, $pageId);
 						}
 						flush_rewrite_rules();
-						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+						$this->write_index_html($appname, $this->get_index_html_content($pageId));
 						echo wp_json_encode([
 							'status' => 1,
 							'message' => 'Url Slug created.'
 						]);
 					}
-				} elseif ($param === "delete_url_slug" && $appname && $pageslug) {
-					Controller::delete_url_slug($app_options_list, $appname, $pageslug);
-				} elseif ($param === "edit_url_slug" && $appname && $pageslug) {
-					$app_option = $this->get_app_options($app_options_list, $appname);
-					$pageslug_key = array_search($old_pageslug, $app_option['pageslugs']);
-					if (($app_option && $pageslug_key !== false)) {
-						$this->update_react_page_slug($old_pageslug, $pageslug);
-
-						$is_pageslug_changed = $this->update_pageslug($app_options_list, $appname, $old_pageslug, $pageslug);
-						if ($is_pageslug_changed === false) {
-							echo wp_json_encode([
-								'status' => 0,
-								'message' => 'Url Slug already taken.'
-							]);
-							return;
-						}
-
-						$this->add_build_path($appname);
-
-						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
-						if ($app_option['allowsRouting']) {
-							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-							Utils::unset_public_url_for_dev_server($appname, $pageslug);
-							Utils::set_public_url_for_dev_server($appname, $pageslug);
-						}
-						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
-						flush_rewrite_rules();
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => 'Url Slug changed.'
-						]);
-					} elseif (!$this->does_pageslug_exist($pageslug) && $pageslug) {
-						$this->update_react_page($appname, $pageslug);
-						$this->add_app_options($app_options_list, $appname, $pageslug);
-						$this->add_build_path($appname);
-						Utils::remove_rewrite_rule('^' . $old_pageslug . '/(.*)?');
-						if ($app_option['allowsRouting']) {
-							add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-							Utils::unset_public_url_for_dev_server($appname, $pageslug);
-							Utils::set_public_url_for_dev_server($appname, $pageslug);
-						}
-						$this->write_index_html($appname, $this->get_index_html_content($pageslug));
-						flush_rewrite_rules();
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => 'Url Slug created.'
-						]);
-					} else {
-						echo wp_json_encode([
-							'status' => 0,
-							'message' => "There exists another page that already has this page slug.",
-						]);
-					}
+				} elseif ($param === "delete_page" && $appname && $pageId) {
+					Controller::delete_page($app_options_list, $appname, $pageId, $permalink);
 				} elseif ($param === "toggle_react_routing" && $appname) {
 					Controller::toggle_react_routing($appname);
-				} elseif ($param === "update_index_html" && $appname && $pageslug) {
-					$this->write_index_html($appname, $this->get_index_html_content($pageslug));
+				} elseif ($param === "update_index_html" && $appname && $pageId) {
+					$this->write_index_html($appname, $this->get_index_html_content($pageId));
 					echo wp_json_encode([
 						'status' => 1,
 						'message' => 'Index.html updated.',
@@ -333,7 +285,7 @@ class Admin {
 				} elseif ($param === 'delete_react_app' && $appname) {
 
 					$options = get_option('repr_apps');
-					$is_option_deleted = update_option('repr_apps', array_filter(
+					$is_option_deleted = Utils::write_apps_option(array_filter(
 						$options,
 						fn ($el) => $el['appname'] !== $appname
 					));
@@ -589,53 +541,20 @@ class Admin {
 		}
 	}
 
-	public function add_app_options(array $app_options_list, string $appname, string $pageslug) {
-		if (!is_array($app_options_list) && $appname && $pageslug) {
+	public function add_app_options(array $app_options_list, string $appname, int $pageId) {
+		if (!is_array($app_options_list) && $appname && $pageId) {
 			add_option('repr_apps', [[
 				'allowsRouting' => false,
 				'appname' => $appname,
-				'pageslugs' => [$pageslug],
+				'pageIds' => [$pageId],
 			]]);
-		} elseif ($appname && $pageslug) {
-			update_option('repr_apps', $this->array_add($app_options_list, [
+		} elseif ($appname && $pageId) {
+			Utils::write_apps_option( $this->array_add($app_options_list, [
 				'allowsRouting' => false,
 				'appname' => $appname,
-				'pageslugs' => [$pageslug],
+				'pageIds' => [$pageId],
 			]));
 		}
-	}
-
-	/**
-	 * Updates the given pagesslug with a new one. 
-	 * Returns false if pageslug already taken.
-	 * @param array $app_options_list
-	 * @param string $appname 
-	 * @param string $old_pageslug 
-	 * @param string $pageslug 
-	 * @return false|array 
-	 * @since 2.0.0
-	 */
-	public function update_pageslug(array $app_options_list, string $appname, string $old_pageslug, string $pageslug) {
-		foreach ($app_options_list as $key => $val) {
-			// pageslug already exists in an app
-			$is_pageslug_taken = in_array($pageslug, $val['pageslugs']);
-			if ($is_pageslug_taken) {
-				return false;
-			}
-
-			if ($val['appname'] === $appname) {
-				$pageslug_key = array_search($old_pageslug, $val['pageslugs']);
-				if ($pageslug_key === false) {
-					// create new pageslug
-					array_push($app_options_list[$key]['pageslugs'], $pageslug);
-				} else {
-					// replace old pageslug with new one
-					$app_options_list[$key]['pageslugs'][$pageslug_key] = $pageslug;
-				}
-			}
-		}
-		update_option('repr_apps', $app_options_list);
-		return $app_options_list;
 	}
 
 	/**

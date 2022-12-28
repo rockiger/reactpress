@@ -18,10 +18,10 @@ use ReactPress\Admin\Utils;
 
 class Controller {
 
-  public static function delete_url_slug(array $app_options_list, string $appname, string $pageslug) {
+  public static function delete_page(array $app_options_list, string $appname, int $pageId, string $permalink) {
     try {
-      Utils::delete_pageslug($app_options_list, $appname, $pageslug);
-      Utils::unset_public_url_for_dev_server($appname, $pageslug);
+      Utils::delete_page($app_options_list, $appname, $pageId);
+      Utils::unset_public_url_for_dev_server($appname, $permalink);
       echo wp_json_encode(['status' => 1]);
     } catch (\Exception $e) {
       repr_log($e);
@@ -31,7 +31,8 @@ class Controller {
 
   public static function toggle_react_routing(string $appname) {
     try {
-      $app_options = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+      $apps = Utils::get_apps();
+      $app_options = is_array($apps) ?  $apps : [];
 
       $new_options = array_map(function ($el) use ($appname) {
         if ($el['appname'] === $appname) {
@@ -41,19 +42,19 @@ class Controller {
 
           //# change rewrite rules in wordpress
           if ($el['allowsRouting']) {
-            // routing is only allowed for one pageslug
-            if (count($el['pageslugs']) > 1) {
+            // routing is only allowed for one single page
+            if (count($el['pages']) > 1) {
               throw new LengthException('Client-side routing is only allowed for apps with one page slug.');
             }
-            foreach ($el['pageslugs'] as $pageslug) {
-              add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
-              Utils::set_public_url_for_dev_server($appname, $pageslug);
+            foreach ($el['pages'] as $page) {
+              add_rewrite_rule('^' . wp_make_link_relative($page['permalink']) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($page['permalink']), 'top');
+              Utils::set_public_url_for_dev_server($appname, $page['permalink']);
             }
             flush_rewrite_rules();
           } else {
-            foreach ($el['pageslugs'] as $pageslug) {
-              Utils::remove_rewrite_rule('^' . $pageslug . '/(.*)?');
-              Utils::unset_public_url_for_dev_server($appname, $pageslug);
+            foreach ($el['pages'] as $page) {
+              Utils::remove_rewrite_rule('^' . wp_make_link_relative($page['permalink']) . '/(.*)?');
+              Utils::unset_public_url_for_dev_server($appname, $page['permalink']);
             }
             flush_rewrite_rules();
           }
@@ -62,7 +63,7 @@ class Controller {
         return $el;
       }, $app_options);
 
-      update_option('repr_apps', $new_options);
+      Utils::write_apps_option($new_options);
       echo wp_json_encode(['status' => 1]);
     } catch (\Exception $e) {
       repr_log($e);

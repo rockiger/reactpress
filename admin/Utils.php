@@ -38,19 +38,20 @@ class Utils {
    * client-side routing
    * is used.
    * @param string $appname
-   * @param string $pageslug
+   * @param string $permalink
    * @return void 
    */
-  public static function set_public_url_for_dev_server(string $appname, string $pageslug) {
+  public static function set_public_url_for_dev_server(string $appname, string $permalink) {
     $apppath = Utils::app_path($appname);
     // We need the relative path, that we can deploy our
     // build app to another server later.
     $relative_apppath = Utils::app_path($appname, true);
     $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
+    $relative_link = wp_make_link_relative($permalink);
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $search = "\"react-scripts start\"";
-    $replace = IS_WINDOWS ? "\"set PUBLIC_URL={$pageslug}&&react-scripts build\"" : "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
+    $replace = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } elseif (stripos($package_json_contents, $replace)) {
@@ -70,19 +71,20 @@ class Utils {
    * client-side routing
    * is used.
    * @param string $appname
-   * @param string $pageslug
+   * @param string $permalink
    * @return void 
    */
-  public static function unset_public_url_for_dev_server(string $appname, string $pageslug) {
+  public static function unset_public_url_for_dev_server(string $appname, string $permalink) {
     $apppath = Utils::app_path($appname);
     // We need the relative path, that we can deploy our
     // build app to another server later.
     $relative_apppath = Utils::app_path($appname, true);
     $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
+    $relative_link = wp_make_link_relative($permalink);
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $replace = "\"react-scripts start\"";
-    $search = IS_WINDOWS ? "\"set PUBLIC_URL={$pageslug}&&react-scripts build\"" : "\"PUBLIC_URL=/{$pageslug} react-scripts start\"";
+    $search = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } else {
@@ -99,21 +101,25 @@ class Utils {
    * Delete an app slug from an app. Returns the new options list
    * @param array $app_options_list
    * @param string $appname 
-   * @param string $pageslug 
+   * @param int $pageId 
    * @return array
    * @since 2.0.0
    */
-  public static function delete_pageslug(array $app_options_list, string $appname, string $pageslug) {
-    $new_app_options_list = array_map(function ($app_option) use ($appname, $pageslug) {
+  public static function delete_page(array $app_options_list, string $appname, string $pageId) {
+    $new_app_options_list = array_map(function ($app_option) use ($appname, $pageId) {
       if ($app_option['appname'] === $appname) {
-        $app_option['pageslugs'] = array_filter(
-          $app_option['pageslugs'],
-          fn ($ps) => $ps !== $pageslug
+        $app_option['pagesIds'] = array_filter(
+          $app_option['pagesIds'],
+          fn ($id) => $id !== $pageId
+        );
+        $app_option['pages'] = array_filter(
+          $app_option['pages'],
+          fn ($p) => $p->ID !== $pageId
         );
       }
       return $app_option;
     }, $app_options_list);
-    update_option('repr_apps', $new_app_options_list);
+    Utils::write_apps_option($new_app_options_list); 
     return $new_app_options_list;
   }
 
@@ -166,7 +172,7 @@ class Utils {
       return [
         'allowsRouting' => $app_option['allowsRouting'] ?? false,
         'appname' => $el,
-        'pageslugs' => $app_option['pageslugs'] ?? [],
+        'pageIds' => $app_option['pageIds'] ?? [],
         'type' => $type
       ];
     }, $appnames);
@@ -197,4 +203,17 @@ class Utils {
     global $wp_rewrite;
     unset($wp_rewrite->extra_rules_top[$regex]);
   }
+
+  /**
+   * Consumes an app list, filters unneccessary information (pages) and
+   * saves it as options.
+   * @param array $app_list 
+   * @return void 
+   */
+  public static function write_apps_option($app_list) {
+    $app_list_option = $app_list;
+    unset($app_list_option['pages']);
+    update_option('repr_apps', $app_list_option);
+  }
+
 }
