@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import React from 'react'
+import AddPageInput from './AddPageForm'
 import icon from './icon.svg'
+import PageLink from './PageLink'
 
 export interface Page {
   ID: number
@@ -22,6 +23,8 @@ export interface AppCardProps {
   deleteApp: (appname: string) => void
   deletePage: (appname: string, page: Page) => void
   deletingApps: string[]
+  getPages: (search?: string, pageIds?: number[]) => void
+  pages: Page[]
   toggleRouting: (appname: string) => void
   updatingApps: string[]
   updateDevEnvironment: (appname: string, pageId: number) => void
@@ -41,6 +44,8 @@ function AppCard({
   deleteApp,
   deletePage,
   deletingApps,
+  getPages,
+  pages,
   toggleRouting,
   updateDevEnvironment,
   updatingApps,
@@ -66,9 +71,19 @@ function AppCard({
             <th scope="row">Target Pages</th>
             <td>
               {_.map(app.pages, (page) => (
-                <div>{page.title}</div>
+                <PageLink
+                  app={app}
+                  key={app.appname}
+                  page={page}
+                  deletePage={deletePage}
+                />
               ))}
-              <div>Add page</div>
+              <AddPageInput
+                addPage={addPage}
+                app={app}
+                getPages={getPages}
+                pages={pages}
+              />
               {!_.isEmpty(app.pageIds) && app.allowsRouting && (
                 <span className="fg-orange">
                   Apps with client-side routing can only have URL slug.
@@ -201,7 +216,7 @@ function AppCard({
       </details>
       <div>
         <button
-          className="button-link button-delete"
+          className="button-link button-delete fg-red-dark"
           onClick={() => deleteApp(app.appname)}
         >
           Delete App

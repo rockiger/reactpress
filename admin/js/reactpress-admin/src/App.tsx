@@ -18,6 +18,7 @@ console.log(rp)
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
   const [deletingApps, setDeletingApps] = useState<string[]>([])
+  const [pages, setPages] = useState<Page[]>([])
   const [updatingApps, setUpdatingApps] = useState<string[]>([])
 
   const deleteApp = useCallback(async (appname: string) => {
@@ -60,8 +61,40 @@ function App() {
     }
   }, [setApps])
 
+  const getPages = useCallback(
+    () =>
+      _.debounce(async (search = '', pageIds: number[] = []) => {
+        const domain = rp.ajaxurl.slice(0, rp.ajaxurl.indexOf('/', 8))
+        const excludes = pageIds.join(',')
+        const url = `${domain}/wp-json/wp/v2/pages?per_page=100&exclude=${excludes}&orderby=title&order=asc&_fields=id,title,link&search=${search}&_locale=user`
+        try {
+          const response = await jQuery.get(url).then()
+          setPages(
+            response.map(
+              (el: {
+                id: string
+                link: string
+                title: { rendered: string }
+              }) => ({
+                ID: el.id,
+                permalink: el.link,
+                title: el.title.rendered,
+              })
+            )
+          )
+        } catch (e) {
+          console.error(e)
+        }
+      }),
+    []
+  )
+
   const addPage = useCallback(
     async (appname: string, pageId: number, pageTitle: string) => {
+      if (isDevEnvironment()) {
+        console.log({ appname, pageId, pageTitle })
+        return
+      }
       try {
         //call to api
         const response = await jQuery
@@ -249,6 +282,8 @@ function App() {
                     deleteApp={deleteApp}
                     deletePage={deletePage}
                     deletingApps={deletingApps}
+                    getPages={getPages}
+                    pages={pages}
                     key={app.appname}
                     toggleRouting={toggleRouting}
                     updateDevEnvironment={updateDevEnvironment}

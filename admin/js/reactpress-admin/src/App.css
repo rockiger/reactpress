@@ -22,6 +22,9 @@ p {
  * Utility classes *
  *******************/
 
+.align-baseline {
+  align-items: baseline;
+}
 .align-center {
   align-items: center;
 }
@@ -56,6 +59,9 @@ p {
 .bg-red {
   background-color: #dc3232 !important;
 }
+.bg-red-dark {
+  background-color: #b32d2e !important;
+}
 .col {
   flex-direction: column;
 }
@@ -68,6 +74,9 @@ p {
 
 .fg-green {
   color: #46b450 !important;
+}
+.fg-grey-light {
+  color: #a7aaad !important;
 }
 .fg-grey {
   color: #646970 !important;
@@ -84,6 +93,9 @@ p {
 .fg-red {
   color: #dc3232 !important;
 }
+.fg-red-dark {
+  color: #b32d2e !important;
+}
 .fg-white {
   color: white !important;
 }
@@ -97,6 +109,10 @@ p {
 
 .float-right {
   float: right;
+}
+
+.font-size-sm {
+  font-size: 0.8125rem;
 }
 
 .fullwidth {
@@ -129,6 +145,10 @@ p {
 }
 .grow1 {
   flex-grow: 1;
+}
+
+.hide {
+  display: none;
 }
 .inline-block {
   display: inline-block;
@@ -195,6 +215,9 @@ p {
 .pb0 {
   padding-bottom: 0;
 }
+.pb05 {
+  padding-bottom: 0.5rem;
+}
 .pb1 {
   padding-bottom: 1rem;
 }
@@ -215,6 +238,10 @@ p {
 }
 .pt1 {
   padding-top: 1rem;
+}
+.py05 {
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
 }
 .py125 {
   padding-bottom: 1.25rem;
@@ -270,6 +297,9 @@ label.error {
   height: 48px;
   width: 48px;
   margin: 0 0.5rem 0 -0.1rem;
+}
+.show-children:hover > * {
+  display: block;
 }
 svg.react,
 .icon {
