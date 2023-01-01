@@ -250,7 +250,7 @@ function App() {
                 <code>npx create-react-app [appname]</code>
               </p>
               <p className="pb1">
-                Insert a page slug and start developing your app with{' '}
+                Add a page and start developing your app with{' '}
                 <code>yarn start</code>.
               </p>
               <p className="pb1">
@@ -261,12 +261,12 @@ function App() {
                 system.
               </p>
               <p className="pb1">
-                Then reload the ReactPress page in the WordpPress admin and give
-                it the exact same slug as on the dev system.
+                Then reload the ReactPress page in the WordpPress admin and add
+                a page again.
               </p>
               <p className="pb1">
-                If you visit the slug now, you should see the app on your live
-                system.
+                If you visit the assigned page now, you should see the app on
+                your live system.
               </p>
             </div>
           </div>

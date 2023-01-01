@@ -18,6 +18,66 @@ use ReactPress\Admin\Utils;
 
 class Controller {
 
+  // # Controller functions 
+
+  public static function add_page($appname, $pageId, $page_title) {
+    $app_option = Utils::get_app_options(Utils::get_apps(), $appname);
+    if ($app_option) {
+      //# Check if the app allows adding of more URL slugs
+      if ($app_option['allowsRouting'] && count($app_option['pageIds'])) {
+        echo wp_json_encode([
+          'status' => 0,
+          'message' => 'Apps with client-side routing can only be shown on one single page.'
+        ]);
+        return;
+      }
+
+      // add slug to existing app_options
+      $inserted_page = Controller::insert_page($appname, $pageId, $page_title);
+      if (!$inserted_page['ID']) {
+        echo wp_json_encode([
+          'status' => 0,
+          'message' => $inserted_page['message']
+        ]);
+        return;
+      }
+      //! ... Get link of page
+      $permalink = get_permalink($inserted_page['ID']);
+
+      Controller::add_build_path($appname);
+      if ($app_option['allowsRouting']) {
+        add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
+        Utils::set_public_url_for_dev_server($appname, $pageId);
+      }
+      flush_rewrite_rules();
+      Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => 'Page added.',
+        'pageId' => 0,
+        'page_title' => 'Page Title',
+        'permalink' => 'test'
+      ]);
+    } else {
+      // create new app option
+      $inserted_page = Controller::insert_page($appname, $pageId, $page_title);
+      $permalink = get_permalink($inserted_page['ID']);
+
+      Utils::add_app_options(Utils::get_apps(), $appname, $pageId);
+      Controller::add_build_path($appname);
+      if ($app_option['allowsRouting']) {
+        add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
+        Utils::set_public_url_for_dev_server($appname, $pageId);
+      }
+      flush_rewrite_rules();
+      Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => 'Page created and added to app.'
+      ]);
+    }
+  }
+
   public static function delete_page(array $app_options_list, string $appname, int $pageId, string $permalink) {
     try {
       Utils::delete_page($app_options_list, $appname, $pageId);
@@ -26,6 +86,106 @@ class Controller {
     } catch (\Exception $e) {
       repr_log($e);
       echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
+    }
+  }
+
+  // # Helper functions
+
+  /**
+   * Add the right build path to package.json
+   *
+   * @param string $appname
+   * @return int 0 if no success
+   * @since 1.2.0
+   */
+  public static function add_build_path($appname) {
+    $apppath = Utils::app_path($appname);
+    // We need the relative path, that we can deploy our
+    // built app to another server later.
+    $relative_apppath = Utils::app_path($appname, true);
+    $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
+    $homepage = "{$relative_apppath}/build";
+    $path_package_json = "{$apppath}/package.json";
+    $package_json_contents = file_get_contents($path_package_json);
+    if (!$package_json_contents) {
+      return 0;
+    } elseif (stripos($package_json_contents, $homepage)) {
+      return 1;
+    } else {
+      // Add a homepage attribute during the build process and remove it again, 
+      // that the developer can build with the public/index.html without WP.
+      file_put_contents(
+        $path_package_json,
+        str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+      );
+      return 2;
+    }
+    return 0;
+  }
+
+  /**
+   * Downloads the content of the page with the given permalink and removes the
+   * the react assets of the build page, that we can use the content for our
+   * development server.
+   *
+   * @param $permalink
+   * @return string
+   * @since 1.0.0
+   */
+  public function get_index_html_content(string $permalink) {
+    $file_contents = wp_remote_retrieve_body(
+      wp_remote_get($permalink, ['timeout' => 1000])
+    );
+    $file_contents_arr = explode(PHP_EOL, $file_contents);
+    // filter all build assets out of the file, that they don't conflict
+    // with the dev assets.
+    $filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
+    $filtered_contents =  implode(PHP_EOL, $filtered_arr);
+    return $filtered_contents;
+  }
+
+  /**
+   * Creates or updates a page with the given name and title.
+   *
+   * @param int $pageId
+   * @param string $page_title
+   * @return void
+   * @since 1.0.0
+   */
+  public function insert_page(int $pageId, string $page_title) {
+    if ($pageId == -1) {
+      $result = wp_insert_post(
+        array(
+          'post_title' => $page_title,
+          'post_status' => 'publish',
+          'post_author' => '1',
+          'post_content' => REPR_REACT_ROOT_TAG,
+          'post_type' => "page",
+          // Assign page template using the relative path, it will be
+          // resolved to the fully qualified name at run-time
+          'page_template'  => 'templates/react-page-template.php',
+        )
+      );
+      return $result
+        ? ['status' => 'true', 'message' => 'Page created.', 'ID' => $result, 'page_title' => $page_title]
+        : ['status' => 'false', 'message' => "Couldn't create page.", "ID" => $result, 'page_title' => $page_title];
+    } else {
+      $page = get_post($pageId);
+      if ($page) {
+        // already we have data with this post name
+        if (strpos($page->post_content, '<div id="root"></div>') !== false) {
+          return ['status' => 'true', 'message' => 'Page with app already exists.', 'ID' => $page->ID];
+        }
+        $result = wp_update_post(
+          [
+            'ID' => $page->ID,
+            'post_content' => $page->post_content . '\n' . REPR_REACT_ROOT_TAG
+          ]
+        );
+        return $result
+          ? ['status' => 'true', 'message' => 'Add app to page.', 'ID' => $result, 'post_title' => $page->post_title]
+          : ['status' => 'false', 'message' => 'Couldn\'t add app to page.', 'ID' => 0, 'post_title' => ''];
+      }
     }
   }
 
@@ -69,5 +229,19 @@ class Controller {
       repr_log($e);
       echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
     }
+  }
+
+  /**
+   * Writes the given to the index.html file in the app directory of
+   * the given appname.
+   *
+   * @param string $appname
+   * @param string $content
+   * @return bool if the writing of the file succeded or not
+   * @since 1.0.0
+   */
+  public static function write_index_html(string $appname, string $content) {
+    $index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
+    return file_put_contents($index_html_path, $content);
   }
 }

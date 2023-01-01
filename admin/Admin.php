@@ -186,9 +186,9 @@ class Admin {
 	 * @since 1.0.0
 	 */
 	public function repr_add_page_template($templates) {
-	    // Use relative paths for the templates and then resolve them at runtime.
-	    $templates['templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
-	    $templates['templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
+		// Use relative paths for the templates and then resolve them at runtime.
+		$templates['templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
+		$templates['templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
 
 		return $templates;
 	}
@@ -212,81 +212,25 @@ class Admin {
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$app_options_list = Utils::get_apps();
-		$old_pageslug = sanitize_title_for_query($_POST['old_pageslug'] ?? '');
-		$pageslug = sanitize_title_for_query($_POST['pageslug'] ?? '');
 		$pageId = sanitize_title_for_query($_POST['pageId'] ?? '');
 		$page_title = sanitize_title_for_query($_POST['page_title'] ?? '');
 		$permalink = sanitize_title_for_query($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
-		$template = sanitize_file_name($_POST['template'] ?? '');
-		$type = sanitize_file_name($_POST['type'] ?? 'development');
 
 		try {
 			if (!empty($param)) {
-				if ($param === "add_page" && $appname && $pageId) {
-					//! needs new logic for pageId instead of pageslug
-					$app_option = $this->get_app_options($app_options_list, $appname);
-					if ($app_option) {
-						//# Check if the app allows adding of more URL slugs
-						if ($app_option['allowsRouting'] && count($app_option['pageIds'])) {
-							echo wp_json_encode([
-								'status' => 0,
-								'message' => 'Apps with client-side routing can only be shown on one single page.'
-							]);
-							return;
-						}
-						// add slug to existing app_options
-						$this->update_react_page($appname, $pageId);
-						$is_pageslug_updated = true; 
-						//$this->update_pageslug($app_options_list, $appname, '', $pageId);
-						// only update app data for succesfull slug updates
-						if ($is_pageslug_updated) {
-							$this->add_build_path($appname);
-							if ($app_option['allowsRouting']) {
-								add_rewrite_rule('^' . $pageId . '/(.*)?', 'index.php?pagename=' . $pageId, 'top');
-								Utils::set_public_url_for_dev_server($appname, $pageId);
-							}
-							flush_rewrite_rules();
-							$this->write_index_html($appname, $this->get_index_html_content($permalink));
-							echo wp_json_encode([
-								'status' => 1,
-								'message' => 'Page added.',
-								'pageId' => 0,
-								'page_title' => 'Page Title',
-								'permalink' => 'test'
-							]);
-						} else {
-							echo wp_json_encode([
-								'status' => 0,
-								'message' => 'Url Slug already exists. Slugs must be unique for ALL apps.'
-							]);
-						}
-					} else {
-						// create new app option
-						$this->update_react_page($appname, $pageId);
-						$this->add_app_options($app_options_list, $appname, $pageId);
-						$this->add_build_path($appname);
-						if ($app_option['allowsRouting']) {
-							add_rewrite_rule('^' . $pageId . '/(.*)?', 'index.php?pagename=' . $pageId, 'top');
-							Utils::set_public_url_for_dev_server($appname, $pageId);
-						}
-						flush_rewrite_rules();
-						$this->write_index_html($appname, $this->get_index_html_content($permalink));
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => 'Url Slug created.'
-						]);
-					}
+				if ($param === "add_page" && $appname && $pageId && $page_title) {
+					return Controller::add_page($appname, $pageId, $page_title);
 				} elseif ($param === "delete_page" && $appname && $pageId) {
 					Controller::delete_page($app_options_list, $appname, $pageId, $permalink);
 				} elseif ($param === "toggle_react_routing" && $appname) {
 					Controller::toggle_react_routing($appname);
 				} elseif ($param === "update_index_html" && $appname && $pageId) {
-					$this->write_index_html($appname, $this->get_index_html_content($permalink));
+					/* 					$this->write_index_html($appname, $this->get_index_html_content($permalink));
 					echo wp_json_encode([
 						'status' => 1,
 						'message' => 'Index.html updated.',
-					]);
+					]); */
 				} elseif ($param === 'delete_react_app' && $appname) {
 
 					$options = get_option('repr_apps');
@@ -330,6 +274,8 @@ class Admin {
 		}
 	}
 
+
+
 	/**
 	 * Checks if the given string is already used as a pageslug of any
 	 * post in the current WP site.
@@ -342,41 +288,6 @@ class Admin {
 		return !empty($wpdb->get_row(
 			$wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s", $pageslug)
 		));
-	}
-
-	/**
-	 * Downloads the content of the page with the given permalink and removes the
-	 * the react assets of the build page, that we can use the content for our
-	 * development server.
-	 *
-	 * @param $permalink
-	 * @return string
-	 * @since 1.0.0
-	 */
-	public function get_index_html_content(string $permalink) {
-		$file_contents = wp_remote_retrieve_body(
-			wp_remote_get($permalink, ['timeout' => 1000])
-		);
-		$file_contents_arr = explode(PHP_EOL, $file_contents);
-		// filter all build assets out of the file, that they don't conflict
-		// with the dev assets.
-		$filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
-		$filtered_contents =  implode(PHP_EOL, $filtered_arr);
-		return $filtered_contents;
-	}
-
-	/**
-	 * Writes the given to the index.html file in the app directory of
-	 * the given appname.
-	 *
-	 * @param string $appname
-	 * @param string $content
-	 * @return bool if the writing of the file succeded or not
-	 * @since 1.0.0
-	 */
-	public function write_index_html(string $appname, string $content) {
-		$index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
-		return file_put_contents($index_html_path, $content);
 	}
 
 	/**
@@ -414,103 +325,6 @@ class Admin {
 	}
 
 	/**
-	 * Add the right build path to package.json
-	 *
-	 * @param string $appname
-	 * @return int 0 if no success
-	 * @since 1.2.0
-	 */
-	function add_build_path($appname) {
-		$apppath = Utils::app_path($appname);
-		// We need the relative path, that we can deploy our
-		// build app to another server later.
-		$relative_apppath = Utils::app_path($appname, true);
-		$relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
-		$homepage = "{$relative_apppath}/build";
-		$path_package_json = "{$apppath}/package.json";
-		$package_json_contents = file_get_contents($path_package_json);
-		if (!$package_json_contents) {
-			return 0;
-		} elseif (stripos($package_json_contents, $homepage)) {
-			return 1;
-		} else {
-			// Add a homepage attribute during the build process and remove it again, 
-			// that the developer can build with the public/index.html without WP.
-			file_put_contents(
-				$path_package_json,
-				str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
-			);
-			return 2;
-		}
-		return 0;
-	}
-
-	/**
-	 * Helper function to add an element to an array
-	 * without mutationg the original array.
-	 *
-	 * @param array $array
-	 * @param [type] $entry
-	 * @return void
-	 * @since 1.0.0
-	 */
-	function array_add(array $array, $entry) {
-		return array_merge($array, [$entry]);
-	}
-
-	/**
-	 * Creates or updates a page with the given name and slug.
-	 *
-	 * @param string $appname
-	 * @param string $pageslug
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function update_react_page(string $appname, string $pageslug) {
-		global $wpdb;
-		// check if post_name (which is the slug and should be unique) exist
-		$get_data = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT `ID`, `post_content` FROM " . $wpdb->prefix . "posts WHERE post_name = %s",
-				$pageslug
-			)
-		);
-
-		if (!empty($get_data)) {
-			// already we have data with this post name
-			if (strpos($get_data->post_content, '<div id="root"></div>') !== false) {
-				return ['status' => 'true', 'message' => 'Page with app already exists.'];
-			}
-			$result = wp_update_post(
-				[
-					'ID' => $get_data->ID,
-					'post_content' => $get_data->post_content . '\n' . REPR_REACT_ROOT_TAG
-				]
-			);
-			return ['status' => 'true', 'message' => 'Add app to page.'];
-		} else {
-			$result = wp_insert_post(
-				array(
-					'post_title' => $appname,
-					'post_name' => $pageslug,
-					'post_status' => 'publish',
-					'post_author' => '1',
-					'post_content' => REPR_REACT_ROOT_TAG,
-					'post_type' => "page",
-				    // Assign page template using the relative path, it will be
-				    // resolved to the fully qualified name at run-time
-				    'page_template'  => 'templates/react-page-template.php',
-				)
-			);
-			if ($result) {
-				return ['status' => 'true', 'message' => 'Page created.'];
-			} else {
-				return ['status' => 'false', 'message' => "Couldn't create page."];
-			}
-		}
-	}
-
-	/**
 	 * Change the slug of a page to the new one.
 	 *
 	 * @param string $oldSlug
@@ -544,37 +358,6 @@ class Admin {
 				return ['status' => 'false', 'message' => "Couldn't update page"];
 			}
 		}
-	}
-
-	public function add_app_options(array $app_options_list, string $appname, int $pageId) {
-		if (!is_array($app_options_list) && $appname && $pageId) {
-			add_option('repr_apps', [[
-				'allowsRouting' => false,
-				'appname' => $appname,
-				'pageIds' => [$pageId],
-			]]);
-		} elseif ($appname && $pageId) {
-			Utils::write_apps_option( $this->array_add($app_options_list, [
-				'allowsRouting' => false,
-				'appname' => $appname,
-				'pageIds' => [$pageId],
-			]));
-		}
-	}
-
-	/**
-	 * Get the option for the given app name.
-	 * @param string $appname 
-	 * @return mixed
-	 */
-	public function get_app_options(array $app_options_list, string $appname) {
-		$app_options = null;
-		foreach ($app_options_list as $key => $val) {
-			if ($val['appname'] === $appname) {
-				$app_options = $val;
-			}
-		}
-		return $app_options;
 	}
 }
 

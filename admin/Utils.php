@@ -13,6 +13,22 @@ namespace ReactPress\Admin;
 
 class Utils {
 
+  public static function add_app_options(array $app_options_list, string $appname, int $pageId) {
+    if (!is_array($app_options_list) && $appname && $pageId) {
+      add_option('repr_apps', [[
+        'allowsRouting' => false,
+        'appname' => $appname,
+        'pageIds' => [$pageId],
+      ]]);
+    } elseif ($appname && $pageId) {
+      Utils::write_apps_option(Utils::array_add($app_options_list, [
+        'allowsRouting' => false,
+        'appname' => $appname,
+        'pageIds' => [$pageId],
+      ]));
+    }
+  }
+
   /**
    * Creates the path the app, beginning from root of filesystem
    * or htdocs.
@@ -30,6 +46,34 @@ class Utils {
     } else {
       return $apppath;
     }
+  }
+
+  /**
+   * Helper function to add an element to an array
+   * without mutationg the original array.
+   *
+   * @param array $array
+   * @param [type] $entry
+   * @return void
+   * @since 1.0.0
+   */
+  public static function array_add(array $array, $entry) {
+    return array_merge($array, [$entry]);
+  }
+
+  /**
+   * Get the option for the given app name.
+   * @param string $appname 
+   * @return mixed
+   */
+  public static function get_app_options(array $app_options_list, string $appname) {
+    $app_options = null;
+    foreach ($app_options_list as $key => $val) {
+      if ($val['appname'] === $appname) {
+        $app_options = $val;
+      }
+    }
+    return $app_options;
   }
 
   /**
@@ -65,6 +109,8 @@ class Utils {
     }
     return 0;
   }
+
+
 
   /**
    * Remove the PUBLIC_URL to start command of package.json of React app. * This is neccessary that the dev server is working as exspected if 
@@ -119,7 +165,7 @@ class Utils {
       }
       return $app_option;
     }, $app_options_list);
-    Utils::write_apps_option($new_app_options_list); 
+    Utils::write_apps_option($new_app_options_list);
     return $new_app_options_list;
   }
 
@@ -178,14 +224,14 @@ class Utils {
     }, $appnames);
 
     //# Enrich the apps with page data
-    $apps_enriched = array_map(function($app) {
-    $newApp = $app;
-    $newApp['pages'] = array_map(function($id) {
-        $p = get_post(100);
+    $apps_enriched = array_map(function ($app) {
+      $newApp = $app;
+      $newApp['pages'] = array_map(function ($id) {
+        $p = get_post($id);
         return [
           'ID' => $p->ID ?? 0,
-          'permalink' => get_permalink( $p ),
-          'title' => $p->post_title ?? '', 
+          'permalink' => get_permalink($p),
+          'title' => $p->post_title ?? '',
         ];
       }, $app['pageIds']);
       return $newApp;
@@ -215,5 +261,4 @@ class Utils {
     unset($app_list_option['pages']);
     update_option('repr_apps', $app_list_option);
   }
-
 }
