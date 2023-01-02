@@ -27,7 +27,7 @@ export interface AppCardProps {
   pages: Page[]
   toggleRouting: (appname: string) => void
   updatingApps: string[]
-  updateDevEnvironment: (appname: string, pageId: number) => void
+  updateDevEnvironment: (appname: string, permalink: string) => void
 }
 
 const APP_TYPES = {
@@ -123,7 +123,7 @@ function AppCard({
                     onClick={() =>
                       updateDevEnvironment(
                         app.appname,
-                        _.first(app.pageIds) || 0
+                        _.get(_.last(app.pages), 'permalink', '')
                       )
                     }
                   >

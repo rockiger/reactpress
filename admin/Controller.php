@@ -41,7 +41,6 @@ class Controller {
         ]);
         return;
       }
-      //! ... Get link of page
       $permalink = get_permalink($inserted_page['ID']);
 
       Controller::add_build_path($appname);
@@ -78,8 +77,9 @@ class Controller {
     }
   }
 
-  public static function delete_page(array $app_options_list, string $appname, int $pageId, string $permalink) {
+  public static function delete_page(string $appname, int $pageId, string $permalink) {
     try {
+      $app_options_list = Utils::get_apps();
       Utils::delete_page($app_options_list, $appname, $pageId);
       Utils::unset_public_url_for_dev_server($appname, $permalink);
       echo wp_json_encode(['status' => 1]);
@@ -87,6 +87,14 @@ class Controller {
       repr_log($e);
       echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
     }
+  }
+
+  public static function update_index_html($appname, $permalink) {
+    Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
+    echo wp_json_encode([
+      'status' => 1,
+      'message' => 'Index.html updated.',
+    ]);
   }
 
   // # Helper functions

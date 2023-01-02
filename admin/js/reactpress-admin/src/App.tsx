@@ -205,13 +205,13 @@ function App() {
   }, [])
 
   const updateDevEnvironment = useCallback(
-    async (appname: string, pageId: number) => {
+    async (appname: string, permalink: string) => {
       setUpdatingApps((updatingApps) => _.concat(updatingApps, appname))
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&pageslug=${pageId}`
+          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&permalink=${permalink}`
         )
         .then()
       const result = JSON.parse(response)
