@@ -222,37 +222,15 @@ class Admin {
 				if ($param === "add_page" && $appname && $pageId && $page_title) {
 					return Controller::add_page($appname, $pageId, $page_title);
 				} elseif ($param === "delete_page" && $appname && $pageId) {
-					Controller::delete_page($app_options_list, $appname, $pageId, $permalink);
+					return Controller::delete_page($appname, $pageId, $permalink);
 				} elseif ($param === "toggle_react_routing" && $appname) {
-					Controller::toggle_react_routing($appname);
-				} elseif ($param === "update_index_html" && $appname && $pageId) {
-					/* 					$this->write_index_html($appname, $this->get_index_html_content($permalink));
-					echo wp_json_encode([
-						'status' => 1,
-						'message' => 'Index.html updated.',
-					]); */
+					return Controller::toggle_react_routing($appname);
+				} elseif ($param === "update_index_html" && $appname && $permalink) {
+					return Controller::update_index_html($appname, $permalink);
 				} elseif ($param === 'delete_react_app' && $appname) {
-
-					$options = get_option('repr_apps');
-					$is_option_deleted = Utils::write_apps_option(array_filter(
-						$options,
-						fn ($el) => $el['appname'] !== $appname
-					));
-					$is_appdir_removed = repr_delete_directory(Utils::app_path($appname));
-					if ($is_appdir_removed) {
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => 'App deleted.',
-						]);
-					} else {
-						echo wp_json_encode([
-							'status' => 1,
-							'message' => "Couldn't remove files. Please remove directory by hand.",
-						]);
-					}
+					return Controller::delete_react_app($appname);
 				} elseif ($param === "get_react_apps") {
-					$apps = Utils::get_apps();
-					echo wp_json_encode(['status' => 1, 'apps' => $apps]);
+					return Controller::get_react_apps();
 				} else {
 					echo wp_json_encode([
 						'status' => 0,

@@ -89,6 +89,31 @@ class Controller {
     }
   }
 
+  public static function delete_react_app($appname) {
+    $options = get_option('repr_apps');
+    $is_option_deleted = Utils::write_apps_option(array_filter(
+      $options,
+      fn ($el) => $el['appname'] !== $appname
+    ));
+    $is_appdir_removed = repr_delete_directory(Utils::app_path($appname));
+    if ($is_appdir_removed) {
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => 'App deleted.',
+      ]);
+    } else {
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => "Couldn't remove files. Please remove directory by hand.",
+      ]);
+    }
+  }
+
+  public static function get_react_apps() {
+    $apps = Utils::get_apps();
+    echo wp_json_encode(['status' => 1, 'apps' => $apps]);
+  }
+
   public static function update_index_html($appname, $permalink) {
     Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
     echo wp_json_encode([
