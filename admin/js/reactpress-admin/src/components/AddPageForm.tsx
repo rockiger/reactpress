@@ -158,7 +158,7 @@ export function AddPageInput({
           </>
         ) : (
           <button
-            className="button button-icon button-link-to-slug"
+            className="button button-link-to-slug"
             //@ts-ignore
             disabled={showSpinner}
             onClick={() => setShowInput(true)}

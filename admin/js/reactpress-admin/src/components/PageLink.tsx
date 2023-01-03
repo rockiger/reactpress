@@ -11,13 +11,13 @@ export default function PageLink({
 }) {
   return (
     <div
-      className="align-baseline flex gap05 pb05 title column-title has-row-actions column-primary page-title show-children"
+      className="align-baseline flex gap05 h1_5 pb05 title column-title has-row-actions column-primary page-title show-children"
       data-colname="Title"
     >
       <strong>
         <a
           className="row-title"
-          href={`/wp-admin/post.php?post=${page.ID}&amp;action=edit`}
+          href={`/wp-admin/post.php?post=${page.ID}&action=edit`}
           aria-label={`“${page.title}” (Edit)`}
         >
           {page.title}
@@ -26,7 +26,7 @@ export default function PageLink({
       <div className="fg-grey-light font-size-sm hide p0">
         <span className="edit">
           <a
-            href={`/wp-admin/post.php?post=${page.ID}&amp;action=edit`}
+            href={`/wp-admin/post.php?post=${page.ID}&action=edit`}
             aria-label={`Edit “${page.title}”`}
           >
             Edit

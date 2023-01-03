@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'lodash'
 import logo from './logo.svg'
 import './App.css'
@@ -61,7 +61,8 @@ function App() {
     }
   }, [setApps])
 
-  const getPages = useCallback(
+  // We use useMemo here, because typescript can't handle _.debounce properly
+  const getPages = useMemo(
     () =>
       _.debounce(async (search = '', pageIds: number[] = []) => {
         const domain = rp.ajaxurl.slice(0, rp.ajaxurl.indexOf('/', 8))
@@ -297,7 +298,10 @@ function App() {
               <p className="pt1">
                 You can find <b>all app sources</b> in your WordPress plugin
                 folder under:
-                <code>{`${rp.appspath}/[appname]`.replace('//', '/')}</code>.
+                <code className="line-break">
+                  {`${rp.appspath}/[appname]`.replace('//', '/')}
+                </code>
+                .
               </p>
               <p className="pt1">
                 <b>For deployments</b> to work, make sure, that you{' '}

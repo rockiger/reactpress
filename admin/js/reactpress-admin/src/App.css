@@ -147,6 +147,10 @@ p {
   flex-grow: 1;
 }
 
+.h1_5 {
+  height: 1.5rem;
+}
+
 .hide {
   display: none;
 }
