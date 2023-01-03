@@ -81,6 +81,7 @@ function AppCard({
               <AddPageInput
                 addPage={addPage}
                 app={app}
+                isDisabled={!_.isEmpty(app.pageIds) && app.allowsRouting}
                 getPages={getPages}
                 pages={pages}
               />

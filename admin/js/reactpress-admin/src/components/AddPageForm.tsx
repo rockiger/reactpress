@@ -11,6 +11,7 @@ interface CreatableSelectOption {
 interface AddPageInputProps {
   addPage: AppCardProps['addPage']
   app: AppCardProps['app']
+  isDisabled: boolean
   getPages: AppCardProps['getPages']
   pages: Page[]
 }
@@ -19,6 +20,7 @@ export default AddPageInput
 export function AddPageInput({
   addPage,
   app,
+  isDisabled = false,
   getPages,
   pages,
 }: AddPageInputProps) {
@@ -160,7 +162,7 @@ export function AddPageInput({
           <button
             className="button button-link-to-slug"
             //@ts-ignore
-            disabled={showSpinner}
+            disabled={isDisabled || showSpinner}
             onClick={() => setShowInput(true)}
           >
             Add Page
