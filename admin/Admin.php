@@ -211,10 +211,9 @@ class Admin {
 		 * @since 1.0.0
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$app_options_list = Utils::get_apps();
-		$pageId = sanitize_title_for_query($_POST['pageId'] ?? '');
-		$page_title = sanitize_title_for_query($_POST['page_title'] ?? '');
-		$permalink = sanitize_title_for_query($_POST['permalink'] ?? '');
+		$pageId = intval($_POST['pageId'] ?? '');
+		$page_title = $_POST['page_title'] ?? '';
+		$permalink = $_POST['permalink'] ?? '';
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 
 		try {

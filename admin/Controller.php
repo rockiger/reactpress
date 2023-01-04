@@ -22,59 +22,42 @@ class Controller {
 
   public static function add_page($appname, $pageId, $page_title) {
     $app_option = Utils::get_app_options(Utils::get_apps(), $appname);
-    if ($app_option) {
-      //# Check if the app allows adding of more URL slugs
-      if ($app_option['allowsRouting'] && count($app_option['pageIds'])) {
-        echo wp_json_encode([
-          'status' => 0,
-          'message' => 'Apps with client-side routing can only be shown on one single page.'
-        ]);
-        return;
-      }
-
-      // add slug to existing app_options
-      $inserted_page = Controller::insert_page($appname, $pageId, $page_title);
-      if (!$inserted_page['ID']) {
-        echo wp_json_encode([
-          'status' => 0,
-          'message' => $inserted_page['message']
-        ]);
-        return;
-      }
-      $permalink = get_permalink($inserted_page['ID']);
-
-      Controller::add_build_path($appname);
-      if ($app_option['allowsRouting']) {
-        add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
-        Utils::set_public_url_for_dev_server($appname, $pageId);
-      }
-      flush_rewrite_rules();
-      Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
+    //# Check if the app allows adding of more URL slugs
+    if ($app_option && $app_option['allowsRouting'] && count($app_option['pageIds'])) {
       echo wp_json_encode([
-        'status' => 1,
-        'message' => 'Page added.',
-        'pageId' => 0,
-        'page_title' => 'Page Title',
-        'permalink' => 'test'
+        'status' => 0,
+        'message' => 'Apps with client-side routing can only be shown on one single page.'
       ]);
-    } else {
-      // create new app option
-      $inserted_page = Controller::insert_page($appname, $pageId, $page_title);
-      $permalink = get_permalink($inserted_page['ID']);
-
-      Utils::add_app_options(Utils::get_apps(), $appname, $pageId);
-      Controller::add_build_path($appname);
-      if ($app_option['allowsRouting']) {
-        add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
-        Utils::set_public_url_for_dev_server($appname, $pageId);
-      }
-      flush_rewrite_rules();
-      Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
-      echo wp_json_encode([
-        'status' => 1,
-        'message' => 'Page created and added to app.'
-      ]);
+      return;
     }
+
+    // add slug to existing app_options
+    $inserted_page = Controller::insert_page($pageId, $page_title);
+    repr_log($inserted_page);
+    if (!$inserted_page['ID']) {
+      echo wp_json_encode([
+        'status' => 0,
+        'message' => $inserted_page['message']
+      ]);
+      return;
+    }
+    $permalink = get_permalink($inserted_page['ID']);
+    repr_log($permalink);
+    $app_option ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
+    Controller::add_build_path($appname);
+    if ($app_option['allowsRouting']) {
+      add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
+      Utils::set_public_url_for_dev_server($appname, $pageId);
+    }
+    flush_rewrite_rules();
+    Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
+    echo wp_json_encode([
+      'status' => 1,
+      'message' => 'Page added.',
+      'pageId' => $inserted_page['ID'],
+      'page_title' => $inserted_page['page_title'],
+      'permalink' => $permalink
+    ]);
   }
 
   public static function delete_page(string $appname, int $pageId, string $permalink) {
@@ -165,7 +148,7 @@ class Controller {
    * @return string
    * @since 1.0.0
    */
-  public function get_index_html_content(string $permalink) {
+  public static function get_index_html_content(string $permalink) {
     $file_contents = wp_remote_retrieve_body(
       wp_remote_get($permalink, ['timeout' => 1000])
     );
@@ -185,13 +168,14 @@ class Controller {
    * @return void
    * @since 1.0.0
    */
-  public function insert_page(int $pageId, string $page_title) {
-    if ($pageId == -1) {
+  public static function insert_page(int $pageId, string $page_title) {
+    repr_log(['$pageId' => $pageId]);
+    if ($pageId === -1) {
+      repr_log("wp_insert_post");
       $result = wp_insert_post(
         array(
           'post_title' => $page_title,
           'post_status' => 'publish',
-          'post_author' => '1',
           'post_content' => REPR_REACT_ROOT_TAG,
           'post_type' => "page",
           // Assign page template using the relative path, it will be
@@ -199,6 +183,7 @@ class Controller {
           'page_template'  => 'templates/react-page-template.php',
         )
       );
+      repr_log($result);
       return $result
         ? ['status' => 'true', 'message' => 'Page created.', 'ID' => $result, 'page_title' => $page_title]
         : ['status' => 'false', 'message' => "Couldn't create page.", "ID" => $result, 'page_title' => $page_title];
@@ -207,7 +192,7 @@ class Controller {
       if ($page) {
         // already we have data with this post name
         if (strpos($page->post_content, '<div id="root"></div>') !== false) {
-          return ['status' => 'true', 'message' => 'Page with app already exists.', 'ID' => $page->ID];
+          return ['status' => 'true', 'message' => 'Page with app already exists.', 'ID' => $page->ID, 'page_title' => $page_title];
         }
         $result = wp_update_post(
           [
@@ -216,8 +201,8 @@ class Controller {
           ]
         );
         return $result
-          ? ['status' => 'true', 'message' => 'Add app to page.', 'ID' => $result, 'post_title' => $page->post_title]
-          : ['status' => 'false', 'message' => 'Couldn\'t add app to page.', 'ID' => 0, 'post_title' => ''];
+          ? ['status' => 'true', 'message' => 'Add app to page.', 'ID' => $result, 'page_title' => $page->post_title]
+          : ['status' => 'false', 'message' => 'Couldn\'t add app to page.', 'ID' => 0, 'page_title' => ''];
       }
     }
   }

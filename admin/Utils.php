@@ -13,7 +13,14 @@ namespace ReactPress\Admin;
 
 class Utils {
 
-  public static function add_app_options(array $app_options_list, string $appname, int $pageId) {
+  /**
+   * Creates options for a new app. If the repr_apps options are not present, it will
+   * create them.
+   */
+
+  //! refactor to not need the $app_options_list
+  public static function add_app_options(string $appname, int $pageId) {
+    $app_options_list = Utils::get_app_options_list();
     if (!is_array($app_options_list) && $appname && $pageId) {
       add_option('repr_apps', [[
         'allowsRouting' => false,
@@ -27,6 +34,15 @@ class Utils {
         'pageIds' => [$pageId],
       ]));
     }
+  }
+
+  public static function add_pageId_to_app_options(string $appname, int $pageId) {
+    Utils::write_apps_option(array_map(function ($el) use ($appname, $pageId) {
+      if ($el['appname'] === $appname) {
+        $el['pageIds'] = array_unique(Utils::array_add($el['pageIds'], $pageId));
+      }
+      return $el;
+    }, Utils::get_app_options_list()));
   }
 
   /**
@@ -66,6 +82,7 @@ class Utils {
    * @param string $appname 
    * @return mixed
    */
+  //! refactor to not need the $app_options_list
   public static function get_app_options(array $app_options_list, string $appname) {
     $app_options = null;
     foreach ($app_options_list as $key => $val) {
@@ -154,13 +171,13 @@ class Utils {
   public static function delete_page(array $app_options_list, string $appname, string $pageId) {
     $new_app_options_list = array_map(function ($app_option) use ($appname, $pageId) {
       if ($app_option['appname'] === $appname) {
-        $app_option['pagesIds'] = array_filter(
-          $app_option['pagesIds'],
+        $app_option['pageIds'] = array_filter(
+          $app_option['pageIds'],
           fn ($id) => $id !== $pageId
         );
         $app_option['pages'] = array_filter(
           $app_option['pages'],
-          fn ($p) => $p->ID !== $pageId
+          fn ($p) => $p['ID'] !== $pageId
         );
       }
       return $app_option;
@@ -184,13 +201,19 @@ class Utils {
   }
 
   /**
-   * Return all apps as an array
+   * Return all apps as an array, enriched with the meta data for pages
+   * 
+   * [['allowsRouting' => false,
+   *   'appname' => $appname,
+   *   'pageIds' => [100]
+   *   'pages' => ['ID' => 100, 'title' => 'Title', 'permalink' => 'http://...']
+   * ]]
    *
    * @return array
    * @since 1.2.0
    */
   public static function get_apps() {
-    $app_options = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+    $app_options = Utils::get_app_options_list();
 
     // combine apps from directory and from settings to get a complete list
     // event when the user deletes an app from the directory
@@ -240,6 +263,14 @@ class Utils {
   }
 
   /**
+   * Retrieves the repr_apps option from WordPress if nothing can retrieved,
+   * produces an empty array.
+   */
+  public static function get_app_options_list(): array {
+    return is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+  }
+
+  /**
    * Removes a rewrite rule from $wp_rewrite->extra_rules_top
    *
    * @param $regex the regex given to add_rewrite_rule
@@ -257,8 +288,11 @@ class Utils {
    * @return void 
    */
   public static function write_apps_option($app_list) {
-    $app_list_option = $app_list;
-    unset($app_list_option['pages']);
+    $app_list_option = array_map(fn ($el) => [
+      'allowsRouting' => $el['allowsRouting'],
+      'appname' => $el['appname'],
+      'pageIds' => $el['pageIds']
+    ], $app_list);
     update_option('repr_apps', $app_list_option);
   }
 }
