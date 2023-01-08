@@ -168,19 +168,21 @@ class Utils {
    * @return array
    * @since 2.0.0
    */
-  public static function delete_page(array $app_options_list, string $appname, string $pageId) {
-    $new_app_options_list = array_map(function ($app_option) use ($appname, $pageId) {
-      if ($app_option['appname'] === $appname) {
-        $app_option['pageIds'] = array_filter(
-          $app_option['pageIds'],
+  public static function delete_page(array $app_options_list, string $appname, int $pageId) {
+    $new_app_options_list = array_map(function ($app_options) use ($appname, $pageId) {
+      if ($app_options['appname'] === $appname) {
+        $new_app_options = $app_options;
+        $new_app_options['pageIds'] = array_filter(
+          $app_options['pageIds'],
           fn ($id) => $id !== $pageId
         );
-        $app_option['pages'] = array_filter(
-          $app_option['pages'],
+        $new_app_options['pages'] = array_filter(
+          $app_options['pages'],
           fn ($p) => $p['ID'] !== $pageId
         );
+        return $new_app_options;
       }
-      return $app_option;
+      return $app_options;
     }, $app_options_list);
     Utils::write_apps_option($new_app_options_list);
     return $new_app_options_list;

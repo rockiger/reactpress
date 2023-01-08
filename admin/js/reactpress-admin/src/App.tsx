@@ -168,7 +168,7 @@ function App() {
     } catch (e) {
       console.log(e)
       changeState(true)
-      showSnackbar("Couldn't delete app.")
+      showSnackbar("Couldn't remove page.")
     }
   }, [])
 

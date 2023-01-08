@@ -20,7 +20,7 @@ class Controller {
 
   // # Controller functions 
 
-  public static function add_page($appname, $pageId, $page_title) {
+  public static function add_page($appname, int $pageId, $page_title) {
     $app_option = Utils::get_app_options(Utils::get_apps(), $appname);
     //# Check if the app allows adding of more URL slugs
     if ($app_option && $app_option['allowsRouting'] && count($app_option['pageIds'])) {
