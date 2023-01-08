@@ -157,7 +157,10 @@ class Controller {
     // with the dev assets.
     $filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
     $filtered_contents =  implode(PHP_EOL, $filtered_arr);
-    return $filtered_contents;
+    // re-add script tag for global reactPress variable
+    $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
+
+    return $readded_contents;
   }
 
   /**
@@ -260,6 +263,7 @@ class Controller {
    */
   public static function write_index_html(string $appname, string $content) {
     $index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
+
     return file_put_contents($index_html_path, $content);
   }
 }
