@@ -20,7 +20,7 @@ class Utils {
 
   //! refactor to not need the $app_options_list
   public static function add_app_options(string $appname, int $pageId) {
-    $app_options_list = Utils::get_app_options_list();
+    $app_options_list = Utils::get_apps();
     if (!is_array($app_options_list) && $appname && $pageId) {
       add_option('repr_apps', [[
         'allowsRouting' => false,
@@ -42,7 +42,7 @@ class Utils {
         $el['pageIds'] = array_unique(Utils::array_add($el['pageIds'], $pageId));
       }
       return $el;
-    }, Utils::get_app_options_list()));
+    }, Utils::get_apps()));
   }
 
   /**
@@ -266,7 +266,8 @@ class Utils {
 
   /**
    * Retrieves the repr_apps option from WordPress if nothing can retrieved,
-   * produces an empty array.
+   * produces an empty array. 
+   * Usually you should prefer Utils::get_apps().
    */
   public static function get_app_options_list(): array {
     return is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];

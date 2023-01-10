@@ -21,9 +21,10 @@ class Controller {
   // # Controller functions 
 
   public static function add_page($appname, int $pageId, $page_title) {
-    $app_option = Utils::get_app_options(Utils::get_apps(), $appname);
+    $app_options = Utils::get_app_options(Utils::get_apps(), $appname);
+    repr_log($app_options);
     //# Check if the app allows adding of more URL slugs
-    if ($app_option && $app_option['allowsRouting'] && count($app_option['pageIds'])) {
+    if ($app_options && $app_options['allowsRouting'] && count($app_options['pageIds'])) {
       echo wp_json_encode([
         'status' => 0,
         'message' => 'Apps with client-side routing can only be shown on one single page.'
@@ -42,10 +43,9 @@ class Controller {
       return;
     }
     $permalink = get_permalink($inserted_page['ID']);
-    repr_log($permalink);
-    $app_option ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
+    $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
     Controller::add_build_path($appname);
-    if ($app_option['allowsRouting']) {
+    if ($app_options['allowsRouting']) {
       add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
       Utils::set_public_url_for_dev_server($appname, $pageId);
     }
