@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'lodash'
 import logo from './logo.svg'
 import './App.css'
-import AppCard, { AppDetails } from './components/AppCard'
+import AppCard from './components/AppCard'
+import type { AppDetails, Page } from './components/AppCard'
 
 interface RP {
   ajaxurl: string
@@ -12,9 +13,12 @@ interface RP {
 declare var rp: RP
 declare var jQuery: any
 
+console.log(rp)
+
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
   const [deletingApps, setDeletingApps] = useState<string[]>([])
+  const [pages, setPages] = useState<Page[]>([])
   const [updatingApps, setUpdatingApps] = useState<string[]>([])
 
   const deleteApp = useCallback(async (appname: string) => {
@@ -57,41 +61,89 @@ function App() {
     }
   }, [setApps])
 
-  const addSlug = useCallback(async (appname: string, newSlug: string) => {
-    try {
-      //call to api
-      const response = await jQuery
-        .post(
-          rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=add_url_slug&appname=${appname}&pageslug=${newSlug}`
-        )
-        .then()
-      const result = JSON.parse(response)
-      if (result.status) {
-        setApps((apps) =>
-          _.map(apps, (app) => {
-            if (app.appname !== appname) return app
-            return { ...app, pageslugs: [...app.pageslugs, newSlug] }
-          })
-        )
-      }
-      showSnackbar(result.message)
-    } catch (e) {
-      console.error(e)
-      showSnackbar("Couldn't change page slug.")
-    }
-  }, [])
+  // We use useMemo here, because typescript can't handle _.debounce properly
+  const getPages = useMemo(
+    () =>
+      _.debounce(async (search = '', pageIds: number[] = []) => {
+        const domain = rp.ajaxurl.slice(0, rp.ajaxurl.indexOf('/', 8))
+        const excludes = pageIds.join(',')
+        const url = `${domain}/wp-json/wp/v2/pages?per_page=100&exclude=${excludes}&orderby=title&order=asc&_fields=id,title,link&search=${search}&_locale=user`
+        try {
+          const response = await jQuery.get(url).then()
+          setPages(
+            response.map(
+              (el: {
+                id: string
+                link: string
+                title: { rendered: string }
+              }) => ({
+                ID: el.id,
+                permalink: el.link,
+                title: el.title.rendered,
+              })
+            )
+          )
+        } catch (e) {
+          console.error(e)
+        }
+      }),
+    []
+  )
 
-  const deleteSlug = useCallback(async (appname: string, pageslug: string) => {
+  const addPage = useCallback(
+    async (appname: string, pageId: number, pageTitle: string) => {
+      if (isDevEnvironment()) {
+        console.log({ appname, pageId, pageTitle })
+        return
+      }
+      try {
+        //call to api
+        const response = await jQuery
+          .post(
+            rp.ajaxurl,
+            `action=repr_admin_ajax_request&param=add_page&appname=${appname}&pageId=${pageId}&page_title=${pageTitle}`
+          )
+          .then()
+        const result = JSON.parse(response)
+        if (result.status) {
+          setApps((apps) =>
+            _.map(apps, (app) => {
+              if (app.appname !== appname) return app
+              return {
+                ...app,
+                pageIds: [...app.pageIds, result.pageId],
+                pages: [
+                  ...app.pages,
+                  {
+                    ID: result.pageId,
+                    permalink: result.permalink,
+                    title: result.page_title,
+                  },
+                ],
+              }
+            })
+          )
+        }
+        showSnackbar(result.message)
+      } catch (e) {
+        console.error(e)
+        showSnackbar("Couldn't add page.")
+      }
+    },
+    []
+  )
+
+  const deletePage = useCallback(async (appname: string, page: Page) => {
     const changeState = (add = false) =>
       setApps((apps) =>
         _.map(apps, (app) => {
           if (app.appname !== appname) return app
           return {
             ...app,
-            pageslugs: add
-              ? _.concat(app.pageslugs, pageslug)
-              : _.without(app.pageslugs, pageslug),
+            pageIds: add
+              ? _.concat(app.pageIds, page.ID)
+              : _.without(app.pageIds, page.ID),
+            pages: add ? _.concat(app.pages, page) : _.without(app.pages, page),
           }
         })
       )
@@ -105,7 +157,7 @@ function App() {
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=delete_url_slug&appname=${appname}&pageslug=${pageslug}`
+          `action=repr_admin_ajax_request&param=delete_page&appname=${appname}&pageId=${page.ID}`
         )
         .then()
       const result = JSON.parse(response)
@@ -116,64 +168,9 @@ function App() {
     } catch (e) {
       console.log(e)
       changeState(true)
-      showSnackbar("Couldn't delete app slug")
+      showSnackbar("Couldn't remove page.")
     }
   }, [])
-
-  const editSlug = useCallback(
-    async (appname: string, newSlug: string, oldSlug: string) => {
-      /**
-       * Function that makes it easy to reverse the if api call doesn't work.
-       */
-      const changeState = ({
-        appname,
-        newSlug,
-        oldSlug,
-      }: {
-        appname: string
-        newSlug: string
-        oldSlug: string
-      }) =>
-        setApps((apps) =>
-          _.map(apps, (app) => {
-            if (app.appname !== appname) return app
-            if (_.isEmpty(app.pageslugs)) {
-              return { ...app, pageslugs: [newSlug] }
-            }
-            if (_.includes(app.pageslugs, oldSlug)) {
-              const pageslugs = _.map(app.pageslugs, (pageslug) =>
-                pageslug === oldSlug ? newSlug : pageslug
-              )
-              return { ...app, pageslugs }
-            }
-            return app
-          })
-        )
-      //optimistically update state
-      changeState({ appname, newSlug, oldSlug })
-
-      if (isDevEnvironment()) return
-      try {
-        //call to api
-        const response = await jQuery
-          .post(
-            rp.ajaxurl,
-            `action=repr_admin_ajax_request&param=edit_url_slug&appname=${appname}&pageslug=${newSlug}&old_pageslug=${oldSlug}`
-          )
-          .then()
-        const result = JSON.parse(response)
-        if (!result.status) {
-          changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
-        }
-        showSnackbar(result.message)
-      } catch (e) {
-        console.log(e)
-        changeState({ appname, newSlug: oldSlug, oldSlug: newSlug })
-        showSnackbar("Couldn't change page slug.")
-      }
-    },
-    []
-  )
 
   const toggleRouting = useCallback(async (appname: string) => {
     const changeState = () =>
@@ -208,25 +205,14 @@ function App() {
     }
   }, [])
 
-  const updateSlug = useCallback(
-    async (appname: string, newSlug: string, oldSlug: string) => {
-      if (oldSlug) {
-        await editSlug(appname, newSlug, oldSlug)
-      } else {
-        await addSlug(appname, newSlug)
-      }
-    },
-    [addSlug, editSlug]
-  )
-
   const updateDevEnvironment = useCallback(
-    async (appname: string, pageslug: string) => {
+    async (appname: string, permalink: string) => {
       setUpdatingApps((updatingApps) => _.concat(updatingApps, appname))
       //call to api
       const response = await jQuery
         .post(
           rp.ajaxurl,
-          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&pageslug=${pageslug}`
+          `action=repr_admin_ajax_request&param=update_index_html&appname=${appname}&permalink=${permalink}`
         )
         .then()
       const result = JSON.parse(response)
@@ -265,7 +251,7 @@ function App() {
                 <code>npx create-react-app [appname]</code>
               </p>
               <p className="pb1">
-                Insert a page slug and start developing your app with{' '}
+                Add a page and start developing your app with{' '}
                 <code>yarn start</code>.
               </p>
               <p className="pb1">
@@ -276,12 +262,12 @@ function App() {
                 system.
               </p>
               <p className="pb1">
-                Then reload the ReactPress page in the WordpPress admin and give
-                it the exact same slug as on the dev system.
+                Then reload the ReactPress page in the WordpPress admin and add
+                a page again.
               </p>
               <p className="pb1">
-                If you visit the slug now, you should see the app on your live
-                system.
+                If you visit the assigned page now, you should see the app on
+                your live system.
               </p>
             </div>
           </div>
@@ -291,14 +277,16 @@ function App() {
               <div id="existing-apps" className="flex flexwrap gap1 row">
                 {_.map(apps, (app) => (
                   <AppCard
+                    addPage={addPage}
                     app={app}
                     appspath={rp.appspath}
                     deleteApp={deleteApp}
-                    deleteSlug={deleteSlug}
+                    deletePage={deletePage}
                     deletingApps={deletingApps}
+                    getPages={getPages}
+                    pages={pages}
                     key={app.appname}
                     toggleRouting={toggleRouting}
-                    updateSlug={updateSlug}
                     updateDevEnvironment={updateDevEnvironment}
                     updatingApps={updatingApps}
                   />
@@ -310,7 +298,10 @@ function App() {
               <p className="pt1">
                 You can find <b>all app sources</b> in your WordPress plugin
                 folder under:
-                <code>{`${rp.appspath}/[appname]`.replace('//', '/')}</code>.
+                <code className="line-break">
+                  {`${rp.appspath}/[appname]`.replace('//', '/')}
+                </code>
+                .
               </p>
               <p className="pt1">
                 <b>For deployments</b> to work, make sure, that you{' '}

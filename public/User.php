@@ -23,6 +23,8 @@
 
 namespace ReactPress\User;
 
+use ReactPress\Admin\Utils;
+
 use function ReactPress\Admin\repr_log;
 
 class User {
@@ -143,15 +145,15 @@ class User {
 	function repr_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
-		$repr_apps = get_option('repr_apps') ?? [];
-		$pageslugs = $repr_apps ? array_map(fn ($el) => $el['pageslugs'], $repr_apps) : [];
+		$repr_apps = Utils::get_apps();
+		$pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
 
-		$valid_pages = array_merge(...$pageslugs);
+		$valid_pages = array_merge(...$pageIds);
 		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
-		if (is_page() && in_array($post->post_name, $valid_pages)) {
+		if (is_page() && in_array($post->ID, $valid_pages)) {
 
 			// Setting path variables.
-			$current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->post_name, $el['pageslugs'])))[0];
+			$current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
 
@@ -241,13 +243,26 @@ class User {
 	 * @since 1.4.0
 	 */
 	public function add_repr_apps_rewrite_rules() {
-		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+		$repr_apps = Utils::get_apps();
 		$repr_apps_with_routing = array_filter($repr_apps, fn ($el) => $el['allowsRouting']);
-		$pageslugArrays = array_map(fn ($el) => $el['pageslugs'], $repr_apps_with_routing);
-		$pageslugs = array_merge(...$pageslugArrays);
+		$permalinkArrays = array_map(
+			fn ($el) => array_map(
+				fn($pg) => $pg['permalink'],
+				$el['pages']
+			),
+			$repr_apps_with_routing
+		);
+		$permalinks = array_merge(...$permalinkArrays);
 
-		foreach ($pageslugs as $pageslug) {
-			add_rewrite_rule('^' . $pageslug . '/(.*)?', 'index.php?pagename=' . $pageslug, 'top');
+		foreach ($permalinks as $permalink) {
+			add_rewrite_rule(
+				'^' . 
+				wp_make_link_relative($permalink) . 
+				'/(.*)?', 
+				'index.php?pagename=' . 
+				wp_make_link_relative($permalink), 
+				'top'
+			);
 		}
 	}
 

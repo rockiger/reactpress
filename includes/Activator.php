@@ -42,6 +42,21 @@ class Activator {
 			}
 		}, $repr_apps);
 
+		//# swap out pageslugs for pageIds, because they are immutable
+		$repr_apps_with_page_ids = array_map(function ($el) {
+			if (!array_key_exists('pageSlugs', $el)) {
+				$new_el = $el;
+				$new_el['pageIds'] = array_map(function($el) {
+				    $result = Activator::get_page_by_slug($el);
+				    return $result ? $result->ID : null;
+				}, $el['pageslugs']);
+				unset($new_el['pageslugs']);
+				return $new_el;
+			} else {
+				return $el;
+			}
+		}, $repr_apps_with_pageslugs);
+
 		//# add flag for app routing
 		$repr_apps_with_app_routing = array_map(function ($el) {
 			if (!array_key_exists('allowsRouting', $el)) {
@@ -51,10 +66,41 @@ class Activator {
 			} else {
 				return $el;
 			}
-		}, $repr_apps_with_pageslugs);
+		}, $repr_apps_with_page_ids);
+
+
 		update_option('repr_apps', $repr_apps_with_app_routing);
 
 		//# update version
 		update_option('repr_version', REPR_VERSION);
+	}
+
+	public static function get_page_by_slug( $page_slug, $output = OBJECT, $post_type = 'page' ) {
+		global $wpdb;
+
+		if ( is_array( $post_type ) ) {
+			$post_type = esc_sql( $post_type );
+			$post_type_in_string = "'" . implode( "','", $post_type ) . "'";
+			$sql = $wpdb->prepare( "
+				SELECT ID
+				FROM $wpdb->posts
+				WHERE post_name = %s
+				AND post_type IN ($post_type_in_string)
+			", $page_slug );
+		} else {
+			$sql = $wpdb->prepare( "
+				SELECT ID
+				FROM $wpdb->posts
+				WHERE post_name = %s
+				AND post_type = %s
+			", $page_slug, $post_type );
+		}
+
+		$page = $wpdb->get_var( $sql );
+
+		if ( $page )
+			return get_post( $page, $output );
+
+		return null;
 	}
 }
