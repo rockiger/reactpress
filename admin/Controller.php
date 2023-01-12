@@ -22,7 +22,6 @@ class Controller {
 
   public static function add_page($appname, int $pageId, $page_title) {
     $app_options = Utils::get_app_options(Utils::get_apps(), $appname);
-    repr_log($app_options);
     //# Check if the app allows adding of more URL slugs
     if ($app_options && $app_options['allowsRouting'] && count($app_options['pageIds'])) {
       echo wp_json_encode([
@@ -34,7 +33,6 @@ class Controller {
 
     // add slug to existing app_options
     $inserted_page = Controller::insert_page($pageId, $page_title);
-    repr_log($inserted_page);
     if (!$inserted_page['ID']) {
       echo wp_json_encode([
         'status' => 0,
@@ -172,9 +170,7 @@ class Controller {
    * @since 1.0.0
    */
   public static function insert_page(int $pageId, string $page_title) {
-    repr_log(['$pageId' => $pageId]);
     if ($pageId === -1) {
-      repr_log("wp_insert_post");
       $result = wp_insert_post(
         array(
           'post_title' => $page_title,
@@ -186,7 +182,6 @@ class Controller {
           'page_template'  => 'templates/react-page-template.php',
         )
       );
-      repr_log($result);
       return $result
         ? ['status' => 'true', 'message' => 'Page created.', 'ID' => $result, 'page_title' => $page_title]
         : ['status' => 'false', 'message' => "Couldn't create page.", "ID" => $result, 'page_title' => $page_title];
