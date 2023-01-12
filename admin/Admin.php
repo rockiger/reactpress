@@ -269,40 +269,6 @@ class Admin {
 	}
 
 	/**
-	 * Reads the React app uri out of the out.log file of the
-	 * app. Which is a splash screen of create-react-app.
-	 *
-	 * @param string $apppath the directory path of the app
-	 * @param integer $max_trys the number of trys to read the uri.
-	 * Important when out.log file is still being created.
-	 * @return array contains the protocol, the ip and the 
-	 * port of the uri.
-	 * @since 1.0.0
-	 */
-	function get_app_uri(string $apppath, int $max_trys = 1) {
-		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
-		$matches = [];
-		$trys = 0;
-		while (empty($matches) && $trys < $max_trys) {
-			try {
-				$file_content = file_get_contents("{$apppath}/out.log");
-			} catch (\Exception $e) {
-				return [];
-			}
-			preg_match($regex, $file_content, $matches);
-			$trys += 1;
-			if ($trys < $max_trys) {
-				sleep(1);
-			}
-		}
-		if (empty($matches)) {
-			return [];
-		} else {
-			return explode(':', $matches[0]);
-		}
-	}
-
-	/**
 	 * Change the slug of a page to the new one.
 	 *
 	 * @param string $oldSlug
