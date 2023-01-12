@@ -100,17 +100,14 @@ class Admin {
 			// React app
 			$plugin_app_dir_url = plugin_dir_url(__FILE__) . 'js/reactpress-admin/';
 			$react_app_build = $plugin_app_dir_url . 'build/';
-			$manifest_url = $react_app_build . 'asset-manifest.json';
 
-			// Request manifest file.
-			$request = file_get_contents($manifest_url);
-
-			// If the remote request fails, wp_remote_get() will return a WP_Error, so let’s check if the $request variable is an error:
-			if (!$request)
-				return false;
+			// Get the asset-manifest.json ($asset_manifest_json) content from React frontend, which is 
+			// created after CRA build. This way we don't need to use
+			// file_get_contents, which doesn't work on some hosts.
+			require_once('asset-manifest.php');
 
 			// Convert json to php array.
-			$files_data = json_decode($request);
+			$files_data = json_decode($asset_manifest_json);
 			if ($files_data === null)
 				return;
 
