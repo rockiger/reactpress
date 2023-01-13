@@ -20,6 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "sh postbuild.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

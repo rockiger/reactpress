@@ -104,7 +104,7 @@ class Admin {
 			// Get the asset-manifest.json ($asset_manifest_json) content from React frontend, which is 
 			// created after CRA build. This way we don't need to use
 			// file_get_contents, which doesn't work on some hosts.
-			require_once('asset-manifest.php');
+			require_once('js/reactpress-admin/build/asset-manifest.php');
 
 			// Convert json to php array.
 			$files_data = json_decode($asset_manifest_json);
