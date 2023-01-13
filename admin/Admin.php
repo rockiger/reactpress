@@ -100,17 +100,14 @@ class Admin {
 			// React app
 			$plugin_app_dir_url = plugin_dir_url(__FILE__) . 'js/reactpress-admin/';
 			$react_app_build = $plugin_app_dir_url . 'build/';
-			$manifest_url = $react_app_build . 'asset-manifest.json';
 
-			// Request manifest file.
-			$request = file_get_contents($manifest_url);
-
-			// If the remote request fails, wp_remote_get() will return a WP_Error, so let’s check if the $request variable is an error:
-			if (!$request)
-				return false;
+			// Get the asset-manifest.json ($asset_manifest_json) content from React frontend, which is 
+			// created after CRA build. This way we don't need to use
+			// file_get_contents, which doesn't work on some hosts.
+			require_once('js/reactpress-admin/build/asset-manifest.php');
 
 			// Convert json to php array.
-			$files_data = json_decode($request);
+			$files_data = json_decode($asset_manifest_json);
 			if ($files_data === null)
 				return;
 
@@ -266,40 +263,6 @@ class Admin {
 		return !empty($wpdb->get_row(
 			$wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "posts WHERE post_name = %s", $pageslug)
 		));
-	}
-
-	/**
-	 * Reads the React app uri out of the out.log file of the
-	 * app. Which is a splash screen of create-react-app.
-	 *
-	 * @param string $apppath the directory path of the app
-	 * @param integer $max_trys the number of trys to read the uri.
-	 * Important when out.log file is still being created.
-	 * @return array contains the protocol, the ip and the 
-	 * port of the uri.
-	 * @since 1.0.0
-	 */
-	function get_app_uri(string $apppath, int $max_trys = 1) {
-		$regex = '/http:\/\/\d+\.\d+\.\d+\.\d+:\d*/';
-		$matches = [];
-		$trys = 0;
-		while (empty($matches) && $trys < $max_trys) {
-			try {
-				$file_content = file_get_contents("{$apppath}/out.log");
-			} catch (\Exception $e) {
-				return [];
-			}
-			preg_match($regex, $file_content, $matches);
-			$trys += 1;
-			if ($trys < $max_trys) {
-				sleep(1);
-			}
-		}
-		if (empty($matches)) {
-			return [];
-		} else {
-			return explode(':', $matches[0]);
-		}
 	}
 
 	/**
