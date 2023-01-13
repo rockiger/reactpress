@@ -2,7 +2,7 @@
 
 use ReactPress\Admin\Utils;
 
- ?>
+?>
 <?php global $post;
 /**
  * Load react app files im page should contain a react app.
@@ -26,16 +26,8 @@ function repr_write_react_app_into_template() {
     $current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])))[0];
     $appname = $current_app['appname'];
     $plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
-
-    // Use fallback if $_SERVER['DOCUMENT_ROOT'] is not set
-    $relative_apppath = escapeshellcmd("/wp-content/reactpress/apps/{$appname}/");
-    if (strpos($plugin_app_dir_url, $document_root) === 0) {
-      // Add check to ensure that the document root and plugin app dir live on the same disk
-      $relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
-    }
-
     $react_app_build = $plugin_app_dir_url . 'build/';
-    $manifest_url = $react_app_build . 'asset-manifest.json';
+    $manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
 
     // Request manifest file.
     set_error_handler(
@@ -47,7 +39,7 @@ function repr_write_react_app_into_template() {
     );
     $request = false;
     try {
-      $request = file_get_contents($manifest_url);
+      $request = file_get_contents($manifest_path);
     } catch (\Exception $e) {
       repr_log($e->getMessage());
     }
@@ -82,17 +74,17 @@ function repr_write_react_app_into_template() {
 
     // Load css files.
     foreach ($css_files as $index => $css_file) {
-      echo '<link href="' . $plugin_app_dir_url . 'build/' . $css_file . '" rel="stylesheet"></link>';
+      echo '<link href="' . $react_app_build . $css_file . '" rel="stylesheet"></link>';
     }
 
     // Load js files.
     foreach ($js_files as $index => $js_file) {
-      echo '<script defer="defer" src="' . $plugin_app_dir_url . 'build/' . $js_file . '"></script>';
+      echo '<script defer="defer" src="' . $react_app_build . $js_file . '"></script>';
     }
 
     // Variables for app use
     $current_user = wp_get_current_user();
-			unset($current_user->user_pass); // Don't show encypted password for security reasons.
+    unset($current_user->user_pass); // Don't show encypted password for security reasons.
     echo '<script> 
             var reactPress = ' . wp_json_encode(
       [
