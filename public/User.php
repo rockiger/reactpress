@@ -109,26 +109,27 @@ class User {
 			$meta = get_post_meta(get_the_ID());
 
 			// Check if the page template is a Reactpress template
-			if (!empty($meta['_wp_page_template'][0]) &&
-			    $meta['_wp_page_template'][0] != $template &&
-			    'default' !== $meta['_wp_page_template'][0] &&
-			    strpos($meta['_wp_page_template'][0], 'react-page-template.php')
-			    ) {
-			        // At this point we know it's a Reactpress template
-			        $template = $meta['_wp_page_template'][0];
+			if (
+				!empty($meta['_wp_page_template'][0]) &&
+				$meta['_wp_page_template'][0] != $template &&
+				'default' !== $meta['_wp_page_template'][0] &&
+				strpos($meta['_wp_page_template'][0], 'react-page-template.php')
+			) {
+				// At this point we know it's a Reactpress template
+				$template = $meta['_wp_page_template'][0];
 
-			        // determine the location of the templates folder reference
-			        $ndx = strpos($template, 'templates/');
+				// determine the location of the templates folder reference
+				$ndx = strpos($template, 'templates/');
 
-			        // If it's not at the beginning
-			        if (0 != $ndx) {
-			            // change the template to be relative to the plugin's folder (i.e., templates/react-page-template.php)
-			            $template = substr($template, $ndx);
-			        }
+				// If it's not at the beginning
+				if (0 != $ndx) {
+					// change the template to be relative to the plugin's folder (i.e., templates/react-page-template.php)
+					$template = substr($template, $ndx);
+				}
 
-			        // Prepend the real path at runtime
-			        $template = REPR_PLUGIN_PATH . $template;
-			    }
+				// Prepend the real path at runtime
+				$template = REPR_PLUGIN_PATH . $template;
+			}
 		}
 
 		return $template;
@@ -156,16 +157,8 @@ class User {
 			$current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
-
-			// Use fallback if $_SERVER['DOCUMENT_ROOT'] is not set
-			$relative_apppath = escapeshellcmd("/wp-content/reactpress/apps/{$appname}/");
-			if (strpos($plugin_app_dir_url, $document_root) === 0) {
-				// Add check to ensure that the document root and plugin app dir live on the same disk
-				$relative_apppath = explode($document_root, $plugin_app_dir_url)[1];
-			}
-
 			$react_app_build = $plugin_app_dir_url . 'build/';
-			$manifest_url = $react_app_build . 'asset-manifest.json';
+			$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
 
 			// Request manifest file.
 			set_error_handler(
@@ -177,7 +170,7 @@ class User {
 			);
 			$request = false;
 			try {
-				$request = file_get_contents($manifest_url);
+				$request = file_get_contents($manifest_path);
 			} catch (\Exception $e) {
 				repr_log($e->getMessage());
 			}
@@ -212,12 +205,12 @@ class User {
 
 			// Load css files.
 			foreach ($css_files as $index => $css_file) {
-				wp_enqueue_style('rp-react-app-asset-' . $index, $plugin_app_dir_url . 'build/' . $css_file);
+				wp_enqueue_style('rp-react-app-asset-' . $index, $react_app_build . $css_file);
 			}
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('rp-react-app-asset-' . $index, $plugin_app_dir_url . 'build/' . $js_file, array(), 1, true);
+				wp_enqueue_script('rp-react-app-asset-' . $index, $react_app_build . $js_file, array(), 1, true);
 			}
 
 			// Variables for app use
@@ -247,7 +240,7 @@ class User {
 		$repr_apps_with_routing = array_filter($repr_apps, fn ($el) => $el['allowsRouting']);
 		$permalinkArrays = array_map(
 			fn ($el) => array_map(
-				fn($pg) => $pg['permalink'],
+				fn ($pg) => $pg['permalink'],
 				$el['pages']
 			),
 			$repr_apps_with_routing
@@ -256,11 +249,11 @@ class User {
 
 		foreach ($permalinks as $permalink) {
 			add_rewrite_rule(
-				'^' . 
-				wp_make_link_relative($permalink) . 
-				'/(.*)?', 
-				'index.php?pagename=' . 
-				wp_make_link_relative($permalink), 
+				'^' .
+					wp_make_link_relative($permalink) .
+					'/(.*)?',
+				'index.php?pagename=' .
+					wp_make_link_relative($permalink),
 				'top'
 			);
 		}
