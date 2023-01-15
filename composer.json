@@ -17,5 +17,15 @@
     }
   ],
   "minimum-stability": "dev",
-  "require": {}
+  "require-dev": {
+    "phpstan/phpstan": "1.10.x-dev",
+    "phpstan/extension-installer": "1.2.x-dev",
+    "phpstan/phpstan-beberlei-assert": "1.1.x-dev",
+    "szepeviktor/phpstan-wordpress": "dev-master"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  }
 }

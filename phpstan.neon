@@ -1,0 +1,7 @@
+# phpstan.neon
+parameters:
+  excludePaths:
+    - 'vendor/*'
+  level: max
+  paths:
+    - '.'
