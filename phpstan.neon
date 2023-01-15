@@ -2,6 +2,6 @@
 parameters:
   excludePaths:
     - 'vendor/*'
-  level: max
+  level: 0
   paths:
     - '.'

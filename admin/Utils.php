@@ -70,7 +70,6 @@ class Utils {
    *
    * @param array $array
    * @param [type] $entry
-   * @return void
    * @since 1.0.0
    */
   public static function array_add(array $array, $entry) {
@@ -288,7 +287,6 @@ class Utils {
    * Consumes an app list, filters unneccessary information (pages) and
    * saves it as options.
    * @param array $app_list 
-   * @return void 
    */
   public static function write_apps_option($app_list) {
     $app_list_option = array_map(fn ($el) => [

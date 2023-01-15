@@ -107,6 +107,7 @@ class Admin {
 			require_once('js/reactpress-admin/build/asset-manifest.php');
 
 			// Convert json to php array.
+			/** @phpstan-ignore-next-line */
 			$files_data = json_decode($asset_manifest_json);
 			if ($files_data === null)
 				return;

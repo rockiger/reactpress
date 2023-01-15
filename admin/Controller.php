@@ -72,7 +72,7 @@ class Controller {
 
   public static function delete_react_app($appname) {
     $options = get_option('repr_apps');
-    $is_option_deleted = Utils::write_apps_option(array_filter(
+    Utils::write_apps_option(array_filter(
       $options,
       fn ($el) => $el['appname'] !== $appname
     ));
@@ -166,7 +166,6 @@ class Controller {
    *
    * @param int $pageId
    * @param string $page_title
-   * @return void
    * @since 1.0.0
    */
   public static function insert_page(int $pageId, string $page_title) {
