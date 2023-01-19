@@ -21,13 +21,7 @@ class Utils {
   //! refactor to not need the $app_options_list
   public static function add_app_options(string $appname, int $pageId) {
     $app_options_list = Utils::get_apps();
-    if (!is_array($app_options_list) && $appname && $pageId) {
-      add_option('repr_apps', [[
-        'allowsRouting' => false,
-        'appname' => $appname,
-        'pageIds' => [$pageId],
-      ]]);
-    } elseif ($appname && $pageId) {
+    if ($appname && $pageId) {
       Utils::write_apps_option(Utils::array_add($app_options_list, [
         'allowsRouting' => false,
         'appname' => $appname,
@@ -68,18 +62,18 @@ class Utils {
    * Helper function to add an element to an array
    * without mutationg the original array.
    *
-   * @param array $array
-   * @param [type] $entry
+   * @param mixed[] $array
+   * @param mixed $entry
    * @since 1.0.0
    */
-  public static function array_add(array $array, $entry) {
+  public static function array_add($array, $entry) {
     return array_merge($array, [$entry]);
   }
 
   /**
    * Get the option for the given app name.
-   * @param string $appname 
-   * @return mixed
+   * @param mixed[] $app_options_list
+   * @param string $appname
    */
   //! refactor to not need the $app_options_list
   public static function get_app_options(array $app_options_list, string $appname) {
@@ -99,7 +93,6 @@ class Utils {
    * is used.
    * @param string $appname
    * @param string $permalink
-   * @return void 
    */
   public static function set_public_url_for_dev_server(string $appname, string $permalink) {
     $apppath = Utils::app_path($appname);
@@ -123,7 +116,6 @@ class Utils {
       );
       return 2;
     }
-    return 0;
   }
 
 
@@ -134,7 +126,6 @@ class Utils {
    * is used.
    * @param string $appname
    * @param string $permalink
-   * @return void 
    */
   public static function unset_public_url_for_dev_server(string $appname, string $permalink) {
     $apppath = Utils::app_path($appname);
@@ -156,18 +147,16 @@ class Utils {
       );
       return 2;
     }
-    return 0;
   }
 
   /**
    * Delete an app slug from an app. Returns the new options list
-   * @param array $app_options_list
+   * @param mixed[] $app_options_list
    * @param string $appname 
    * @param int $pageId 
-   * @return array
    * @since 2.0.0
    */
-  public static function delete_page(array $app_options_list, string $appname, int $pageId) {
+  public static function delete_page($app_options_list, $appname, $pageId) {
     $new_app_options_list = array_map(function ($app_options) use ($appname, $pageId) {
       if ($app_options['appname'] === $appname) {
         $new_app_options = $app_options;
@@ -190,7 +179,6 @@ class Utils {
   /**
    * Get all folders in the apps directory and return them as an array
    *
-   * @return array
    * @since 1.2.0
    */
   public static function get_app_names() {
@@ -198,6 +186,7 @@ class Utils {
     wp_mkdir_p(REPR_APPS_PATH);
     chdir(REPR_APPS_PATH);
     $appnames = scandir(REPR_APPS_PATH);
+    $appnames = $appnames ? $appnames : [];
     return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
   }
 
@@ -210,7 +199,6 @@ class Utils {
    *   'pages' => ['ID' => 100, 'title' => 'Title', 'permalink' => 'http://...']
    * ]]
    *
-   * @return array
    * @since 1.2.0
    */
   public static function get_apps() {
@@ -254,7 +242,7 @@ class Utils {
         $p = get_post($id);
         return [
           'ID' => $p->ID ?? 0,
-          'permalink' => get_permalink($p),
+          'permalink' => get_permalink($p ? $p : 0),
           'title' => $p->post_title ?? '',
         ];
       }, $app['pageIds']);
@@ -267,8 +255,10 @@ class Utils {
    * Retrieves the repr_apps option from WordPress if nothing can retrieved,
    * produces an empty array. 
    * Usually you should prefer Utils::get_apps().
+   * 
+   * @return mixed[]
    */
-  public static function get_app_options_list(): array {
+  public static function get_app_options_list() {
     return is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
   }
 
@@ -286,7 +276,7 @@ class Utils {
   /**
    * Consumes an app list, filters unneccessary information (pages) and
    * saves it as options.
-   * @param array $app_list 
+   * @param mixed[] $app_list 
    */
   public static function write_apps_option($app_list) {
     $app_list_option = array_map(fn ($el) => [

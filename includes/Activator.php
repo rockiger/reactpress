@@ -13,6 +13,8 @@
 
 namespace ReactPress\Includes;
 
+use WP_Post;
+
 class Activator {
 
 	/**
@@ -77,7 +79,13 @@ class Activator {
 		update_option('repr_version', REPR_VERSION);
 	}
 
-	public static function get_page_by_slug($page_slug, $output = OBJECT, $post_type = 'page') {
+	/**
+	 * 
+	 * @param string $page_slug 
+	 * @param string|object[] $post_type
+	 * @return WP_Post|null 
+	 */
+	public static function get_page_by_slug($page_slug, $post_type = 'page') {
 		global $wpdb;
 
 		if (is_array($post_type)) {
@@ -101,7 +109,7 @@ class Activator {
 		$page = $wpdb->get_var($sql);
 
 		if ($page)
-			return get_post($page, $output);
+			return get_post($page);
 
 		return null;
 	}

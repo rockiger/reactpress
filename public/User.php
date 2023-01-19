@@ -99,14 +99,14 @@ class User {
 	 * (C) PRADIP DEBNATH https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
 	 * Fix for template incompatibility with Elementor and some other plugins.
 	 * (C) Sally CJ https://stackoverflow.com/questions/67696139/error-in-wordpress-with-plugin-reactpress/68455647#answer-67751220
-	 * @param $template
+	 * @param mixed $template
 	 *
 	 * @return mixed
 	 * @since 1.0.0
 	 */
 	public function repr_change_page_template($template) {
 		if (is_page()) {
-			$meta = get_post_meta(get_the_ID());
+			$meta = get_post_meta(intval(get_the_ID()));
 
 			// Check if the page template is a Reactpress template
 			if (
@@ -119,7 +119,7 @@ class User {
 				$template = $meta['_wp_page_template'][0];
 
 				// determine the location of the templates folder reference
-				$ndx = strpos($template, 'templates/');
+				$ndx = intval(strpos($template, 'templates/'));
 
 				// If it's not at the beginning
 				if (0 != $ndx) {
@@ -210,7 +210,7 @@ class User {
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('rp-react-app-asset-' . $index, $react_app_build . $js_file, array(), 1, true);
+				wp_enqueue_script('rp-react-app-asset-' . $index, $react_app_build . $js_file, array(), '1', true);
 			}
 
 			// Variables for app use
@@ -260,7 +260,7 @@ class User {
 	}
 
 
-	public function site_custom_endpoint($wp_rewrite) {
+	public function site_custom_endpoint(mixed $wp_rewrite) {
 
 		// repr_log($wp_rewrite);
 		return $wp_rewrite->rules;

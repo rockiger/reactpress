@@ -2,6 +2,9 @@
 parameters:
   excludePaths:
     - 'vendor/*'
-  level: 0
+  ignoreErrors:
+    - '#Function [a-zA-Z0-9\\_]+\(\) has no return type specified.#'
+    - '#Method [a-zA-Z0-9\\_:]+\(\) has no return type specified.#'
+  level: 8
   paths:
     - '.'

@@ -8,7 +8,7 @@ use ReactPress\Admin\Utils;
  * Load react app files im page should contain a react app.
  * (C) Ben Broide https://medium.com/swlh/wordpress-create-react-app-integration-30b41657b79e
  * 
- * @return bool|void
+ * @return bool
  * @since 1.0.0
  */
 
@@ -41,7 +41,7 @@ function repr_write_react_app_into_template() {
     try {
       $request = file_get_contents($manifest_path);
     } catch (\Exception $e) {
-      repr_log($e->getMessage());
+      print_r($e->getMessage());
     }
     // remove error handler again.
     restore_error_handler();
@@ -53,8 +53,7 @@ function repr_write_react_app_into_template() {
     // Convert json to php array.
     $files_data = json_decode(strval($request));
     if ($files_data === null)
-      return;
-
+      return false;
 
     if (!property_exists($files_data, 'entrypoints'))
       return false;
@@ -99,7 +98,9 @@ function repr_write_react_app_into_template() {
         ),
       ]
     ) . '</script>';
+    return true;
   }
+  return false;
 }
 
 

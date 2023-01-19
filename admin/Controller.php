@@ -20,7 +20,7 @@ class Controller {
 
   // # Controller functions 
 
-  public static function add_page($appname, int $pageId, $page_title) {
+  public static function add_page(string $appname, int $pageId, string $page_title) {
     $app_options = Utils::get_app_options(Utils::get_apps(), $appname);
     //# Check if the app allows adding of more URL slugs
     if ($app_options && $app_options['allowsRouting'] && count($app_options['pageIds'])) {
@@ -41,11 +41,12 @@ class Controller {
       return;
     }
     $permalink = get_permalink($inserted_page['ID']);
+    $permalink = $permalink ? $permalink : '';
     $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
     Controller::add_build_path($appname);
     if ($app_options['allowsRouting']) {
       add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
-      Utils::set_public_url_for_dev_server($appname, $pageId);
+      Utils::set_public_url_for_dev_server($appname, $permalink);
     }
     flush_rewrite_rules();
     Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
@@ -70,7 +71,7 @@ class Controller {
     }
   }
 
-  public static function delete_react_app($appname) {
+  public static function delete_react_app(string $appname) {
     $options = get_option('repr_apps');
     Utils::write_apps_option(array_filter(
       $options,
@@ -95,7 +96,7 @@ class Controller {
     echo wp_json_encode(['status' => 1, 'apps' => $apps]);
   }
 
-  public static function update_index_html($appname, $permalink) {
+  public static function update_index_html(string $appname, string $permalink) {
     Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
     echo wp_json_encode([
       'status' => 1,
@@ -134,7 +135,6 @@ class Controller {
       );
       return 2;
     }
-    return 0;
   }
 
   /**
@@ -206,8 +206,7 @@ class Controller {
 
   public static function toggle_react_routing(string $appname) {
     try {
-      $apps = Utils::get_apps();
-      $app_options = is_array($apps) ?  $apps : [];
+      $app_options = Utils::get_apps();
 
       $new_options = array_map(function ($el) use ($appname) {
         if ($el['appname'] === $appname) {
@@ -248,11 +247,10 @@ class Controller {
 
   /**
    * Writes the given to the index.html file in the app directory of
-   * the given appname.
+   * the given appname and produces if the writing of the file succeded or not.
    *
    * @param string $appname
    * @param string $content
-   * @return bool if the writing of the file succeded or not
    * @since 1.0.0
    */
   public static function write_index_html(string $appname, string $content) {

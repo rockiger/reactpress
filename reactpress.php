@@ -57,7 +57,7 @@ define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
 define('REPR_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
 define('REPR_PLUGIN_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
-
+/** @phpstan-ignore-next-line */
 define('REPR_APPS_PATH', IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
 define('REPR_APPS_URL', content_url() . '/reactpress/apps');
 
