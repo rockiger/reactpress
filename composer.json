@@ -21,7 +21,8 @@
     "phpstan/phpstan": "1.10.x-dev",
     "phpstan/extension-installer": "1.2.x-dev",
     "phpstan/phpstan-beberlei-assert": "1.1.x-dev",
-    "szepeviktor/phpstan-wordpress": "dev-master"
+    "szepeviktor/phpstan-wordpress": "dev-master",
+    "phpunit/phpunit": "^9"
   },
   "config": {
     "allow-plugins": {
