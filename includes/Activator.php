@@ -13,6 +13,7 @@
 
 namespace ReactPress\Includes;
 
+use ReactPress\Admin\Utils;
 use WP_Post;
 
 class Activator {
@@ -29,8 +30,8 @@ class Activator {
 		wp_mkdir_p(REPR_APPS_PATH);
 		$repr_version_option = get_option('repr_version');
 		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
-		update_option(
-			'repr_apps',
+
+		Utils::write_apps_option(
 			Activator::activate_helper(
 				$repr_apps,
 				$repr_version_option,
