@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 6.1.1
 Requires PHP: 7.4
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,10 +107,11 @@ You can than style your React app with every styling solution for React that bes
 
 == Changelog ==
 
-= 3.0.0 =
+= 3.0.1 =
 
 * Allow child pages to be ReactPress pages, where a React app is embedded.
 * Add support for hosts that have turned the `php.ini` setting `allow_url_fopen` to `off`.
+* Don't delete options when uninstalling plugin.
 
 = 2.1.3 =
 
