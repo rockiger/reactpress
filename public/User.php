@@ -260,9 +260,8 @@ class User {
 	}
 
 
-	public function site_custom_endpoint(mixed $wp_rewrite) {
-
-		// repr_log($wp_rewrite);
+	/** @phpstan-ignore-next-line */
+	public function site_custom_endpoint($wp_rewrite) {
 		return $wp_rewrite->rules;
 	}
 }
