@@ -29,8 +29,3 @@
 if (!defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
-
-$role = get_role('administrator');
-if (!empty($role)) {
-	delete_option('repr_apps');
-}

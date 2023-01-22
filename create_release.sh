@@ -1,5 +1,7 @@
 version='x.x.x'
-
+ 
+# We don't want a ton of dev dependencies in our release.
+composer install --no-dev --optimize-autoloader
 rm -r /tmp/reactpress-svn
 mkdir -p /tmp/reactpress-svn/tags/$version
 cp -r ./ /tmp/reactpress-svn/tags/$version/
@@ -15,4 +17,6 @@ rm -r /tmp/reactpress-svn/tags/$version/admin/js/reactpress-admin/public
 rm -rf /tmp/reactpress-svn/tags/$version/admin/js/reactpress-admin/.git
 rm -r /tmp/reactpress-svn/trunk
 cp -r /tmp/reactpress-svn/tags/$version/ /tmp/reactpress-svn/
+# Reinstall dev dependencies to be able to work on ReactPress again
 mv /tmp/reactpress-svn/$version /tmp/reactpress-svn/trunk
+composer install
