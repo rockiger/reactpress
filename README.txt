@@ -74,9 +74,9 @@ Repeat steps 6 to 10 when you have new releases you want to deploy.
 
 == Upgrade Notice ==
 
-Release 2.0.0+ does change to way to use ReactPress and gives you much more control. It make the use of client-side routing much more transparent.
+Release 3.0.0+ does change page information differently. Backward compatibility has to be broken for that. Downgrading won't work without reacreating pages.
 
-Upgrades should be smoothless. Unfortunately, backward compatibility has to be broken for that. Downgrading could be problematic.
+Upgrades should be smoothless.
 
 == Frequently Asked Questions ==
 
