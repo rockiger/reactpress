@@ -107,6 +107,7 @@ class Admin {
 			require_once('js/reactpress-admin/build/asset-manifest.php');
 
 			// Convert json to php array.
+			/** @phpstan-ignore-next-line */
 			$files_data = json_decode($asset_manifest_json);
 			if ($files_data === null)
 				return;
@@ -133,7 +134,7 @@ class Admin {
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array('jquery'), 1, true);
+				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array('jquery'), '1', true);
 			}
 		}
 	}
@@ -159,8 +160,8 @@ class Admin {
 	 * Add own post state (label) for pages used by apps.
 	 * (C) https://www.ibenic.com/post-states-labels/
 	 * 
-	 * @param array   $states Array of all registered states.
-	 * @param WP_Post $post   Post object that we can use.
+	 * @param string[]   $states Array of all registered states.
+	 * @param \WP_Post $post   Post object that we can use.
 	 */
 	function add_post_state($states, $post) {
 		if ('page' === get_post_type($post)) {
@@ -175,11 +176,10 @@ class Admin {
 	}
 
 	/**
-	 * Add page template.
+	 * Add page template. Consues a list of templates and adds two templates.
 	 * (C) https://www.pradipdebnath.com/2019/08/17/how-to-add-page-template-from-plugin-in-wordpress/
 	 * 
-	 * @param  array  $templates  The list of page templates
-	 * @return array  $templates  The modified list of page templates* 
+	 * @param string[]  $templates  The list of page templates 
 	 * @since 1.0.0
 	 */
 	public function repr_add_page_template($templates) {
@@ -217,17 +217,17 @@ class Admin {
 		try {
 			if (!empty($param)) {
 				if ($param === "add_page" && $appname && $pageId && $page_title) {
-					return Controller::add_page($appname, $pageId, $page_title);
+					Controller::add_page($appname, $pageId, $page_title);
 				} elseif ($param === "delete_page" && $appname && $pageId) {
-					return Controller::delete_page($appname, $pageId, $permalink);
+					Controller::delete_page($appname, $pageId, $permalink);
 				} elseif ($param === "toggle_react_routing" && $appname) {
-					return Controller::toggle_react_routing($appname);
+					Controller::toggle_react_routing($appname);
 				} elseif ($param === "update_index_html" && $appname && $permalink) {
-					return Controller::update_index_html($appname, $permalink);
+					Controller::update_index_html($appname, $permalink);
 				} elseif ($param === 'delete_react_app' && $appname) {
-					return Controller::delete_react_app($appname);
+					Controller::delete_react_app($appname);
 				} elseif ($param === "get_react_apps") {
-					return Controller::get_react_apps();
+					Controller::get_react_apps();
 				} else {
 					echo wp_json_encode([
 						'status' => 0,
@@ -270,7 +270,6 @@ class Admin {
 	 *
 	 * @param string $oldSlug
 	 * @param string $newSlug
-	 * @return void
 	 * @since 1.0.0
 	 */
 	public function update_react_page_slug(string $oldSlug, string $newSlug) {

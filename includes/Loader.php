@@ -31,7 +31,7 @@ class Loader {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $actions    The actions registered with WordPress to fire when the plugin loads.
+	 * @var  	 mixed[] $actions    The actions registered with WordPress to fire when the plugin loads.
 	 */
 	protected $actions;
 
@@ -40,7 +40,7 @@ class Loader {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $filters    The filters registered with WordPress to fire when the plugin loads.
+	 * @var      mixed[]  $filters    The filters registered with WordPress to fire when the plugin loads.
 	 */
 	protected $filters;
 
@@ -89,13 +89,13 @@ class Loader {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @param    array                $hooks            The collection of hooks that is being registered (that is, actions or filters).
+	 * @param    mixed[]    $hooks            The collection of hooks that is being registered (that is, actions or filters).
 	 * @param    string               $hook             The name of the WordPress filter that is being registered.
 	 * @param    object               $component        A reference to the instance of the object on which the filter is defined.
 	 * @param    string               $callback         The name of the function definition on the $component.
 	 * @param    int                  $priority         The priority at which the function should be fired.
 	 * @param    int                  $accepted_args    The number of arguments that should be passed to the $callback.
-	 * @return   array                                  The collection of actions and filters registered with WordPress.
+	 * @return   mixed[]                           The collection of actions and filters registered with WordPress.
 	 */
 	private function add($hooks, $hook, $component, $callback, $priority, $accepted_args) {
 
@@ -118,10 +118,12 @@ class Loader {
 	public function run() {
 
 		foreach ($this->filters as $hook) {
+			/** @phpstan-ignore-next-line */
 			add_filter($hook['hook'], array($hook['component'], $hook['callback']), $hook['priority'], $hook['accepted_args']);
 		}
 
 		foreach ($this->actions as $hook) {
+			/** @phpstan-ignore-next-line */
 			add_action($hook['hook'], array($hook['component'], $hook['callback']), $hook['priority'], $hook['accepted_args']);
 		}
 	}
