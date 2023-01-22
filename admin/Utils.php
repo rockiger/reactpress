@@ -18,7 +18,6 @@ class Utils {
    * create them.
    */
 
-  //! refactor to not need the $app_options_list
   public static function add_app_options(string $appname, int $pageId) {
     $app_options_list = Utils::get_apps();
     if ($appname && $pageId) {
@@ -72,11 +71,16 @@ class Utils {
 
   /**
    * Get the option for the given app name.
-   * @param mixed[] $app_options_list
-   * @param string $appname
    */
-  //! refactor to not need the $app_options_list
-  public static function get_app_options(array $app_options_list, string $appname) {
+  public static function get_app_options(string $appname) {
+    return Utils::__get_app_options($appname, Utils::get_apps());
+  }
+  /**
+   * Helper function for get_app_options
+   * @param string $appname
+   * @param mixed[] $app_options_list
+   */
+  public static function __get_app_options($appname, $app_options_list) {
     $app_options = null;
     foreach ($app_options_list as $key => $val) {
       if ($val['appname'] === $appname) {
@@ -157,6 +161,17 @@ class Utils {
    * @since 2.0.0
    */
   public static function delete_page($app_options_list, $appname, $pageId) {
+    $new_app_options_list = Utils::__delete_page($app_options_list, $appname, $pageId);
+    Utils::write_apps_option($new_app_options_list);
+    return $new_app_options_list;
+  }
+  /**
+   * delete_page helper
+   * @param mixed[] $app_options_list
+   * @param string $appname 
+   * @param int $pageId 
+   */
+  public static function  __delete_page($app_options_list, $appname, $pageId) {
     $new_app_options_list = array_map(function ($app_options) use ($appname, $pageId) {
       if ($app_options['appname'] === $appname) {
         $new_app_options = $app_options;
@@ -172,7 +187,6 @@ class Utils {
       }
       return $app_options;
     }, $app_options_list);
-    Utils::write_apps_option($new_app_options_list);
     return $new_app_options_list;
   }
 
@@ -191,7 +205,7 @@ class Utils {
   }
 
   /**
-   * Return all apps as an array, enriched with the meta data for pages
+   * Return all apps as an array, enriched with the meta data for pages.
    * 
    * [['allowsRouting' => false,
    *   'appname' => $appname,
@@ -203,14 +217,23 @@ class Utils {
    */
   public static function get_apps() {
     $app_options = Utils::get_app_options_list();
-
-    // combine apps from directory and from settings to get a complete list
-    // event when the user deletes an app from the directory
-    $appnames_from_opts = array_map(fn ($el) => $el['appname'], $app_options);
     $appnames_from_dir = Utils::get_app_names();
+    return Utils::__get_apps($app_options, $appnames_from_dir);
+  }
+  /**
+   * Helper for get_apps
+   * @param mixed[] $app_options 
+   * @param string[] $appnames_from_dir 
+   * @return array<array-key, mixed> 
+   */
+  public static function __get_apps($app_options, $appnames_from_dir) {
+    // combine apps from directory and from settings to get a complete list
+    // even when the user deletes an app from the directory
+    $appnames_from_opts = array_map(fn ($el) => $el['appname'], $app_options);
     $appnames = array_unique(array_merge($appnames_from_opts, $appnames_from_dir));
 
     $apps = array_map(function ($el) use ($app_options) {
+      //# get app option (in a complicated way?)
       $app_option = array_reduce(
         $app_options ? $app_options : [],
         fn ($carry, $item) =>

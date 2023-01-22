@@ -21,7 +21,7 @@ class Controller {
   // # Controller functions 
 
   public static function add_page(string $appname, int $pageId, string $page_title) {
-    $app_options = Utils::get_app_options(Utils::get_apps(), $appname);
+    $app_options = Utils::get_app_options($appname);
     //# Check if the app allows adding of more URL slugs
     if ($app_options && $app_options['allowsRouting'] && count($app_options['pageIds'])) {
       echo wp_json_encode([
