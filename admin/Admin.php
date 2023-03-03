@@ -93,6 +93,11 @@ class Admin {
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
+				'api' => [
+					'nonce' => wp_create_nonce('wp_rest'),
+					'rest_url' => esc_url_raw(rest_url()),
+
+				],
 				'apps' => Utils::get_apps(),
 				'appspath' => REPR_APPS_PATH,
 			));

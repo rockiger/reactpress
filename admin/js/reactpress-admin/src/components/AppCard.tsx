@@ -73,7 +73,7 @@ function AppCard({
               {_.map(app.pages, (page) => (
                 <PageLink
                   app={app}
-                  key={app.appname}
+                  key={page.ID}
                   page={page}
                   deletePage={deletePage}
                 />

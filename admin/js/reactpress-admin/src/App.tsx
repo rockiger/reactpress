@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'lodash'
+import WPAPI from 'wpapi'
 import logo from './logo.svg'
 import './App.css'
 import AppCard from './components/AppCard'
@@ -7,13 +8,25 @@ import type { AppDetails, Page } from './components/AppCard'
 
 interface RP {
   ajaxurl: string
+  api: {
+    nonce: string
+    rest_url: string
+  }
   apps: AppDetails[]
   appspath: string
 }
 declare var rp: RP
 declare var jQuery: any
 
-console.log(rp)
+const wp = new WPAPI(
+  process.env.NODE_ENV === 'development'
+    ? {
+        endpoint: rp.api.rest_url,
+        username: 'admin',
+        password: 'Chrf A6HY 2B9t YAsx qIpi foOM',
+      }
+    : { endpoint: rp.api.rest_url, nonce: rp.api.nonce }
+)
 
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)
@@ -65,11 +78,12 @@ function App() {
   const getPages = useMemo(
     () =>
       _.debounce(async (search = '', pageIds: number[] = []) => {
-        const domain = rp.ajaxurl.slice(0, rp.ajaxurl.indexOf('/', 8))
-        const excludes = pageIds.join(',')
-        const url = `${domain}/wp-json/wp/v2/pages?per_page=100&exclude=${excludes}&orderby=title&order=asc&_fields=id,title,link&search=${search}&_locale=user`
         try {
-          const response = await jQuery.get(url).then()
+          const response = await wp
+            .pages()
+            .status(['any'])
+            .param('exclude', pageIds)
+            .get()
           setPages(
             response.map(
               (el: {
