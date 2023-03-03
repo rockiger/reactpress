@@ -49,14 +49,26 @@ class Controller {
       Utils::set_public_url_for_dev_server($appname, $permalink);
     }
     flush_rewrite_rules();
-    Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
-    echo wp_json_encode([
-      'status' => 1,
-      'message' => 'Page added.',
-      'pageId' => $inserted_page['ID'],
-      'page_title' => $inserted_page['page_title'],
-      'permalink' => $permalink
-    ]);
+    $html_content = Controller::get_index_html_content($permalink);
+    if (empty($html_content)) {
+      echo wp_json_encode([
+        'status' => 0,
+        'message' => 'Couldn\'t download page content.'
+      ]);
+    } elseif (Controller::write_index_html($appname, $html_content)) {
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => 'Page added.',
+        'pageId' => $inserted_page['ID'],
+        'page_title' => $inserted_page['page_title'],
+        'permalink' => $permalink
+      ]);
+    } else {
+      echo wp_json_encode([
+        'status' => 0,
+        'message' => 'Something went wrong.',
+      ]);
+    }
   }
 
   public static function delete_page(string $appname, int $pageId, string $permalink) {
@@ -97,7 +109,13 @@ class Controller {
   }
 
   public static function update_index_html(string $appname, string $permalink) {
-    if (Controller::write_index_html($appname, Controller::get_index_html_content($permalink))) {
+    $html_content = Controller::get_index_html_content($permalink);
+    if (empty($html_content)) {
+      echo wp_json_encode([
+        'status' => 0,
+        'message' => 'Couldn\'t download page content.'
+      ]);
+    } elseif (Controller::write_index_html($appname, $html_content)) {
       echo wp_json_encode([
         'status' => 1,
         'message' => 'Index.html updated.',
