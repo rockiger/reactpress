@@ -97,11 +97,17 @@ class Controller {
   }
 
   public static function update_index_html(string $appname, string $permalink) {
-    Controller::write_index_html($appname, Controller::get_index_html_content($permalink));
-    echo wp_json_encode([
-      'status' => 1,
-      'message' => 'Index.html updated.',
-    ]);
+    if (Controller::write_index_html($appname, Controller::get_index_html_content($permalink))) {
+      echo wp_json_encode([
+        'status' => 1,
+        'message' => 'Index.html updated.',
+      ]);
+    } else {
+      echo wp_json_encode([
+        'status' => 0,
+        'message' => 'Index.html could not be updated.',
+      ]);
+    }
   }
 
   // # Helper functions
