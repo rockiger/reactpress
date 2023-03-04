@@ -222,6 +222,7 @@ class User {
 					'rest_url' => esc_url_raw(rest_url()),
 
 				],
+				'post' => $post,
 				'user' => $current_user,
 				'usermeta' => get_user_meta(
 					get_current_user_id()
