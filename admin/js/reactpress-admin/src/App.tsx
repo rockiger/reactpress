@@ -19,7 +19,7 @@ declare var rp: RP
 declare var jQuery: any
 
 const wp = new WPAPI(
-  process.env.NODE_ENV === 'development'
+  isDevEnvironment()
     ? {
         endpoint: rp.api.rest_url,
         username: 'admin',
@@ -60,7 +60,9 @@ function App() {
   }, [])
 
   const getApps = useCallback(async () => {
-    if (isDevEnvironment()) return
+    if (isDevEnvironment()) {
+      return console.log('getApps fired')
+    }
     try {
       const response = await jQuery
         .post(rp.ajaxurl, `action=repr_admin_ajax_request&param=get_react_apps`)
@@ -240,8 +242,18 @@ function App() {
     []
   )
 
+  /**
+   * Make sure apps are updated often enough.
+   */
   useEffect(() => {
     getApps()
+    window.addEventListener('focus', getApps)
+    const timerId = setInterval(() => getApps(), 5 * 60 * 1000)
+
+    return () => {
+      window.removeEventListener('focus', getApps)
+      clearInterval(timerId)
+    }
   }, [getApps])
 
   return (
@@ -329,13 +341,13 @@ function App() {
       </div>
     </div>
   )
-
-  function isDevEnvironment() {
-    return process.env.NODE_ENV === 'development'
-  }
 }
 
 export default App
+
+function isDevEnvironment() {
+  return process.env.NODE_ENV === 'development'
+}
 
 function showSnackbar(message = '') {
   jQuery('#rp-snackbar').addClass('show').text(message)
