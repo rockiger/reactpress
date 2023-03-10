@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 6.1.1
 Requires PHP: 7.4
-Stable tag: 3.0.1
+Stable tag: 3.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Easily create, build and deploy React apps into your existing WordPress sites.
 
 == Description ==
 
-Easily create, build and deploy React apps into your existing WordPress sites.
+ReactPress enables you to easily create, build and deploy React apps into your existing WordPress sites. Use your React knowledge to create single page applications for your WordPress customers.
 
 Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
 
@@ -24,6 +24,21 @@ ReactPress does 3 things:
 * It builds your React app in a way that it is usable from your WordPress site.
 * It makes it easy to upload your app to a live server after building.
 
+=== Features ===
+* Fast refresh during app development
+* WordPress integration during development
+* Easy deploy to your live site
+* client-side routing
+* zero-config
+* TypeScript support
+
+=== Links === 
+* [Website](https://rockiger.com/en/reactpress/)
+* [Getting Started](https://rockiger.com/en/reactpress/getting-started/)
+* [In depth React with WordPress Tutorial](https://rockiger.com/en/reactpress/reactpress-tutorial/)
+* [FAQ](https://rockiger.com/en/reactpress/understanding-reactpress/)
+* [Development](https://github.com/rockiger/reactpress/)
+
 === System Requirements ===
 
 To develop React apps your WordPress instance needs access to:
@@ -31,42 +46,7 @@ To develop React apps your WordPress instance needs access to:
 * Access to the PHP function `file_get_contents`. Some hosting providers deactivate `fopen` on which `file_get_contents` depends. Access to `file_get_contents` is neccessary on your dev and your live system!
 * POSIX compatible system, Windows support is experimental. ([Alternatively Windows users can use WSL2](https://rockiger.com/en/windows-survival-guide-to-for-react-and-web-developers/ "Windows Survival Guide for React and Web Developers"))
 
-=== Development ===
-
-Active development of this plugin is handled [on GitHub](https://github.com/rockiger/reactpress/).
-
-=== Documentation ===
-
-You find a more detailed getting started guide at: [
-Getting Started With ReactPress](https://rockiger.com/en/reactpress/getting-started/) ).
-
-To create and deploy your first app:
-
-1. Install ReactPress on your local WordPress installation.
-
-2. In your command line use npx create-react-app [your-app-name] in the apps directory of ReactPress, e.g. `[path-to-WordPress]/wp-content/reactpress/apps/my-app`
-
-3. Reload the ReactPress admin page and add a URL Slug for your app.
-
-4. In the command line start the React app with `npm start` or `yarn start`.
-
-5. Develop your app, changes will automatically hot reloaded.
-
-6. When you are finished, build the app from the command line. You can now see your app embedded in your WordPress instance. Open it at [your-domain]/[your-slug].
-
-7. To deploy, Install ReactPress on live WordPress site.
-
-8. Upload the build folder from your dev system under `.../wp-content/reactpress/apps/[your-app-name]` to the same directory onto your live server. No need for create-react-app.
-
-9. Reload the ReactPress admin page and add a URL Slug for your app.
-
-10. Open the React app under [your-domain]/[your-slug].
-
-Repeat steps 6 to 10 when you have new releases you want to deploy.
-
-
 == Installation ==
-
 
 1. Like any other plugin install via *Plugins/Add New*. You can download the plugin via admin or upload it to the plugins directory.
 
@@ -77,23 +57,6 @@ Repeat steps 6 to 10 when you have new releases you want to deploy.
 Release 3.0.0+ does change page information differently. Backward compatibility has to be broken for that. Downgrading won't work without reacreating pages.
 
 Upgrades should be smoothless.
-
-== Frequently Asked Questions ==
-
-= How do I make react-router work =
-
-To make client-side routing work, follow this guide: [Client-Side Routing with ReactPress](https://rockiger.com/en/reactpress/client-side-routing/)
-
-= Where do I go for support on your plugin? =
-
-Please visit our [support forum](https://wordpress.org/support/plugin/reactpress/) and search for your problem. If you can't find any help there, feel free to create another topic. 
-
-= Is ReactPress compatible with my theme? =
-
-ReactPress should work with every theme. Depending on the page template you choose you will have a clean slate without any styling or a normal page that inherits the styling of your theme.
-
-You can than style your React app with every styling solution for React that best fits your needs.
-
 
 == Screenshots ==
 
@@ -106,6 +69,16 @@ You can than style your React app with every styling solution for React that bes
 4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 3.1.0 =
+
+ * Make sure that pages of all states (private, draft) are shown.
+ * Improve user feedback when something goes wrong during index.html update. 
+ * Don't write empty content to index.html if page download did not work.
+ * Add css as late as possible to ReactPress page, to reduce `!important` in app's css.
+ * Add information about the post into `reactPress` variable
+ * Automatically update the app list without the need to reload the page
+ 
 
 = 3.0.1 =
 
@@ -125,7 +98,7 @@ You can than style your React app with every styling solution for React that bes
 
 = 2.1.0 =
 
-* Add totally clear canvas template. This template doesn't get any styles and scripts from WordPress. Good if you want to embed a totally independent React app.
+* Add totally empty canvas template. This template doesn't get any styles and scripts from WordPress. Good if you want to embed a totally independent React app.
 * Add nonce and base rest_url to global ReactPress variable.
 * Fix loading of global ReactPress variable.
 * Improve Windows compatibility
