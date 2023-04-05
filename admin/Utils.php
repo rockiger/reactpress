@@ -240,16 +240,7 @@ class Utils {
         $item['appname'] === $el ? $item : $carry,
         []
       );
-      $type = '';
-      if (is_file(REPR_APPS_PATH . '/' . $el . '/package.json')) {
-        $type = 'development';
-      } elseif (is_dir(REPR_APPS_PATH . '/' . $el . '/build')) {
-        $type = 'deployment';
-      } elseif (is_dir(REPR_APPS_PATH . '/' . $el)) {
-        $type = 'empty';
-      } else {
-        $type = 'orphan';
-      }
+      $type = Utils::__get_app_type($el);
       return [
         'allowsRouting' => $app_option['allowsRouting'] ?? false,
         'appname' => $el,
@@ -272,6 +263,28 @@ class Utils {
       return $newApp;
     }, $apps);
     return $apps_enriched;
+  }
+
+  /**
+   * @param string $appname 
+   * @return 'development_cra' | 'development_vite' | 'deployment_cra' | 'deployment_vite' | 'empty' | 'orphan'
+   */
+  public static function __get_app_type($appname) {
+    if (is_file(REPR_APPS_PATH . '/' . $appname . '/package.json')) {
+      $packageJson = json_decode(
+        file_get_contents(REPR_APPS_PATH . '/' . $appname . '/package.json')
+      );
+      $type = (isset($packageJson->devDependencies->vite)) ? 'development_vite' : 'development_cra';
+    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/build')) {
+      $type = 'deployment_cra';
+    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/dist')) {
+      $type = 'deployment_vite';
+    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname)) {
+      $type = 'empty';
+    } else {
+      $type = 'orphan';
+    }
+    return $type;
   }
 
   /**

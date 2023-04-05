@@ -1,7 +1,11 @@
 import _ from 'lodash'
 import AddPageInput from './AddPageForm'
-import icon from './icon.svg'
 import PageLink from './PageLink'
+
+import cra from './cra.svg'
+import empty from './empty.svg'
+import orphan from './orphan.svg'
+import vite from './vite.svg'
 
 export interface Page {
   ID: number
@@ -13,7 +17,13 @@ export interface AppDetails {
   appname: string
   pageIds: number[]
   pages: Page[]
-  type?: 'development' | 'deployment' | 'empty' | 'orphan'
+  type?:
+    | 'deployment_cra'
+    | 'deployment_vite'
+    | 'development_cra'
+    | 'development_vite'
+    | 'empty'
+    | 'orphan'
 }
 
 export interface AppCardProps {
@@ -31,10 +41,30 @@ export interface AppCardProps {
 }
 
 const APP_TYPES = {
-  deployment: 'Production',
-  development: 'Development',
+  deployment_cra: 'CRA Production',
+  deployment_vite: 'Vite Production',
+  development_cra: 'CRA Development',
+  development_vite: 'Vite Development',
   empty: 'Empty Folder - It seems no build folder was added.',
   orphan: 'Orphan - It seems the app folder was deleted.',
+}
+
+const icons = {
+  deployment_cra: cra,
+  deployment_vite: vite,
+  development_cra: cra,
+  development_vite: vite,
+  orphan: orphan,
+  empty: empty,
+}
+
+const iconDescriptions = {
+  deployment_cra: 'Create-React-App Logo',
+  deployment_vite: 'Vite Logo',
+  development_cra: 'Create-React-App Logo',
+  development_vite: 'Vite Logo',
+  orphan: 'Empty Document Icon',
+  empty: 'Empty Folder Icon',
 }
 
 function AppCard({
@@ -53,7 +83,11 @@ function AppCard({
   return (
     <div id={app.appname} className="AppCard card col flex fullwidth m0 p2">
       <h3 className="title flex m0 mb-05 row">
-        <img alt="" className="icon" src={icon} />
+        <img
+          alt={iconDescriptions[app?.type ?? 'orphan']}
+          className="icon"
+          src={icons[app.type ?? 'orphan']}
+        />
         {app.appname}
       </h3>
 
@@ -106,11 +140,11 @@ function AppCard({
             <th scope="row">Type</th>
             <td>
               <span style={{ textTransform: 'capitalize' }}>
-                {APP_TYPES[app?.type || 'development']}
+                {APP_TYPES[app?.type || 'development_cra']}
               </span>
             </td>
           </tr>
-          {app.type === 'development' && (
+          {app.type?.startsWith('development') && (
             <>
               <tr>
                 <th scope="row">Update Dev-Environtment</th>
