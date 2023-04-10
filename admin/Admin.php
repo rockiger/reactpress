@@ -214,7 +214,6 @@ class Admin {
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
 		$pageId = intval($_POST['pageId'] ?? '');
-		repr_log(gettype($pageId));
 		$page_title = $_POST['page_title'] ?? '';
 		$permalink = $_POST['permalink'] ?? '';
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");

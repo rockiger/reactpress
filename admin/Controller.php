@@ -22,6 +22,7 @@ class Controller {
 
   public static function add_page(string $appname, int $pageId, string $page_title) {
     $app_options = Utils::get_app_options($appname);
+    $apptype = Utils::get_app_type($appname);
     //# Check if the app allows adding of more URL slugs
     if ($app_options && $app_options['allowsRouting'] && count($app_options['pageIds'])) {
       echo wp_json_encode([
@@ -49,13 +50,13 @@ class Controller {
       Utils::set_public_url_for_dev_server($appname, $permalink);
     }
     flush_rewrite_rules();
-    $html_content = Controller::get_index_html_content($permalink);
+    $html_content = Controller::get_index_html_content($permalink, $apptype);
     if (empty($html_content)) {
       echo wp_json_encode([
         'status' => 0,
         'message' => 'Couldn\'t download page content.'
       ]);
-    } elseif (Controller::write_index_html($appname, $html_content)) {
+    } elseif (Controller::write_index_html($appname, $html_content, $apptype)) {
       echo wp_json_encode([
         'status' => 1,
         'message' => 'Page added.',
@@ -109,13 +110,14 @@ class Controller {
   }
 
   public static function update_index_html(string $appname, string $permalink) {
-    $html_content = Controller::get_index_html_content($permalink);
+    $apptype = Utils::get_app_type($appname);
+    $html_content = Controller::get_index_html_content($permalink, $apptype);
     if (empty($html_content)) {
       echo wp_json_encode([
         'status' => 0,
         'message' => 'Couldn\'t download page content.'
       ]);
-    } elseif (Controller::write_index_html($appname, $html_content)) {
+    } elseif (Controller::write_index_html($appname, $html_content, $apptype)) {
       echo wp_json_encode([
         'status' => 1,
         'message' => 'Index.html updated.',
@@ -170,7 +172,7 @@ class Controller {
    * @return string
    * @since 1.0.0
    */
-  public static function get_index_html_content(string $permalink) {
+  public static function get_index_html_content(string $permalink, $apptype = 'development_cra') {
     $file_contents = wp_remote_retrieve_body(
       wp_remote_get($permalink, ['timeout' => 1000])
     );
@@ -181,6 +183,15 @@ class Controller {
     $filtered_contents =  implode(PHP_EOL, $filtered_arr);
     // re-add script tag for global reactPress variable
     $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
+
+    if ($apptype === 'development_vite') {
+      // add script tag after root div that link to src/main.tsx
+      $readded_contents = str_replace(
+        '<div id="root"></div>',
+        '<div id="root"></div><script type="module" src="/src/main.tsx"></script>',
+        $readded_contents
+      );
+    }
 
     return $readded_contents;
   }
@@ -277,8 +288,11 @@ class Controller {
    * @param string $content
    * @since 1.0.0
    */
-  public static function write_index_html(string $appname, string $content) {
-    $index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
+  public static function write_index_html(string $appname, string $content, $apptype = 'development_cra') {
+    $index_html_path =
+      $apptype === 'development_vite'
+      ? sprintf("%s/%s/index.html", REPR_APPS_PATH, $appname)
+      : sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
 
     return file_put_contents($index_html_path, $content);
   }

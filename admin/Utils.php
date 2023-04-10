@@ -240,7 +240,7 @@ class Utils {
         $item['appname'] === $el ? $item : $carry,
         []
       );
-      $type = Utils::__get_app_type($el);
+      $type = Utils::get_app_type($el);
       return [
         'allowsRouting' => $app_option['allowsRouting'] ?? false,
         'appname' => $el,
@@ -269,7 +269,7 @@ class Utils {
    * @param string $appname 
    * @return 'development_cra' | 'development_vite' | 'deployment_cra' | 'deployment_vite' | 'empty' | 'orphan'
    */
-  public static function __get_app_type($appname) {
+  public static function get_app_type($appname) {
     if (is_file(REPR_APPS_PATH . '/' . $appname . '/package.json')) {
       $packageJson = json_decode(
         file_get_contents(REPR_APPS_PATH . '/' . $appname . '/package.json')

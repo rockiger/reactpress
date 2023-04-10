@@ -150,67 +150,90 @@ class User {
 		$pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
 
 		$valid_pages = array_merge(...$pageIds);
-		$document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
 		if (is_page() && in_array($post->ID, $valid_pages)) {
 
 			// Setting path variables.
 			$current_app = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])))[0];
 			$appname = $current_app['appname'];
 			$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
-			$react_app_build = $plugin_app_dir_url . 'build/';
-			$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
-
-			// Request manifest file.
-			set_error_handler(
-				// Needed to surpress pontetial errors in file_get_contents and make try/catch
-				// usable for php errors - which are much older than exceptions.
-				function ($severity, $message, $file, $line) {
-					throw new \ErrorException($message, $severity, $severity, $file, $line);
+			$apptype = Utils::get_app_type($appname);
+			$css_files = [];
+			$js_files = [];
+			// setting up vite app
+			if ($apptype === 'development_vite' || $apptype === 'deployment_vite') {
+				$react_app_build = REPR_APPS_PATH . '/' . $appname . '/dist/assets';
+				$assets_files = scandir($react_app_build);
+				if (!$assets_files) {
+					return false;
 				}
-			);
-			$request = false;
-			try {
-				$request = file_get_contents($manifest_path);
-			} catch (\Exception $e) {
-				repr_log($e->getMessage());
+				// We use array_values to reindex the array (because PHP)
+				$js_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_values(array_filter(
+					$assets_files,
+					fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+				)));
+				$css_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_filter(
+					$assets_files,
+					fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+				));
 			}
-			// remove error handler again.
-			restore_error_handler();
 
-			// If the remote request fails, return.
-			if (!$request)
-				return false;
+			// setting up cra app
+			else {
+				$react_app_build = $plugin_app_dir_url . 'build/';
+				$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
 
-			// Convert json to php array.
-			$files_data = json_decode(strval($request));
-			if ($files_data === null)
-				return;
+				// Request manifest file.
+				set_error_handler(
+					// Needed to surpress pontential errors in file_get_contents and make try/catch
+					// usable for php errors - which are much older than exceptions.
+					function ($severity, $message, $file, $line) {
+						throw new \ErrorException($message, $severity, $severity, $file, $line);
+					}
+				);
+				$request = false;
+				try {
+					$request = file_get_contents($manifest_path);
+				} catch (\Exception $e) {
+					repr_log($e->getMessage());
+				}
+				// remove error handler again.
+				restore_error_handler();
+
+				// If the remote request fails, return.
+				if (!$request)
+					return false;
+
+				// Convert json to php array.
+				$files_data = json_decode(strval($request));
+				if ($files_data === null)
+					return;
 
 
-			if (!property_exists($files_data, 'entrypoints'))
-				return false;
+				if (!property_exists($files_data, 'entrypoints'))
+					return false;
 
-			// Get assets links.
-			$assets_files = $files_data->entrypoints;
+				// Get assets links.
+				$assets_files = $files_data->entrypoints;
 
-			// We use array_values to reindex the array (because PHP)
-			$js_files = array_values(array_filter(
-				$assets_files,
-				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
-			));
-			$css_files = array_filter(
-				$assets_files,
-				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
-			);
+				// We use array_values to reindex the array (because PHP)
+				$js_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_values(array_filter(
+					$assets_files,
+					fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+				)));
+				$css_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_filter(
+					$assets_files,
+					fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+				));
+			}
 
 			// Load css files.
 			foreach ($css_files as $index => $css_file) {
-				wp_enqueue_style('rp-react-app-asset-' . $index, $react_app_build . $css_file);
+				wp_enqueue_style('rp-react-app-asset-' . $index, $css_file);
 			}
 
 			// Load js files.
 			foreach ($js_files as $index => $js_file) {
-				wp_enqueue_script('rp-react-app-asset-' . $index, $react_app_build . $js_file, array(), '1', true);
+				wp_enqueue_script('rp-react-app-asset-' . $index, $js_file, array(), '1', true);
 			}
 
 			// Variables for app use
