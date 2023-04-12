@@ -44,13 +44,13 @@ class Controller {
     $permalink = get_permalink($inserted_page['ID']);
     $permalink = $permalink ? $permalink : '';
     $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
-    Controller::add_build_path($appname);
+    Controller::add_build_path($appname, $apptype);
     if ($app_options['allowsRouting']) {
       add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
       Utils::set_public_url_for_dev_server($appname, $permalink);
     }
     flush_rewrite_rules();
-    $html_content = Controller::get_index_html_content($permalink, $apptype);
+    $html_content = Controller::get_index_html_content($permalink, $apptype, $appname);
     if (empty($html_content)) {
       echo wp_json_encode([
         'status' => 0,
@@ -111,7 +111,7 @@ class Controller {
 
   public static function update_index_html(string $appname, string $permalink) {
     $apptype = Utils::get_app_type($appname);
-    $html_content = Controller::get_index_html_content($permalink, $apptype);
+    $html_content = Controller::get_index_html_content($permalink, $apptype, $appname);
     if (empty($html_content)) {
       echo wp_json_encode([
         'status' => 0,
@@ -139,27 +139,48 @@ class Controller {
    * @return int 0 if no success
    * @since 1.2.0
    */
-  public static function add_build_path($appname) {
+  public static function add_build_path($appname, $apptype = 'development_cra') {
     $apppath = Utils::app_path($appname);
     // We need the relative path, that we can deploy our
     // built app to another server later.
     $relative_apppath = Utils::app_path($appname, true);
     $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
-    $homepage = "{$relative_apppath}/build";
-    $path_package_json = "{$apppath}/package.json";
-    $package_json_contents = file_get_contents($path_package_json);
-    if (!$package_json_contents) {
-      return 0;
-    } elseif (stripos($package_json_contents, $homepage)) {
-      return 1;
+    if ($apptype === 'development_vite') {
+      $homepage = "{$relative_apppath}/dist/";
+      $path_vite_config = is_file("{$apppath}/vite.config.js") ? "{$apppath}/vite.config.js" : "{$apppath}/vite.config.ts";
+      $vite_config_contents = file_get_contents($path_vite_config);
+      if (!$vite_config_contents) {
+        return 0;
+      } elseif (stripos($vite_config_contents, $homepage)) {
+        return 1;
+      } else {
+        // add the base pathe to vite.config.*
+        file_put_contents(
+          $path_vite_config,
+          str_replace(
+            "export default defineConfig({\n  plugins: [react()],\n})",
+            "export default defineConfig(({ command }) => {\n  if (command === 'build') {\n    return {\n      base: \"{$homepage}\",\n      plugins: [react()],\n    }\n  } else {\n    return {\n      plugins: [react()],\n    }\n  }\n})",
+            $vite_config_contents
+          )
+        );
+        return 2;
+      }
     } else {
-      // Add a homepage attribute during the build process and remove it again, 
-      // that the developer can build with the public/index.html without WP.
-      file_put_contents(
-        $path_package_json,
-        str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
-      );
-      return 2;
+      $homepage = "{$relative_apppath}/build";
+      $path_package_json = "{$apppath}/package.json";
+      $package_json_contents = file_get_contents($path_package_json);
+      if (!$package_json_contents) {
+        return 0;
+      } elseif (stripos($package_json_contents, $homepage)) {
+        return 1;
+      } else {
+        // add the base path that images are correctly loaded
+        file_put_contents(
+          $path_package_json,
+          str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+        );
+        return 2;
+      }
     }
   }
 
@@ -172,7 +193,7 @@ class Controller {
    * @return string
    * @since 1.0.0
    */
-  public static function get_index_html_content(string $permalink, $apptype = 'development_cra') {
+  public static function get_index_html_content(string $permalink, $apptype = 'development_cra', $appname = '') {
     $file_contents = wp_remote_retrieve_body(
       wp_remote_get($permalink, ['timeout' => 1000])
     );
@@ -185,10 +206,12 @@ class Controller {
     $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
 
     if ($apptype === 'development_vite') {
+      $apppath = Utils::app_path($appname);
+      $file_ending = is_file("{$apppath}/src/main.jsx") ? 'jsx' : 'tsx';
       // add script tag after root div that link to src/main.tsx
       $readded_contents = str_replace(
         '<div id="root"></div>',
-        '<div id="root"></div><script type="module" src="/src/main.tsx"></script>',
+        "<div id=\"root\"></div><script type=\"module\" src=\"/src/main.{$file_ending}\"></script>",
         $readded_contents
       );
     }
