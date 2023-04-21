@@ -105,7 +105,7 @@ function repr_write_react_app_into_template() {
 
       // Load js files.
       foreach ($js_files as $index => $js_file) {
-        echo '<script defer="defer" src="' . $js_file . '"></script>';
+        echo '<script type="module" src="' . $js_file . '"></script>';
       }
     }
 

@@ -16,7 +16,7 @@
  * Plugin Name:       ReactPress
  * Plugin URI:        https://rockiger.com/en/reactpress
  * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
- * Version:           3.1.0
+ * Version:           3.2.0
  * Author:            Rockiger
  * Author URI:        https://rockiger.com/en/reactpress
  * License:           GPL-2.0+
@@ -52,7 +52,7 @@ use ReactPress\Includes\Deactivator;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('REPR_VERSION', '3.1.0');
+define('REPR_VERSION', '3.2.0');
 define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
 define('REPR_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
