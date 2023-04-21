@@ -276,7 +276,7 @@ class Controller {
           if ($el['allowsRouting']) {
             // routing is only allowed for one single page
             if (count($el['pages']) > 1) {
-              throw new LengthException('Client-side routing is only allowed for apps with one page slug.');
+              throw new LengthException('Client-side routing is only possible on one single page.');
             }
             foreach ($el['pages'] as $page) {
               add_rewrite_rule('^' . wp_make_link_relative($page['permalink']) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($page['permalink']), 'top');
