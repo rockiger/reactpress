@@ -179,6 +179,7 @@ class Core {
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts', 1000);
 		// Add template 
 		$this->loader->add_filter('template_include', $plugin_public, 'repr_change_page_template', 99);
+		$this->loader->add_filter('script_loader_tag', $plugin_public, 'add_type_module_to_scripts', 10, 3);
 		// Add rewrite rules
 		$this->loader->add_action('init', $plugin_public, 'add_repr_apps_rewrite_rules');
 		$this->loader->add_action('generate_rewrite_rules', $plugin_public, 'site_custom_endpoint');

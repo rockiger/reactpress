@@ -93,6 +93,17 @@ class User {
 		$this->repr_load_react_app();
 	}
 
+	/**
+	 * Add the type="module" attribute to the script tag, for 
+	 * ReactPress apps, to remove some errors with Vite.
+	 */
+	function add_type_module_to_scripts($tag, $handle, $src) {
+		if (str_starts_with($handle, 'rp-react-app-asset')) {
+			$tag = '<script id="' . $handle . '" type="module" src="' . esc_url($src) . '"></script>';
+		}
+
+		return $tag;
+	}
 
 	/**
 	 * Change the page template to the our template on the dropdown if selected.
