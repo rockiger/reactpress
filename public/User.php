@@ -21,11 +21,11 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\User;
+namespace Fulcrum\User;
 
-use ReactPress\Admin\Utils;
+use Fulcrum\Admin\Utils;
 
-use function ReactPress\Admin\repr_log;
+use function Fulcrum\Admin\repr_log;
 
 class User {
 
@@ -95,7 +95,7 @@ class User {
 
 	/**
 	 * Add the type="module" attribute to the script tag, for 
-	 * ReactPress apps, to remove some errors with Vite.
+	 * Fulcrum apps, to remove some errors with Vite.
 	 */
 	function add_type_module_to_scripts($tag, $handle, $src) {
 		if (str_starts_with($handle, 'rp-react-app-asset')) {

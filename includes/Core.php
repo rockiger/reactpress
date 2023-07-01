@@ -28,22 +28,22 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Includes;
+namespace Fulcrum\Includes;
 
 //* The class responsible for defining all actions that occur in the admin area.
-use ReactPress\Admin\Admin;
+use Fulcrum\Admin\Admin;
 
 //* The class responsible for defining internationalization functionality
 //* of the plugin.
-use ReactPress\Includes\I18n;
+use Fulcrum\Includes\I18n;
 
 //* The class responsible for orchestrating the actions and filters of the 
 //* core plugin.
-use ReactPress\Includes\Loader;
+use Fulcrum\Includes\Loader;
 
 //* The class responsible for defining all actions that occur in the public-facing
 //* side of the site.
-use ReactPress\User\User;
+use Fulcrum\User\User;
 
 class Core {
 

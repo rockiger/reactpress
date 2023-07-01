@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use ReactPress\Includes\Activator;
+use Fulcrum\Includes\Activator;
 
 class ActivatorPostMock {
     public int $ID = 100;

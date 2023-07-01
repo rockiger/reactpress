@@ -11,7 +11,7 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Includes;
+namespace Fulcrum\Includes;
 
 class Deactivator {
 

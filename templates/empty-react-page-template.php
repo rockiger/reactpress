@@ -1,6 +1,6 @@
 <?php /* Template Name: EmptyReactPageTemplate */
 
-use ReactPress\Admin\Utils;
+use Fulcrum\Admin\Utils;
 
 ?>
 <?php global $post;

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Brain\Monkey;
 use Hamcrest\Util;
-use ReactPress\Admin\Utils;
+use Fulcrum\Admin\Utils;
 
 use function Brain\Monkey\Functions\stubs;
 

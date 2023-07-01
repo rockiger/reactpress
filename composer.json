@@ -5,9 +5,9 @@
   "license": "GPL",
   "autoload": {
     "psr-4": {
-      "ReactPress\\Admin\\": "admin/",
-      "ReactPress\\Includes\\": "includes/",
-      "ReactPress\\User\\": "public/"
+      "Fulcrum\\Admin\\": "admin/",
+      "Fulcrum\\Includes\\": "includes/",
+      "Fulcrum\\User\\": "public/"
     }
   },
   "authors": [

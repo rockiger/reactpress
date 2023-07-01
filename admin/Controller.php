@@ -11,10 +11,10 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Admin;
+namespace Fulcrum\Admin;
 
 use LengthException;
-use ReactPress\Admin\Utils;
+use Fulcrum\Admin\Utils;
 
 class Controller {
 

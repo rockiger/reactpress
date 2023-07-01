@@ -1,4 +1,4 @@
-=== ReactPress - Create React App for Wordpress ===
+=== Fulcrum - Create React App for Wordpress ===
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
@@ -12,13 +12,13 @@ Easily create, build and deploy React apps into your existing WordPress sites.
 
 == Description ==
 
-ReactPress enables you to easily create, build and deploy React apps into your existing WordPress sites. Use your React knowledge to create single page applications for your WordPress customers.
+Fulcrum enables you to easily create, build and deploy React apps into your existing WordPress sites. Use your React knowledge to create single page applications for your WordPress customers.
 
 Get started in seconds and develop your React app with instant feedback and your WordPress theme in mind.
 
 Combine the flexibility of WordPress with the UI capabilities of React and seamlessly integrate create-react-app into your WordPress project for your next SaaS.
 
-ReactPress does 3 things:
+Fulcrum does 3 things:
 
 * It integrates your local dev server into your WordPress theme, that you have instant feedback, how your React app looks in the context of your WordPress website.
 * It builds your React app in a way that it is usable from your WordPress site.
@@ -80,14 +80,14 @@ Upgrades should be smoothless.
  * Make sure that pages of all states (private, draft) are shown.
  * Improve user feedback when something goes wrong during index.html update. 
  * Don't write empty content to index.html if page download did not work.
- * Add css as late as possible to ReactPress page, to reduce `!important` in app's css.
+ * Add css as late as possible to Fulcrum page, to reduce `!important` in app's css.
  * Add information about the post into `reactPress` variable
  * Automatically update the app list without the need to reload the page
  
 
 = 3.0.1 =
 
-* Allow child pages to be ReactPress pages, where a React app is embedded.
+* Allow child pages to be Fulcrum pages, where a React app is embedded.
 * Add support for hosts that have turned the `php.ini` setting `allow_url_fopen` to `off`.
 * Don't delete options when uninstalling plugin.
 
@@ -104,8 +104,8 @@ Upgrades should be smoothless.
 = 2.1.0 =
 
 * Add totally empty canvas template. This template doesn't get any styles and scripts from WordPress. Good if you want to embed a totally independent React app.
-* Add nonce and base rest_url to global ReactPress variable.
-* Fix loading of global ReactPress variable.
+* Add nonce and base rest_url to global Fulcrum variable.
+* Fix loading of global Fulcrum variable.
 * Improve Windows compatibility
 * Securtiy fix: don't show encrypted user password
 
@@ -123,7 +123,7 @@ Upgrades should be smoothless.
 * Revamp the admin page to be cleaner and a React app itself
 * Add PHP namespaces
 * Use create-react-app in the admin area for dogfooding
-* Add post state label to signal the user a page was created by ReactPress
+* Add post state label to signal the user a page was created by Fulcrum
 * Test with WordPress 6.0.2
 
 = 1.3.2 = 
@@ -148,7 +148,7 @@ Upgrades should be smoothless.
 
 = 1.2.0 = 
 
-* Revamp the process of adding using ReactPress. Don't start the react app anymore, only update the `index.html` from WordPress admin. Make it possible to add apps manually with npm or yarn.
+* Revamp the process of adding using Fulcrum. Don't start the react app anymore, only update the `index.html` from WordPress admin. Make it possible to add apps manually with npm or yarn.
 
 * Add fallback if we can't find the plugin directory programmatically.
 

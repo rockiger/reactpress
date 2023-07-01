@@ -13,7 +13,7 @@
  * @package           Reactpress
  *
  * @wordpress-plugin
- * Plugin Name:       ReactPress
+ * Plugin Name:       Fulcrum
  * Plugin URI:        https://rockiger.com/en/reactpress
  * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
  * Version:           3.2.0
@@ -36,15 +36,15 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
-use ReactPress\Includes\Activator;
+use Fulcrum\Includes\Activator;
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
 
-use ReactPress\Includes\Core;
-use ReactPress\Includes\Deactivator;
+use Fulcrum\Includes\Core;
+use Fulcrum\Includes\Deactivator;
 
 
 /**

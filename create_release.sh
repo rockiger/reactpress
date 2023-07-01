@@ -17,6 +17,6 @@ rm -r /tmp/reactpress-svn/tags/$version/admin/js/reactpress-admin/public
 rm -rf /tmp/reactpress-svn/tags/$version/admin/js/reactpress-admin/.git
 rm -r /tmp/reactpress-svn/trunk
 cp -r /tmp/reactpress-svn/tags/$version/ /tmp/reactpress-svn/
-# Reinstall dev dependencies to be able to work on ReactPress again
+# Reinstall dev dependencies to be able to work on Fulcrum again
 mv /tmp/reactpress-svn/$version /tmp/reactpress-svn/trunk
 composer install

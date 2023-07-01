@@ -22,10 +22,10 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Admin;
+namespace Fulcrum\Admin;
 
-use ReactPress\Admin\Controller;
-use ReactPress\Includes\Activator;
+use Fulcrum\Admin\Controller;
+use Fulcrum\Includes\Activator;
 
 class Admin {
 
@@ -152,8 +152,8 @@ class Admin {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			'ReactPress',
-			'ReactPress',
+			'Fulcrum',
+			'Fulcrum',
 			'manage_options',
 			'reactpress',
 			fn () =>  require_once('partials/reactpress-admin-display.php'),
@@ -174,7 +174,7 @@ class Admin {
 			$pageIds = array_map(fn ($el) => $el['pageIds'], $repr_apps);
 			$valid_pages = array_merge(...$pageIds);
 			if (in_array($post->ID, $valid_pages)) {
-				$states['reactpress'] = __('ReactPress', 'text-domain');
+				$states['reactpress'] = __('Fulcrum', 'text-domain');
 			}
 		}
 		return $states;
@@ -189,8 +189,8 @@ class Admin {
 	 */
 	public function repr_add_page_template($templates) {
 		// Use relative paths for the templates and then resolve them at runtime.
-		$templates['templates/empty-react-page-template.php'] = __('ReactPress Canvas', 'text-domain');
-		$templates['templates/react-page-template.php'] = __('ReactPress Full Width', 'text-domain');
+		$templates['templates/empty-react-page-template.php'] = __('Fulcrum Canvas', 'text-domain');
+		$templates['templates/react-page-template.php'] = __('Fulcrum Full Width', 'text-domain');
 
 		return $templates;
 	}

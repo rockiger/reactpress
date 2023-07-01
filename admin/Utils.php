@@ -8,7 +8,7 @@
  * @author Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Admin;
+namespace Fulcrum\Admin;
 
 
 class Utils {

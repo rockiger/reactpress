@@ -11,9 +11,9 @@
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
-namespace ReactPress\Includes;
+namespace Fulcrum\Includes;
 
-use ReactPress\Admin\Utils;
+use Fulcrum\Admin\Utils;
 use WP_Post;
 
 class Activator {
