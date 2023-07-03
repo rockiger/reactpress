@@ -6,8 +6,8 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
 

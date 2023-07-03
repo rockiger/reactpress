@@ -3,8 +3,8 @@
 /**
  * Utility functions for the admin. All created in as static methods.
 
- * @package Reactpress
- * @subpackage Reactpress/admin
+ * @package Fulcrum
+ * @subpackage Fulcrum/admin
  * @author Marco Laspe <marco@rockiger.com>
  */
 

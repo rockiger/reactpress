@@ -6,8 +6,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/public
+ * @package    Fulcrum
+ * @subpackage Fulcrum/public
  */
 
 /**
@@ -16,8 +16,8 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Reactpress
- * @subpackage Reactpress/public
+ * @package    Fulcrum
+ * @subpackage Fulcrum/public
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
@@ -71,10 +71,10 @@ class User {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Reactpress_Loader as all of the hooks are defined
+		 * defined in Fulcrum_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Reactpress_Loader will then create the relationship
+		 * The Fulcrum_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
@@ -119,14 +119,14 @@ class User {
 		if (is_page()) {
 			$meta = get_post_meta(intval(get_the_ID()));
 
-			// Check if the page template is a Reactpress template
+			// Check if the page template is a Fulcrum template
 			if (
 				!empty($meta['_wp_page_template'][0]) &&
 				$meta['_wp_page_template'][0] != $template &&
 				'default' !== $meta['_wp_page_template'][0] &&
 				strpos($meta['_wp_page_template'][0], 'react-page-template.php')
 			) {
-				// At this point we know it's a Reactpress template
+				// At this point we know it's a Fulcrum template
 				$template = $meta['_wp_page_template'][0];
 
 				// determine the location of the templates folder reference

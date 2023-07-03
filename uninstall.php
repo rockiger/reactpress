@@ -22,7 +22,7 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
+ * @package    Fulcrum
  */
 
 // If uninstall not called from WordPress, then exit.

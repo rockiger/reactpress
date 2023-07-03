@@ -9,8 +9,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  */
 
 /**
@@ -23,8 +23,8 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
@@ -103,10 +103,10 @@ class Core {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Reactpress_Loader. Orchestrates the hooks of the plugin.
-	 * - Reactpress_i18n. Defines internationalization functionality.
-	 * - Reactpress_Admin. Defines all hooks for the admin area.
-	 * - Reactpress_Public. Defines all hooks for the public side of the site.
+	 * - Fulcrum_Loader. Orchestrates the hooks of the plugin.
+	 * - Fulcrum_i18n. Defines internationalization functionality.
+	 * - Fulcrum_Admin. Defines all hooks for the admin area.
+	 * - Fulcrum_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -121,7 +121,7 @@ class Core {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Reactpress_i18n class in order to set the domain and to register the hook
+	 * Uses the Fulcrum_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0

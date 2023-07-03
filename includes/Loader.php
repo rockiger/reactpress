@@ -6,8 +6,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  */
 
 /**
@@ -17,8 +17,8 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
 

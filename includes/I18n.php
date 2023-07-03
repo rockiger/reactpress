@@ -9,8 +9,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  */
 
 /**
@@ -20,8 +20,8 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Reactpress
- * @subpackage Reactpress/includes
+ * @package    Fulcrum
+ * @subpackage Fulcrum/includes
  * @author     Marco Laspe <marco@rockiger.com>
  */
 

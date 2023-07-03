@@ -6,8 +6,8 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Reactpress
- * @subpackage Reactpress/admin
+ * @package    Fulcrum
+ * @subpackage Fulcrum/admin
  * @author     Marco Laspe <marco@rockiger.com>
  */
 

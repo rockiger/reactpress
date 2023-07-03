@@ -8,8 +8,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/admin/partials
+ * @package    Fulcrum
+ * @subpackage Fulcrum/admin/partials
  */
 ?>
 

@@ -7,8 +7,8 @@
  * @link       https://rockiger.com
  * @since      1.0.0
  *
- * @package    Reactpress
- * @subpackage Reactpress/admin
+ * @package    Fulcrum
+ * @subpackage Fulcrum/admin
  */
 
 /**
@@ -17,8 +17,8 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Reactpress
- * @subpackage Reactpress/admin
+ * @package    Fulcrum
+ * @subpackage Fulcrum/admin
  * @author     Marco Laspe <marco@rockiger.com>
  */
 
