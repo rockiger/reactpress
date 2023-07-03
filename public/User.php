@@ -251,7 +251,7 @@ class User {
 			// Variables for app use
 			$current_user = wp_get_current_user();
 			unset($current_user->user_pass); // Don't show encypted password for security reasons.
-			wp_localize_script('rp-react-app-asset-0-0', 'reactPress', array(
+			wp_localize_script('rp-react-app-asset-0-0', 'fulcrum', array(
 				'api' => [
 					'nonce' => wp_create_nonce('wp_rest'),
 					'rest_url' => esc_url_raw(rest_url()),

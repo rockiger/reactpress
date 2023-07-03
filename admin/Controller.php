@@ -202,8 +202,8 @@ class Controller {
     // with the dev assets.
     $filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
     $filtered_contents =  implode(PHP_EOL, $filtered_arr);
-    // re-add script tag for global reactPress variable
-    $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
+    // re-add script tag for global fulcrum variable
+    $readded_contents = str_replace('var fulcrum', "<script>\nvar fulcrum", $filtered_contents);
 
     if ($apptype === 'development_vite') {
       $apppath = Utils::app_path($appname);

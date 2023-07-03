@@ -81,7 +81,7 @@ Upgrades should be smoothless.
  * Improve user feedback when something goes wrong during index.html update. 
  * Don't write empty content to index.html if page download did not work.
  * Add css as late as possible to Fulcrum page, to reduce `!important` in app's css.
- * Add information about the post into `reactPress` variable
+ * Add information about the post into `fulcrum` variable
  * Automatically update the app list without the need to reload the page
  
 
