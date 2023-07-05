@@ -79,18 +79,18 @@ class Controller {
       Utils::unset_public_url_for_dev_server($appname, $permalink);
       echo wp_json_encode(['status' => 1]);
     } catch (\Exception $e) {
-      repr_log($e);
+      fulc_log($e);
       echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
     }
   }
 
   public static function delete_react_app(string $appname) {
-    $options = get_option('repr_apps');
+    $options = get_option('fulc_apps');
     Utils::write_apps_option(array_filter(
       $options,
       fn ($el) => $el['appname'] !== $appname
     ));
-    $is_appdir_removed = repr_delete_directory(Utils::app_path($appname));
+    $is_appdir_removed = fulc_delete_directory(Utils::app_path($appname));
     if ($is_appdir_removed) {
       echo wp_json_encode([
         'status' => 1,
@@ -144,7 +144,7 @@ class Controller {
     // We need the relative path, that we can deploy our
     // built app to another server later.
     $relative_apppath = Utils::app_path($appname, true);
-    $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/reactpress/apps/{$appname}/";
+    $relative_apppath = $relative_apppath ? $relative_apppath : "/wp-content/fulcrum/apps/{$appname}/";
     if ($apptype === 'development_vite') {
       $homepage = "{$relative_apppath}/dist/";
       $path_vite_config = is_file("{$apppath}/vite.config.js") ? "{$apppath}/vite.config.js" : "{$apppath}/vite.config.ts";
@@ -232,7 +232,7 @@ class Controller {
         array(
           'post_title' => $page_title,
           'post_status' => 'publish',
-          'post_content' => REPR_REACT_ROOT_TAG,
+          'post_content' => FULC_REACT_ROOT_TAG,
           'post_type' => "page",
           // Assign page template using the relative path, it will be
           // resolved to the fully qualified name at run-time
@@ -298,7 +298,7 @@ class Controller {
       Utils::write_apps_option($new_options);
       echo wp_json_encode(['status' => 1]);
     } catch (\Exception $e) {
-      repr_log($e);
+      fulc_log($e);
       echo wp_json_encode(['status' => 0, 'message' => $e->getMessage()]);
     }
   }
@@ -314,8 +314,8 @@ class Controller {
   public static function write_index_html(string $appname, string $content, $apptype = 'development_cra') {
     $index_html_path =
       $apptype === 'development_vite'
-      ? sprintf("%s/%s/index.html", REPR_APPS_PATH, $appname)
-      : sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
+      ? sprintf("%s/%s/index.html", FULC_APPS_PATH, $appname)
+      : sprintf("%s/%s/public/index.html", FULC_APPS_PATH, $appname);
 
     return file_put_contents($index_html_path, $content);
   }

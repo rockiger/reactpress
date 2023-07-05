@@ -27,34 +27,34 @@ class Activator {
 	 */
 	public static function activate() {
 		//# check im reactpress directory exists if not create it
-		wp_mkdir_p(REPR_APPS_PATH);
-		$repr_version_option = get_option('repr_version');
-		$repr_apps = is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+		wp_mkdir_p(FULC_APPS_PATH);
+		$fulc_version_option = get_option('fulc_version');
+		$fulc_apps = is_array(get_option('fulc_apps')) ?  get_option('fulc_apps') : [];
 
 		Utils::write_apps_option(
 			Activator::activate_helper(
-				$repr_apps,
-				$repr_version_option,
+				$fulc_apps,
+				$fulc_version_option,
 				fn (string $page_slug) => Activator::get_page_by_slug($page_slug)
 			)
 		);
 		//# update version
-		update_option('repr_version', REPR_VERSION);
+		update_option('fulc_version', FULC_VERSION);
 	}
 
 	/**
 	 * 
-	 * @param string $repr_version_option 
-	 * @param array<array-key, mixed> $repr_apps 
+	 * @param string $fulc_version_option 
+	 * @param array<array-key, mixed> $fulc_apps 
 	 * @param callable $get_page_by_slug
 	 * @return array<array-key, mixed>
 	 */
-	public static function activate_helper($repr_apps, $repr_version_option, $get_page_by_slug) {
-		if ($repr_version_option && $repr_version_option < '3.0.0') {
-			//# check if repr_apps have the right format, otherwise update
+	public static function activate_helper($fulc_apps, $fulc_version_option, $get_page_by_slug) {
+		if ($fulc_version_option && $fulc_version_option < '3.0.0') {
+			//# check if fulc_apps have the right format, otherwise update
 
 			//# transform pageslug to pageslugs
-			$repr_apps_with_pageslugs = array_map(function ($el) {
+			$fulc_apps_with_pageslugs = array_map(function ($el) {
 				if (array_key_exists('pageslug', $el)) {
 					$new_el = $el;
 					$pageslug = $el['pageslug'];
@@ -64,10 +64,10 @@ class Activator {
 				} else {
 					return $el;
 				}
-			}, $repr_apps);
+			}, $fulc_apps);
 
 			//# swap out pageslugs for pageIds, because they are immutable
-			$repr_apps_with_page_ids = array_map(function ($el) use ($get_page_by_slug) {
+			$fulc_apps_with_page_ids = array_map(function ($el) use ($get_page_by_slug) {
 				if (array_key_exists('pageslugs', $el)) {
 					$new_el = $el;
 					$new_el['pageIds'] = array_map(function ($el) use ($get_page_by_slug) {
@@ -79,11 +79,11 @@ class Activator {
 				} else {
 					return $el;
 				}
-			}, $repr_apps_with_pageslugs);
+			}, $fulc_apps_with_pageslugs);
 
 
 			//# add flag for app routing
-			$repr_apps_with_app_routing = array_map(function ($el) {
+			$fulc_apps_with_app_routing = array_map(function ($el) {
 				if (!array_key_exists('allowsRouting', $el)) {
 					$new_el = $el;
 					$new_el['allowsRouting'] = true;
@@ -91,11 +91,11 @@ class Activator {
 				} else {
 					return $el;
 				}
-			}, $repr_apps_with_page_ids);
+			}, $fulc_apps_with_page_ids);
 
-			return $repr_apps_with_app_routing;
+			return $fulc_apps_with_app_routing;
 		}
-		return $repr_apps;
+		return $fulc_apps;
 	}
 
 	/**

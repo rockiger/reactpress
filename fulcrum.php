@@ -52,14 +52,14 @@ use Fulcrum\Includes\Deactivator;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('REPR_VERSION', '3.2.0');
+define('FULC_VERSION', '3.2.0');
 define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
-define('REPR_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
-define('REPR_PLUGIN_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
+define('FULC_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
+define('FULC_PLUGIN_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
 /** @phpstan-ignore-next-line */
-define('REPR_APPS_PATH', IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
-define('REPR_APPS_URL', content_url() . '/reactpress/apps');
+define('FULC_APPS_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__) . '/apps') : plugin_dir_path(__FILE__) . '/apps');
+define('FULC_APPS_URL', plugin_dir_url(__FILE__) . '/apps');
 
 /**
  * The code that runs during plugin activation.

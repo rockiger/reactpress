@@ -25,7 +25,7 @@ namespace Fulcrum\User;
 
 use Fulcrum\Admin\Utils;
 
-use function Fulcrum\Admin\repr_log;
+use function Fulcrum\Admin\fulc_log;
 
 class User {
 
@@ -90,7 +90,7 @@ class User {
 	public function enqueue_scripts() {
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-public.js', array('jquery'), $this->version, false);
 
-		$this->repr_load_react_app();
+		$this->fulc_load_react_app();
 	}
 
 	/**
@@ -115,7 +115,7 @@ class User {
 	 * @return mixed
 	 * @since 1.0.0
 	 */
-	public function repr_change_page_template($template) {
+	public function fulc_change_page_template($template) {
 		if (is_page()) {
 			$meta = get_post_meta(intval(get_the_ID()));
 
@@ -139,7 +139,7 @@ class User {
 				}
 
 				// Prepend the real path at runtime
-				$template = REPR_PLUGIN_PATH . $template;
+				$template = FULC_PLUGIN_PATH . $template;
 			}
 		}
 
@@ -154,26 +154,26 @@ class User {
 	 * @since 1.0.0
 	 */
 
-	function repr_load_react_app() {
+	function fulc_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
 		global $post;
-		$repr_apps = Utils::get_apps();
-		$pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
+		$fulc_apps = Utils::get_apps();
+		$pageIds = $fulc_apps ? array_map(fn ($el) => $el['pageIds'], $fulc_apps) : [];
 
 		$valid_pages = array_merge(...$pageIds);
 		if (is_page() && in_array($post->ID, $valid_pages)) {
-			$suitable_apps = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])));
+			$suitable_apps = array_values(array_filter($fulc_apps, fn ($el) => in_array($post->ID, $el['pageIds'])));
 			foreach ($suitable_apps as $app_index => $current_app) {
 
 				// Setting path variables.
 				$appname = $current_app['appname'];
-				$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
+				$plugin_app_dir_url = escapeshellcmd(FULC_APPS_URL . "/{$appname}/");
 				$apptype = Utils::get_app_type($appname);
 				$css_files = [];
 				$js_files = [];
 				// setting up vite app
 				if ($apptype === 'development_vite' || $apptype === 'deployment_vite') {
-					$react_app_build = REPR_APPS_PATH . '/' . $appname . '/dist/assets';
+					$react_app_build = FULC_APPS_PATH . '/' . $appname . '/dist/assets';
 					$assets_files = scandir($react_app_build);
 					if (!$assets_files) {
 						return false;
@@ -192,7 +192,7 @@ class User {
 				// setting up cra app
 				else {
 					$react_app_build = $plugin_app_dir_url . 'build/';
-					$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
+					$manifest_path = escapeshellcmd(FULC_APPS_PATH . "/{$appname}/build/asset-manifest.json");
 
 					// Request manifest file.
 					set_error_handler(
@@ -206,7 +206,7 @@ class User {
 					try {
 						$request = file_get_contents($manifest_path);
 					} catch (\Exception $e) {
-						repr_log($e->getMessage());
+						fulc_log($e->getMessage());
 					}
 					// remove error handler again.
 					restore_error_handler();
@@ -271,15 +271,15 @@ class User {
 	 * 
 	 * @since 1.4.0
 	 */
-	public function add_repr_apps_rewrite_rules() {
-		$repr_apps = Utils::get_apps();
-		$repr_apps_with_routing = array_filter($repr_apps, fn ($el) => $el['allowsRouting']);
+	public function add_fulc_apps_rewrite_rules() {
+		$fulc_apps = Utils::get_apps();
+		$fulc_apps_with_routing = array_filter($fulc_apps, fn ($el) => $el['allowsRouting']);
 		$permalinkArrays = array_map(
 			fn ($el) => array_map(
 				fn ($pg) => $pg['permalink'],
 				$el['pages']
 			),
-			$repr_apps_with_routing
+			$fulc_apps_with_routing
 		);
 		$permalinks = array_merge(...$permalinkArrays);
 

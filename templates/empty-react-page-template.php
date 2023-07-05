@@ -12,28 +12,28 @@ use Fulcrum\Admin\Utils;
  * @since 1.0.0
  */
 
-function repr_write_react_app_into_template() {
+function fulc_write_react_app_into_template() {
   // Only load react app scripts on pages that contain our apps
   global $post;
-  $repr_apps = Utils::get_apps();
-  $pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
+  $fulc_apps = Utils::get_apps();
+  $pageIds = $fulc_apps ? array_map(fn ($el) => $el['pageIds'], $fulc_apps) : [];
 
   $valid_pages = array_merge(...$pageIds);
   $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
   if (is_page() && in_array($post->ID, $valid_pages)) {
-    $suitable_apps = array_values(array_filter($repr_apps, fn ($el) => in_array($post->ID, $el['pageIds'])));
+    $suitable_apps = array_values(array_filter($fulc_apps, fn ($el) => in_array($post->ID, $el['pageIds'])));
     foreach ($suitable_apps as $current_app) {
 
       // Setting path variables.
       $appname = $current_app['appname'];
-      $plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
+      $plugin_app_dir_url = escapeshellcmd(FULC_APPS_URL . "/{$appname}/");
       $apptype = Utils::get_app_type($appname);
       $css_files = [];
       $js_files = [];
 
       // setting up vite app
       if ($apptype === 'development_vite' || $apptype === 'deployment_vite') {
-        $react_app_build = REPR_APPS_PATH . '/' . $appname . '/dist/assets';
+        $react_app_build = FULC_APPS_PATH . '/' . $appname . '/dist/assets';
         $assets_files = scandir($react_app_build);
         if (!$assets_files) {
           return false;
@@ -52,7 +52,7 @@ function repr_write_react_app_into_template() {
       // setting up cra app
       else {
         $react_app_build = $plugin_app_dir_url . 'build/';
-        $manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
+        $manifest_path = escapeshellcmd(FULC_APPS_PATH . "/{$appname}/build/asset-manifest.json");
 
         // Request manifest file.
         set_error_handler(
@@ -146,7 +146,7 @@ function repr_write_react_app_into_template() {
   <link rel="manifest" href="/<?php echo $post->post_name; ?>/manifest.json" />
   <title><?php echo $post->post_title; ?></title>
 
-  <?php repr_write_react_app_into_template() ?>
+  <?php fulc_write_react_app_into_template() ?>
 </head>
 
 <body>

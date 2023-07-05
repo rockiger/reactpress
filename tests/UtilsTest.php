@@ -15,7 +15,7 @@ class UtilsPostMock {
     public string $post_title = 'Title';
 }
 
-define('REPR_APPS_PATH', '/htdocs/wp-content/reactpress/apps');
+define('FULC_APPS_PATH', '/htdocs/wp-content/reactpress/apps');
 $_SERVER['DOCUMENT_ROOT'] = '/htdocs';
 $GLOBALS['get_post'] = fn (int $id) => new UtilsPostMock();
 $GLOBALS['get_permalink'] = fn (int $id) => '/test';
@@ -108,7 +108,7 @@ final class UtilsTest extends TestCase {
         ]], Utils::__get_apps([], ['test']));
     }
 
-    /** Test the when repr_apps are present */
+    /** Test the when fulc_apps are present */
     public function testGetApps_fromOptions() {
         Monkey\Functions\stubs([
             'get_post' => new UtilsPostMock(),

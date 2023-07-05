@@ -14,7 +14,7 @@ namespace Fulcrum\Admin;
 class Utils {
 
   /**
-   * Creates options for a new app. If the repr_apps options are not present, it will
+   * Creates options for a new app. If the fulc_apps options are not present, it will
    * create them.
    */
 
@@ -48,7 +48,7 @@ class Utils {
    * @since 1.0.0
    */
   public static function app_path(string $appname, $relative_to_home_path = false): string {
-    $apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
+    $apppath = escapeshellcmd(FULC_APPS_PATH . "/{$appname}");
     $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
     if ($relative_to_home_path) {
       return explode($document_root, $apppath)[1];
@@ -197,9 +197,9 @@ class Utils {
    */
   public static function get_app_names() {
     // check im reactpress directory exists if not create it
-    wp_mkdir_p(REPR_APPS_PATH);
-    chdir(REPR_APPS_PATH);
-    $appnames = scandir(REPR_APPS_PATH);
+    wp_mkdir_p(FULC_APPS_PATH);
+    chdir(FULC_APPS_PATH);
+    $appnames = scandir(FULC_APPS_PATH);
     $appnames = $appnames ? $appnames : [];
     return array_values(array_filter($appnames, fn ($el) => $el[0] !== '.' && is_dir($el)));
   }
@@ -270,16 +270,16 @@ class Utils {
    * @return 'development_cra' | 'development_vite' | 'deployment_cra' | 'deployment_vite' | 'empty' | 'orphan'
    */
   public static function get_app_type($appname) {
-    if (is_file(REPR_APPS_PATH . '/' . $appname . '/package.json')) {
+    if (is_file(FULC_APPS_PATH . '/' . $appname . '/package.json')) {
       $packageJson = json_decode(
-        file_get_contents(REPR_APPS_PATH . '/' . $appname . '/package.json')
+        file_get_contents(FULC_APPS_PATH . '/' . $appname . '/package.json')
       );
       $type = (isset($packageJson->devDependencies->vite)) ? 'development_vite' : 'development_cra';
-    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/build')) {
+    } elseif (is_dir(FULC_APPS_PATH . '/' . $appname . '/build')) {
       $type = 'deployment_cra';
-    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/dist')) {
+    } elseif (is_dir(FULC_APPS_PATH . '/' . $appname . '/dist')) {
       $type = 'deployment_vite';
-    } elseif (is_dir(REPR_APPS_PATH . '/' . $appname)) {
+    } elseif (is_dir(FULC_APPS_PATH . '/' . $appname)) {
       $type = 'empty';
     } else {
       $type = 'orphan';
@@ -288,14 +288,14 @@ class Utils {
   }
 
   /**
-   * Retrieves the repr_apps option from WordPress if nothing can retrieved,
+   * Retrieves the fulc_apps option from WordPress if nothing can retrieved,
    * produces an empty array. 
    * Usually you should prefer Utils::get_apps().
    * 
    * @return mixed[]
    */
   public static function get_app_options_list() {
-    return is_array(get_option('repr_apps')) ?  get_option('repr_apps') : [];
+    return is_array(get_option('fulc_apps')) ?  get_option('fulc_apps') : [];
   }
 
   /**
@@ -320,6 +320,6 @@ class Utils {
       'appname' => $el['appname'],
       'pageIds' => $el['pageIds']
     ], $app_list);
-    update_option('repr_apps', $app_list_option);
+    update_option('fulc_apps', $app_list_option);
   }
 }
