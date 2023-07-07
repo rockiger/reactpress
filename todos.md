@@ -11,7 +11,9 @@ repr => fulc
 REPR\_ => FULC\_ /
 add post types /
 add actions for graphql /
-require dependencies (wp-graphql, wp-graphql CPT, WPGraphQL Tax Query, LH Private Content Login)
+require dependencies (wp-graphql, WPGraphQL Tax Query, LH Private Content Login) /
+Create default space with overview page
+set page to private.
 
 ---
 

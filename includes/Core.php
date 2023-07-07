@@ -160,6 +160,9 @@ class Core {
 
 		// Check if current current version of plugin is saved in db
 		$this->loader->add_action('admin_init', $plugin_admin, 'check_plugin_version');
+
+		// Check plugin dependencies
+		$this->loader->add_action('tgmpa_register', $plugin_admin, 'fulc_register_required_plugins');
 	}
 
 
