@@ -183,6 +183,11 @@ class Core {
 		// Add rewrite rules
 		$this->loader->add_action('init', $plugin_public, 'add_fulc_apps_rewrite_rules');
 		$this->loader->add_action('generate_rewrite_rules', $plugin_public, 'site_custom_endpoint');
+		// Add custom content type for Fulcrum
+		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_cpts');
+		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_taxes');
+		$this->loader->add_action('init', $plugin_public, 'register_graphql_fulcrum_page');
+		$this->loader->add_action('init', $plugin_public, 'register_graphql_update_fulcrum_page_meta');
 	}
 
 	/**
