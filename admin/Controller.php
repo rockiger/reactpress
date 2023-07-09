@@ -34,6 +34,7 @@ class Controller {
 
     // add slug to existing app_options
     $inserted_page = Controller::insert_page($pageId, $page_title);
+    fulc_log(['$inserted_page' => $inserted_page]);
     if (!$inserted_page['ID']) {
       echo wp_json_encode([
         'status' => 0,
@@ -44,32 +45,41 @@ class Controller {
     $permalink = get_permalink($inserted_page['ID']);
     $permalink = $permalink ? $permalink : '';
     $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
-    Controller::add_build_path($appname, $apptype);
-    if ($app_options['allowsRouting']) {
-      add_rewrite_rule('^' .  wp_make_link_relative($permalink) . '/(.*)?', 'index.php?pagename=' . wp_make_link_relative($permalink), 'top');
-      Utils::set_public_url_for_dev_server($appname, $permalink);
+
+    //# Check if the default space and the default page should be created
+    $terms = get_terms('fulcrum_space');
+    $posts = get_posts([
+      'post_type' => 'fulcrum_page',
+      'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash']
+    ]);
+
+    fulc_log(['before fulcrum check' => 'before fulcrum check', 'terms' => count($terms), 'posts' => count($posts), 'cond' => !count($terms) && count($posts)]);
+    if (!count($terms) && !count($posts)) {
+      fulc_log('inside fulcrum check');
+      $default_term = wp_create_term('Default', 'fulcrum_space');
+      fulc_log(['$default_term' => $default_term]);
+      wp_insert_post([
+        'post_title' => 'Overview',
+        'post_type' => 'fulcrum_page',
+        'post_status' => 'publish',
+        'post_content' => DEFAULT_OVERVIEW_CONTENT,
+        'tax_input'    => [
+          'fulcrum_space' => [$default_term['term_id']],
+        ],
+        'meta_input'   => [
+          'isOverview' => true,
+          'width' => 'standard'
+        ],
+      ]);
     }
-    flush_rewrite_rules();
-    $html_content = Controller::get_index_html_content($permalink, $apptype, $appname);
-    if (empty($html_content)) {
-      echo wp_json_encode([
-        'status' => 0,
-        'message' => 'Couldn\'t download page content.'
-      ]);
-    } elseif (Controller::write_index_html($appname, $html_content, $apptype)) {
-      echo wp_json_encode([
-        'status' => 1,
-        'message' => 'Page added.',
-        'pageId' => $inserted_page['ID'],
-        'page_title' => $inserted_page['page_title'],
-        'permalink' => $permalink
-      ]);
-    } else {
-      echo wp_json_encode([
-        'status' => 0,
-        'message' => 'Something went wrong.',
-      ]);
-    }
+
+    echo wp_json_encode([
+      'status' => 1,
+      'message' => 'Page added.',
+      'pageId' => $inserted_page['ID'],
+      'page_title' => $inserted_page['page_title'],
+      'permalink' => $permalink
+    ]);
   }
 
   public static function delete_page(string $appname, int $pageId, string $permalink) {
@@ -320,3 +330,159 @@ class Controller {
     return file_put_contents($index_html_path, $content);
   }
 }
+
+define('DEFAULT_OVERVIEW_CONTENT', $str = <<<EOD
+<h2>Welcome to your wiki</h2>
+This is <strong>your </strong><a target="_blank" rel="noopener noreferrer nofollow" href="https://en.wikipedia.org/wiki/Wiki">wiki</a>, where you can do whatever you want.
+
+You can use it to:
+<ul>
+ 	<li>Develop ideas</li>
+ 	<li>Use it as a notebook</li>
+ 	<li>Collect links, files and data</li>
+ 	<li>Post code snippets you find useful</li>
+</ul>
+These are just <strong>suggestions</strong>. Do whatever <strong>you want</strong>. It is <strong>your</strong> wiki.
+<h2>Some tips to get you started</h2>
+<ul>
+ 	<li><strong>Edit this page.</strong> Click on the <strong>edit icon</strong> or press <strong>e</strong> on your keyboard, the editor will open. You can insert files from your Google Drive by using the Drive-button in the menu bar.</li>
+ 	<li><strong>Insert a new page.</strong> Click on the <strong>New Page</strong> button on the top left to create a <strong>new page below the current page</strong>. If you want to <strong>create a page somewhere else</strong> in your wiki, <strong>hover over an entry</strong> in the page tree and <strong>click</strong> the <strong>+</strong>-button.</li>
+ 	<li><strong>Search your wiki.</strong> Click into the <strong>search box</strong> or press <strong>/</strong> on your keyboard to search your wiki. The search box will also show your last visited wiki pages.</li>
+ 	<li>You can <strong>insert files</strong> from your Google Drive <strong>into your wiki</strong> pages by using the <strong>Drive-button</strong> in the menu bar.</li>
+ 	<li>If you <strong>need more wikis</strong>, add them <strong>from your Google Drive</strong> using the <strong>New-Button.</strong></li>
+</ul>
+<h2>Editor features and shortcuts</h2>
+<table>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1">Feature</td>
+<td colspan="1" rowspan="1">Shortcut</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Start editing</td>
+<td colspan="1" rowspan="1">e</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Save and close editor</td>
+<td colspan="1" rowspan="1">Ctrl+Enter / ⌘+Enter</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"></td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle heading style [1-6]</td>
+<td colspan="1" rowspan="1">Ctrl+Alt+[1-6] / ⌘+Alt+[1-6]</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle numbered list</td>
+<td colspan="1" rowspan="1">Ctrl+Shift+7 / ⌘+Shift+7</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle bulleted list</td>
+<td colspan="1" rowspan="1">Ctrl+Shift+8 / ⌘+Shift+8</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle code block</td>
+<td colspan="1" rowspan="1">Ctrl+Shift+0 / ⌘+Shift+0</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Choose syntax highlighting for code block</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"></td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle quote</td>
+<td colspan="1" rowspan="1">Ctrl+Shift+9 / ⌘+Shift+9</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle bold text</td>
+<td colspan="1" rowspan="1">Ctrl+b / ⌘+b</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle italic text</td>
+<td colspan="1" rowspan="1">Ctrl+i / ⌘+i</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle underlined text</td>
+<td colspan="1" rowspan="1">Ctrl+u / ⌘+u</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle strikethrough text</td>
+<td colspan="1" rowspan="1">Ctrl+~ / ⌘+~</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle monospaced text</td>
+<td colspan="1" rowspan="1">Ctrl+` / ⌘+`</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"></td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Insert link</td>
+<td colspan="1" rowspan="1">Ctrl+k / ⌘+k</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Insert image from Google Drive</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Drag image from your computer</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Insert a link to an item in your Google Drive</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"></td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Insert table</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Delete table</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Add column</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Remove column</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Add row</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Remove row</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1">Toggle table header</td>
+<td colspan="1" rowspan="1"></td>
+</tr>
+</tbody>
+</table>
+<h2>Markdown shortcuts</h2>
+If you know markdown you can use it as a shortcut to structure your content. You simply type the markdown marker and hit space. Fulcrum supports the following markers:
+<h1># Header 1</h1>
+<h2>## Header 2</h2>
+<h3>### Header 3</h3>
+<h4>#### Header 4</h4>
+<h5>##### Header 5</h5>
+<h6>###### Header 6</h6>
+<ul>
+ 	<li>* bullet point</li>
+</ul>
+&gt; quote+-9*
++
+EOD);

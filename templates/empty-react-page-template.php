@@ -113,7 +113,7 @@ function fulc_write_react_app_into_template() {
     $current_user = wp_get_current_user();
     unset($current_user->user_pass); // Don't show encypted password for security reasons.
     echo '<script> 
-            var fulcrum = ' . wp_json_encode(
+            var reactPress = ' . wp_json_encode(
       [
         'api' => [
           'nonce' => wp_create_nonce('wp_rest'),
