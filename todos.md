@@ -12,10 +12,27 @@ REPR\_ => FULC\_ /
 add post types /
 add actions for graphql /
 require dependencies (wp-graphql, WPGraphQL Tax Query, LH Private Content Login) /
-Create default space with overview page
+Create default space with overview page /
+redirect to overview page /
+fix errors in react app again /
+create page /
+Check that authentication works right /
+Update Readme's /
+Add versions /
+Change release script
+Make plugin /
+Test plugin
+Submit plugin
+
 set page to private.
 
 ---
 
 Ideas for ReactPress
 Create plugin mode to remove unnecessary features
+
+Known Issues:
+When opening the disclosure the link activated => can't stop event propagation on Disclosure button, move to radix
+
+New Stories:
+Create a publishing workflow with draft, private, published

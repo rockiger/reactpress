@@ -52,7 +52,7 @@ use Fulcrum\Includes\Deactivator;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('FULC_VERSION', '3.2.0');
+define('FULC_VERSION', '0.1.0');
 define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
 define('FULC_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));

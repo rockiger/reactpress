@@ -246,7 +246,7 @@ class Controller {
           'post_type' => "page",
           // Assign page template using the relative path, it will be
           // resolved to the fully qualified name at run-time
-          'page_template'  => 'templates/react-page-template.php',
+          'page_template'  => 'templates/empty-react-page-template.php',
         )
       );
       return $result

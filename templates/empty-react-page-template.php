@@ -112,6 +112,8 @@ function fulc_write_react_app_into_template() {
     // Variables for app use
     $current_user = wp_get_current_user();
     unset($current_user->user_pass); // Don't show encypted password for security reasons.
+
+    $graphql_settings = get_option('graphql_general_settings');
     echo '<script> 
             var reactPress = ' . wp_json_encode(
       [
