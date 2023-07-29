@@ -21,8 +21,8 @@ Update Readme's /
 Add versions /
 Change release script
 Make plugin /
-Test plugin
-Submit plugin
+Test plugin /
+Submit plugin /
 
 set page to private.
 

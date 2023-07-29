@@ -15,13 +15,12 @@
  * @wordpress-plugin
  * Plugin Name:       Fulcrum
  * Plugin URI:        https://rockiger.com/en/reactpress
- * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
+ * Description:       Capture knowledge. Find information faster. Share your ideas with others. Save projects, meeting notes and marketing plans right in your WordPress installation.
  * Version:           3.2.0
  * Author:            Rockiger
- * Author URI:        https://rockiger.com/en/reactpress
+ * Author URI:        https://rockiger.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * GitHub Plugin URI: https://github.com/rockiger/reactpress/
  * Text Domain:       reactpress
  * Domain Path:       /languages
  */
