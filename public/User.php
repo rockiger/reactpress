@@ -255,7 +255,7 @@ class User {
 				'api' => [
 					'nonce' => wp_create_nonce('wp_rest'),
 					'rest_url' => esc_url_raw(rest_url()),
-
+					'graphql_url' => esc_url_raw(site_url(get_option('graphql_general_settings', ["graphql_endpoint" => 'graphql'])['graphql_endpoint'])),
 				],
 				'post' => $post,
 				'user' => $current_user,
