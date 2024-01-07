@@ -252,7 +252,7 @@ class Controller {
         $result = wp_update_post(
           [
             'ID' => $page->ID,
-            'post_content' => $page->post_content . '\n' . REPR_REACT_ROOT_TAG
+            'post_content' => $page->post_content . "\n\n" . REPR_REACT_ROOT_TAG
           ]
         );
         return $result
