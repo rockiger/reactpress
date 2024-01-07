@@ -292,7 +292,7 @@ class Admin {
 			$result = wp_update_post(
 				array(
 					'ID' => $get_data->ID,
-					'post_content' => $get_data->post_content . "\n" . REPR_REACT_ROOT_TAG,
+					'post_content' => $get_data->post_content . "\n\n" . REPR_REACT_ROOT_TAG,
 					'post_name' => $newSlug,
 				)
 			);
