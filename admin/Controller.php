@@ -331,8 +331,7 @@ class Controller {
   }
 }
 
-define('DEFAULT_OVERVIEW_CONTENT', $str = <<<EOD
-<h2>Welcome to your wiki</h2>
+define('DEFAULT_OVERVIEW_CONTENT', $str = '<h2>Welcome to your wiki</h2>
 This is <strong>your </strong><a target="_blank" rel="noopener noreferrer nofollow" href="https://en.wikipedia.org/wiki/Wiki">wiki</a>, where you can do whatever you want.
 
 You can use it to:
@@ -484,5 +483,4 @@ If you know markdown you can use it as a shortcut to structure your content. You
  	<li>* bullet point</li>
 </ul>
 &gt; quote+-9*
-+
-EOD);
++');

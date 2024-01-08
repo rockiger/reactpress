@@ -15,6 +15,8 @@ rm -r /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/node_modules
 # rm -r /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/src
 # rm -r /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/public
 rm -rf /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/.git
+rm /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/public/index.html
+rm /tmp/fulcrum-svn/tags/$version/admin/js/reactpress-admin/postbuild.sh
 #//! repeat wiki-app
 #//...
 # rm /tmp/fulcrum-svn/tags/$version/apps/wp-wiki/*
