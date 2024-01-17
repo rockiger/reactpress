@@ -160,9 +160,6 @@ class Core {
 
 		// Check if current current version of plugin is saved in db
 		$this->loader->add_action('admin_init', $plugin_admin, 'check_plugin_version');
-
-		// Check plugin dependencies
-		$this->loader->add_action('tgmpa_register', $plugin_admin, 'fulc_register_required_plugins');
 	}
 
 
@@ -189,8 +186,8 @@ class Core {
 		// Add custom content type for Fulcrum
 		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_cpts');
 		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_taxes');
-		$this->loader->add_action('init', $plugin_public, 'register_graphql_fulcrum_page');
-		$this->loader->add_action('init', $plugin_public, 'register_graphql_update_fulcrum_page_meta');
+		$this->loader->add_action('rest_api_init', $plugin_public, 'create_api_wikipage_meta_field');
+		$this->loader->add_action('rest_insert_wikipage', $plugin_public, 'wikipage_meta_update', 10, 3);
 	}
 
 	/**

@@ -113,14 +113,12 @@ function fulc_write_react_app_into_template() {
     $current_user = wp_get_current_user();
     unset($current_user->user_pass); // Don't show encypted password for security reasons.
 
-    $graphql_settings = get_option('graphql_general_settings');
     echo '<script> 
             var reactPress = ' . wp_json_encode(
       [
         'api' => [
           'nonce' => wp_create_nonce('wp_rest'),
           'rest_url' => esc_url_raw(rest_url()),
-          'graphql_url' => esc_url_raw(site_url(get_option('graphql_general_settings', ["graphql_endpoint" => 'graphql'])['graphql_endpoint'])),
         ],
         'user' => $current_user,
         'usermeta' => get_user_meta(

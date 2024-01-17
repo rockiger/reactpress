@@ -47,24 +47,24 @@ class Controller {
     $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
 
     //# Check if the default space and the default page should be created
-    $terms = get_terms('fulcrum_space');
+    $terms = get_terms('fulcrum-spaces');
     $posts = get_posts([
-      'post_type' => 'fulcrum_page',
+      'post_type' => 'fulcrum-page',
       'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash']
     ]);
 
     fulc_log(['before fulcrum check' => 'before fulcrum check', 'terms' => count($terms), 'posts' => count($posts), 'cond' => !count($terms) && count($posts)]);
     if (!count($terms) && !count($posts)) {
       fulc_log('inside fulcrum check');
-      $default_term = wp_create_term('Default', 'fulcrum_space');
+      $default_term = wp_create_term('Default', 'fulcrum-spaces');
       fulc_log(['$default_term' => $default_term]);
       wp_insert_post([
         'post_title' => 'Overview',
-        'post_type' => 'fulcrum_page',
+        'post_type' => 'fulcrum-page',
         'post_status' => 'publish',
         'post_content' => DEFAULT_OVERVIEW_CONTENT,
         'tax_input'    => [
-          'fulcrum_space' => [$default_term['term_id']],
+          'fulcrum-spaces' => [$default_term['term_id']],
         ],
         'meta_input'   => [
           'isOverview' => true,

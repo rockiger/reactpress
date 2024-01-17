@@ -52,6 +52,4 @@ Don\'t waste your time searching. Find what you are looking for with a powerful 
 1. Go to the WordPress Dashboard “Add New Plugin” section.
 2. Search For “Fulcrum Wiki”.
 3. Install, then Activate it.
-4. Install the dependencies (WPGraphQL, WPGraphQL Tax Query and LH Private Content Login).
-5. Go to the Fulcrum-Menu, decide on which page to add you wiki.
-6. Optionally make your wiki private with LH Private Content Login.
+4. Go to the Fulcrum-Menu, decide on which page to add you wiki.

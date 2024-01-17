@@ -22,7 +22,11 @@ Add versions /
 Change release script
 Make plugin /
 Test plugin /
-Submit plugin /
+Remove Graphql /
+
+Use react-query to reduce calls to API
+Use NextUI to make app prettier
+Submit plugin
 
 set page to private.
 
