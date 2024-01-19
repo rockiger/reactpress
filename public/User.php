@@ -433,7 +433,12 @@ class User {
 		register_taxonomy("wikispace", ["wikipage"], $args);
 	}
 
-	public function create_api_wikipage_meta_field() {
+	/**
+	 * Registers meta fields and REST fields for the 'wikipage' post type.
+	 *
+	 * @return void
+	 */
+	public function alter_wikipage_endpoint_response() {
 
 		register_meta(
 			'wikipage',
@@ -450,12 +455,8 @@ class User {
 			'wikipage',
 			'isOverview',
 			array(
-				'get_callback'    => function ($object) {
-					//get the id of the post object array
-					$post_id = $object['id'];
-
-					//return the post meta
-					return get_post_meta($post_id, 'isOverview', true) ? true : false;
+				'get_callback'    => function ($wikipage) {
+					return get_post_meta($wikipage['id'], 'isOverview', true) ? true : false;
 				},
 				'schema'          => null,
 			)
@@ -464,12 +465,8 @@ class User {
 			'wikipage',
 			'width',
 			array(
-				'get_callback'    => function ($object) {
-					//get the id of the post object array
-					$post_id = $object['id'];
-
-					//return the post meta
-					$width = get_post_meta($post_id, 'width', true);
+				'get_callback'    => function ($wikipage) {
+					$width = get_post_meta($wikipage['id'], 'width', true);
 					return  $width ? $width : 'standard';
 				},
 				'schema'          => null,
@@ -479,13 +476,21 @@ class User {
 			'wikipage',
 			'wikispace',
 			array(
-				'get_callback'    => function ($object) {
-					//get the id of the post object array
-					$post_id = $object['id'];
+				'get_callback'    => function ($wikipage) {
+					return ['id' => $wikipage['wikispaces'][0] ?? 0, 'name' => get_term($wikipage['wikispaces'][0] ?? 0)->name ?? ''];
+				},
+				'schema'          => null,
+			)
+		);
 
-					//return the post meta
-					//return get the name of the 
-					return ['id' => $object['wikispaces'][0] ?? 0, 'name' => get_term($object['wikispaces'][0] ?? 0)->name ?? ''];
+
+		register_rest_field(
+			'wikipage',
+			'author',
+			array(
+				'get_callback'    => function ($wikipage) {
+					$author_name = get_the_author_meta('display_name', $wikipage['author']);
+					return ['id' => $wikipage['author'], 'name' => $author_name];
 				},
 				'schema'          => null,
 			)

@@ -24,7 +24,8 @@ Make plugin /
 Test plugin /
 Remove Graphql /
 
-Use react-query to reduce calls to API
+Use react-query to reduce calls to API /
+Add Author with name and ID to Endpoint /
 Use NextUI to make app prettier
 Submit plugin
 
