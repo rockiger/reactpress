@@ -2,6 +2,7 @@
 parameters:
   excludePaths:
     - 'vendor/*'
+    - '**/node_modules/*'
   ignoreErrors:
     - '#Function [a-zA-Z0-9\\_]+\(\) has no return type specified.#'
     - '#Method [a-zA-Z0-9\\_:]+\(\) has no return type specified.#'

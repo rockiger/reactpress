@@ -26,18 +26,18 @@ Remove Graphql /
 
 Use react-query to reduce calls to API /
 Add Author with name and ID to Endpoint /
-Use NextUI to make app prettier
-Submit plugin
+Use NextUI to make app prettier /
+Make api only usable for registered users. /
 
-set page to private.
+Submit plugin
 
 ---
 
 Ideas for ReactPress
 Create plugin mode to remove unnecessary features
 
-Known Issues:
-When opening the disclosure the link activated => can't stop event propagation on Disclosure button, move to radix
-
 New Stories:
+Make content types only available for logged-in users.
 Create a publishing workflow with draft, private, published
+
+---

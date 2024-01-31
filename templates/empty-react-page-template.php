@@ -1,5 +1,7 @@
 <?php /* Template Name: EmptyReactPageTemplate */
 
+if (!defined('ABSPATH')) exit; // Exit if accessed directly    
+
 use Fulcrum\Admin\Utils;
 
 ?>
@@ -19,7 +21,6 @@ function fulc_write_react_app_into_template() {
   $pageIds = $fulc_apps ? array_map(fn ($el) => $el['pageIds'], $fulc_apps) : [];
 
   $valid_pages = array_merge(...$pageIds);
-  $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
   if (is_page() && in_array($post->ID, $valid_pages)) {
     $suitable_apps = array_values(array_filter($fulc_apps, fn ($el) => in_array($post->ID, $el['pageIds'])));
     foreach ($suitable_apps as $current_app) {
@@ -118,7 +119,7 @@ function fulc_write_react_app_into_template() {
       [
         'api' => [
           'nonce' => wp_create_nonce('wp_rest'),
-          'rest_url' => esc_url_raw(rest_url()),
+          'rest_url' => rest_url(),
         ],
         'user' => $current_user,
         'usermeta' => get_user_meta(
@@ -142,9 +143,9 @@ function fulc_write_react_app_into_template() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
-  <link rel="apple-touch-icon" href="<?php echo wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0] ?? '/favicon.ico'; ?>" />
-  <link rel="manifest" href="/<?php echo $post->post_name; ?>/manifest.json" />
-  <title><?php echo $post->post_title; ?></title>
+  <link rel="apple-touch-icon" href="<?php echo esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]) ?? '/favicon.ico'; ?>" />
+  <link rel="manifest" href="/<?php echo esc_html($post->post_name); ?>/manifest.json" />
+  <title><?php echo esc_html($post->post_title); ?></title>
 
   <?php fulc_write_react_app_into_template() ?>
 </head>

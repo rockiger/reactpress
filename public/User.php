@@ -25,8 +25,6 @@ namespace Fulcrum\User;
 
 use Fulcrum\Admin\Utils;
 
-use function Fulcrum\Admin\fulc_log;
-
 class User {
 
 	/**
@@ -206,7 +204,7 @@ class User {
 					try {
 						$request = file_get_contents($manifest_path);
 					} catch (\Exception $e) {
-						fulc_log($e->getMessage());
+						fulc_debug($e->getMessage());
 					}
 					// remove error handler again.
 					restore_error_handler();
@@ -251,7 +249,7 @@ class User {
 			// Variables for app use
 			$current_user = wp_get_current_user();
 			unset($current_user->user_pass); // Don't show encypted password for security reasons.
-			wp_localize_script('rp-react-app-asset-0-0', 'fulcrum', array(
+			wp_localize_script('rp-react-app-asset-0-0', 'reactPress', array(
 				'api' => [
 					'nonce' => wp_create_nonce('wp_rest'),
 					'rest_url' => esc_url_raw(rest_url()),
@@ -358,7 +356,7 @@ class User {
 			"show_in_nav_menus" => true,
 			"delete_with_user" => false,
 			"exclude_from_search" => false,
-			"capability_type" => "post",
+			"capability_type" => "wikipage", // "wikipage"
 			"map_meta_cap" => true,
 			"hierarchical" => true,
 			"can_export" => true,
@@ -428,9 +426,63 @@ class User {
 			"show_in_quick_edit" => true,
 			"sort" => true,
 			"show_in_graphql" => false,
-			"default_term" => ['name' => 'Default'],
+			// "default_term" => ['name' => 'Default'], collides with add term
+			'capabilities' => array(
+				'manage_terms' => 'manage_wikispace',
+				'edit_terms' => 'edit_wikispace',
+				'delete_terms' => 'delete_wikispace',
+				'assign_terms' => 'assign_wikispace',
+			),
 		];
 		register_taxonomy("wikispace", ["wikipage"], $args);
+	}
+
+	function add_custom_capabilities() {
+		// Administrator
+		$admin = get_role('administrator');
+		$admin->add_cap('read_wikipage');
+		$admin->add_cap('edit_wikipage');
+		$admin->add_cap('delete_wikipage');
+		$admin->add_cap('edit_wikipages');
+		$admin->add_cap('edit_others_wikipages');
+		$admin->add_cap('delete_wikipages');
+		$admin->add_cap('publish_wikipages');
+		$admin->add_cap('read_private_wikipages');
+		$admin->add_cap('read');
+		$admin->add_cap('delete_private_wikipages');
+		$admin->add_cap('delete_published_wikipages');
+		$admin->add_cap('delete_others_wikipages');
+		$admin->add_cap('edit_private_wikipages');
+		$admin->add_cap('edit_published_wikipages');
+		$admin->add_cap('edit_wikipages');
+
+		$admin->add_cap('manage_wikispace');
+		$admin->add_cap('edit_wikispace');
+		$admin->add_cap('delete_wikispace');
+		$admin->add_cap('assign_wikispace');
+
+		// Editor
+		$editor = get_role('editor');
+		$editor->add_cap('read_wikipage');
+		$editor->add_cap('edit_wikipage');
+		$editor->add_cap('delete_wikipage');
+		$editor->add_cap('edit_wikipages');
+		$editor->add_cap('edit_others_wikipages');
+		$editor->add_cap('delete_wikipages');
+		$editor->add_cap('publish_wikipages');
+		$editor->add_cap('read_private_wikipages');
+		$editor->add_cap('read');
+		$editor->add_cap('delete_private_wikipages');
+		$editor->add_cap('delete_published_wikipages');
+		$editor->add_cap('delete_others_wikipages');
+		$editor->add_cap('edit_private_wikipages');
+		$editor->add_cap('edit_published_wikipages');
+		$editor->add_cap('edit_wikipages');
+
+		$editor->add_cap('manage_wikispace');
+		$editor->add_cap('edit_wikispace');
+		$editor->add_cap('delete_wikispace');
+		$editor->add_cap('assign_wikispace');
 	}
 
 	/**

@@ -186,6 +186,7 @@ class Core {
 		// Add custom content type for Fulcrum
 		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_cpts');
 		$this->loader->add_action('init', $plugin_public, 'cptui_register_my_taxes');
+		$this->loader->add_action('init', $plugin_public, 'add_custom_capabilities');
 		$this->loader->add_action('rest_api_init', $plugin_public, 'alter_wikipage_endpoint_response');
 		$this->loader->add_action('rest_insert_wikipage', $plugin_public, 'wikipage_meta_update', 10, 3);
 	}

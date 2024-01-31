@@ -4,13 +4,14 @@ Tags: wiki, knowledge management, confluence, intranet, react, single page appli
 Requires at least: 5.0
 Tested up to: 6.4.2
 Requires PHP: 7.4
-Stable tag: 3.2.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Capture knowledge. Find information faster. Share your ideas with others. Save projects, meeting notes and marketing plans right in your WordPress installation.
 
 == Description ==
+
 === Your knowledge management should make you look smart. Like an assistant that always has your back. ===
 
 Have you felt frustrated by your note-taking app?
@@ -18,7 +19,7 @@ Have you felt frustrated by your note-taking app?
 * Did you endlessly look for a note you have written?
 * Created time-consuming documents nobody looked at again?
 * Never came back to that great idea you wrote down?
-* Were you anxios for not hosting your notes on your own servers?
+* Were you anxious for not hosting your notes on your own servers?
 
 === Manage your knowledge. Have your records always ready. ===
 

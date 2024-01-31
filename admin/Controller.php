@@ -21,6 +21,7 @@ class Controller {
   // # Controller functions 
 
   public static function add_page(string $appname, int $pageId, string $page_title) {
+    fulc_log('add_page');
     $app_options = Utils::get_app_options($appname);
     $apptype = Utils::get_app_type($appname);
     //# Check if the app allows adding of more URL slugs
@@ -32,6 +33,7 @@ class Controller {
       return;
     }
 
+
     // add slug to existing app_options
     $inserted_page = Controller::insert_page($pageId, $page_title);
     fulc_log(['$inserted_page' => $inserted_page]);
@@ -42,29 +44,32 @@ class Controller {
       ]);
       return;
     }
+
     $permalink = get_permalink($inserted_page['ID']);
     $permalink = $permalink ? $permalink : '';
     $app_options ? Utils::add_pageId_to_app_options($appname, $inserted_page['ID']) : Utils::add_app_options($appname, $inserted_page['ID']);
 
     //# Check if the default space and the default page should be created
-    $terms = get_terms('fulcrum-spaces');
+    $terms = get_terms('wikispace');
     $posts = get_posts([
-      'post_type' => 'fulcrum-page',
+      'post_type' => 'wikipage',
       'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash']
     ]);
+
+    fulc_log(['add_page' => 'add_page', 'terms' => $terms, 'posts' => $posts]);
 
     fulc_log(['before fulcrum check' => 'before fulcrum check', 'terms' => count($terms), 'posts' => count($posts), 'cond' => !count($terms) && count($posts)]);
     if (!count($terms) && !count($posts)) {
       fulc_log('inside fulcrum check');
-      $default_term = wp_create_term('Default', 'fulcrum-spaces');
+      $default_term = wp_create_term('Default', 'wikispace');
       fulc_log(['$default_term' => $default_term]);
       wp_insert_post([
         'post_title' => 'Overview',
-        'post_type' => 'fulcrum-page',
+        'post_type' => 'wikipage',
         'post_status' => 'publish',
-        'post_content' => DEFAULT_OVERVIEW_CONTENT,
+        'post_content' => FULC_DEFAULT_OVERVIEW_CONTENT,
         'tax_input'    => [
-          'fulcrum-spaces' => [$default_term['term_id']],
+          'wikispace' => [$default_term['term_id']],
         ],
         'meta_input'   => [
           'isOverview' => true,
@@ -187,7 +192,7 @@ class Controller {
         // add the base path that images are correctly loaded
         file_put_contents(
           $path_package_json,
-          str_replace("react-scripts build", IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
+          str_replace("react-scripts build", FULC_IS_WINDOWS ? "set PUBLIC_URL={$homepage}&&react-scripts build" : "PUBLIC_URL={$homepage} react-scripts build", $package_json_contents)
         );
         return 2;
       }
@@ -262,7 +267,7 @@ class Controller {
         $result = wp_update_post(
           [
             'ID' => $page->ID,
-            'post_content' => $page->post_content . "\n\n" . REPR_REACT_ROOT_TAG
+            'post_content' => $page->post_content . "\n\n" . FULC_REACT_ROOT_TAG
           ]
         );
         return $result
@@ -331,7 +336,7 @@ class Controller {
   }
 }
 
-define('DEFAULT_OVERVIEW_CONTENT', $str = '<h2>Welcome to your wiki</h2>
+define('FULC_DEFAULT_OVERVIEW_CONTENT', $str = '<h2>Welcome to your wiki</h2>
 This is <strong>your </strong><a target="_blank" rel="noopener noreferrer nofollow" href="https://en.wikipedia.org/wiki/Wiki">wiki</a>, where you can do whatever you want.
 
 You can use it to:

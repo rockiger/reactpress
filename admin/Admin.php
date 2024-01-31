@@ -142,6 +142,9 @@ class Admin {
 				wp_enqueue_script('react-plugin-' . $index, $react_app_build . $js_file, array('jquery'), '1', true);
 			}
 		}
+
+
+		fulc_log(['fulc_version' => FULC_VERSION, 'is_windows' => FULC_IS_WINDOWS, 'fulc_plugin_url' => FULC_PLUGIN_URL, 'fulc_plugin_path' => FULC_PLUGIN_PATH, 'fulc_apps_path' => FULC_APPS_PATH, 'fulc_apps_url' => FULC_APPS_URL]);
 	}
 
 	/**
@@ -213,9 +216,9 @@ class Admin {
 		 * @since 1.0.0
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$pageId = intval($_POST['pageId'] ?? '');
-		$page_title = $_POST['page_title'] ?? '';
-		$permalink = $_POST['permalink'] ?? '';
+		$pageId = intval(sanitize_key($_POST['pageId'] ?? ''));
+		$page_title = sanitize_title($_POST['page_title'] ?? '');
+		$permalink = sanitize_url($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 
 		try {
@@ -292,7 +295,7 @@ class Admin {
 			$result = wp_update_post(
 				array(
 					'ID' => $get_data->ID,
-					'post_content' => $get_data->post_content . "\n\n" . REPR_REACT_ROOT_TAG,
+					'post_content' => $get_data->post_content . "\n\n" . FULC_REACT_ROOT_TAG,
 					'post_name' => $newSlug,
 				)
 			);
@@ -329,23 +332,6 @@ function fulc_delete_directory(string $dirname): bool {
 	}
 	closedir($dir_handle);
 	return rmdir($dirname);
-}
-
-/**
- * Write error to a log file named debug.log in wp-content.
- * 
- * @param mixed $log The thing you want to log.
- * @since 1.0.0
- */
-function fulc_log($log) {
-	if (true === WP_DEBUG) {
-		if (is_array($log) || is_object($log)) {
-			error_log(print_r($log, true));
-		} else {
-			error_log($log);
-		}
-	}
-	return $log;
 }
 
 
