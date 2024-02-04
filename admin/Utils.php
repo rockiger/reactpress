@@ -49,7 +49,7 @@ class Utils {
    */
   public static function app_path(string $appname, $relative_to_home_path = false): string {
     $apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
-    $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
+    $document_root = rtrim(ABSPATH,  '/') ?? '';
     if ($relative_to_home_path) {
       return explode($document_root, $apppath)[1];
     } else {
