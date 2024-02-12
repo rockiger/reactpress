@@ -212,7 +212,7 @@ class Controller {
       $readded_contents = str_replace(
         '<div id="root"></div>',
         "<div id=\"root\"></div><script type=\"module\" src=\"/src/main.{$file_ending}\"></script>",
-        $readded_contents
+        $filtered_contents
       );
     }
 
