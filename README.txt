@@ -4,7 +4,7 @@ Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
 Tested up to: 6.2
 Requires PHP: 7.4
-Stable tag: 3.2.0
+Stable tag: 3.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,11 @@ Upgrades should be smoothless.
 4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 3.2.1 =
+
+* Removing extra script tag when using vite - thanks to @dylanlawrence
+* Using ABSPATH for the document root
 
 = 3.2.0 =
 

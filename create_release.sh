@@ -1,4 +1,4 @@
-version='x.x.x'
+version='3.2.1'
  
 # We don't want a ton of dev dependencies in our release.
 composer install --no-dev --optimize-autoloader
