@@ -53,4 +53,35 @@ Don\'t waste your time searching. Find what you are looking for with a powerful 
 1. Go to the WordPress Dashboard “Add New Plugin” section.
 2. Search For “Fulcrum Wiki”.
 3. Install, then Activate it.
-4. Go to the Fulcrum-Menu, decide on which page to add you wiki.
+4. Go to the Fulcrum-Menu, decide on which page to add your wiki.
+
+=== Third-Party JavaScript Library ===
+
+This plugin makes extensive use of third-party open-source JavaScript libraries. To reduce download size this libraries are only included in minified form. Both the admin-interface and the frontend page are React single page applications. All libraries are available at https://www.npmjs.com/.
+
+The whole list of libraries used in the admin interface can be found in it's `package.json` file (see `admin/js/reactpress-admin/package.json` for more detailed information).
+
+Respectively, the whole list of libraries used in the frontend can be found in it's `package.json` file  (see `apps/wiki/package.json` for more detailed information).
+
+The sources of this plugin are seperated into two plugins:
+
+- The plugin itself including the admin-interface: [https://github.com/rockiger/reactpress/tree/fulcrum-plugin](https://github.com/rockiger/reactpress/tree/fulcrum-plugin)
+- The wiki single page application: [https://github.com/rockiger/wp-wiki](https://github.com/rockiger/wp-wiki)
+
+==== Build instructions ====
+
+To build this plugin yourself, you need to have [nodejs](https://nodejs.org/en), [composer](https://getcomposer.org/) and [git](https://git-scm.com/) installed. The build instructions are as follows:
+
+`
+git clone https://github.com/rockiger/reactpress/ fulcrum
+cd fulcrum
+git checkout fulcrum-plugin
+composer install
+cd admin/js/reactpress-admin
+npm install
+npm build         # npm start, if you want to start the dev server
+cd ../../../apps
+git clone https://github.com/rockiger/wp-wiki
+npm install
+npm build         # npm dev, if you want to start the dev server
+`

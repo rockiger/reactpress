@@ -29,7 +29,7 @@ Add Author with name and ID to Endpoint /
 Use NextUI to make app prettier /
 Make api only usable for registered users. /
 
-Submit plugin
+Submit plugin /
 
 ---
 
@@ -37,7 +37,7 @@ Ideas for ReactPress
 Create plugin mode to remove unnecessary features
 
 New Stories:
-Make content types only available for logged-in users.
+Make content types only available for logged-in users. /
 Create a publishing workflow with draft, private, published
 
 ---

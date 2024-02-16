@@ -524,6 +524,17 @@ class User {
 				'schema'          => null,
 			)
 		);
+
+		register_rest_field(
+			'wikipage',
+			'raw_title',
+			array(
+				'get_callback'    => function ($wikipage) {
+					return $wikipage;
+				},
+				'schema'          => null,
+			)
+		);
 		register_rest_field(
 			'wikipage',
 			'wikispace',
