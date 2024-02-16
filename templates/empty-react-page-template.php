@@ -24,8 +24,6 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
   <link rel="manifest" href="/<?php echo esc_html($post->post_name); ?>/manifest.json" />
   <?php wp_head() ?>
-  ?>
-
 
 </head>
 
