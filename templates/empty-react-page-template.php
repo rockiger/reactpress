@@ -8,6 +8,10 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 <head>
   <style>
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji" !important;
+    }
+
     #wpadminbar {
       display: none !important;
     }
@@ -20,7 +24,6 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
   <link rel="manifest" href="/<?php echo esc_html($post->post_name); ?>/manifest.json" />
   <?php wp_head() ?>
-  <?php // fulc_write_react_app_into_template() 
   ?>
 
 
