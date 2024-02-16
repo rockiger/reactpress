@@ -2,7 +2,7 @@
 Contributors: rockiger
 Tags: wiki, knowledge management, confluence, intranet, react, single page application
 Requires at least: 5.0
-Tested up to: 6.4.2
+Tested up to: 6.4.3
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -73,15 +73,17 @@ The sources of this plugin are seperated into two plugins:
 To build this plugin yourself, you need to have [nodejs](https://nodejs.org/en), [composer](https://getcomposer.org/) and [git](https://git-scm.com/) installed. The build instructions are as follows:
 
 `
-git clone https://github.com/rockiger/reactpress/ fulcrum
+git clone https://github.com/rockiger/reactpress.git fulcrum
 cd fulcrum
 git checkout fulcrum-plugin
 composer install
 cd admin/js/reactpress-admin
 npm install
 npm build         # npm start, if you want to start the dev server
-cd ../../../apps
-git clone https://github.com/rockiger/wp-wiki
+cd ../../../
+mkdir apps
+cd apps
+git clone https://github.com/rockiger/wp-wiki.git
 npm install
 npm build         # npm dev, if you want to start the dev server
 `

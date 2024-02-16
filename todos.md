@@ -33,6 +33,7 @@ Submit plugin /
 
 ---
 
+Re-Order js-enques with index, vendor on top and then according to size
 Ideas for ReactPress
 Create plugin mode to remove unnecessary features
 

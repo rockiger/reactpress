@@ -192,8 +192,7 @@ class Admin {
 	 */
 	public function fulc_add_page_template($templates) {
 		// Use relative paths for the templates and then resolve them at runtime.
-		$templates['templates/empty-react-page-template.php'] = __('Fulcrum Canvas', 'text-domain');
-		$templates['templates/react-page-template.php'] = __('Fulcrum Full Width', 'text-domain');
+		$templates['templates/empty-react-page-template.php'] = __('Fulcrum Wiki', 'fulcrum');
 
 		return $templates;
 	}
