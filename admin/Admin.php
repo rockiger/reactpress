@@ -213,9 +213,9 @@ class Admin {
 		 * @since 1.0.0
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$pageId = intval($_POST['pageId'] ?? '');
-		$page_title = $_POST['page_title'] ?? '';
-		$permalink = $_POST['permalink'] ?? '';
+		$pageId = intval(sanitize_key($_POST['pageId'] ?? ''));
+		$page_title = sanitize_title($_POST['page_title'] ?? '');
+		$permalink = sanitize_url($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 
 		try {
@@ -329,23 +329,6 @@ function repr_delete_directory(string $dirname): bool {
 	}
 	closedir($dir_handle);
 	return rmdir($dirname);
-}
-
-/**
- * Write error to a log file named debug.log in wp-content.
- * 
- * @param mixed $log The thing you want to log.
- * @since 1.0.0
- */
-function repr_log($log) {
-	if (true === WP_DEBUG) {
-		if (is_array($log) || is_object($log)) {
-			error_log(print_r($log, true));
-		} else {
-			error_log($log);
-		}
-	}
-	return $log;
 }
 
 

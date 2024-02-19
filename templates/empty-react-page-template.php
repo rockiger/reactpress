@@ -1,5 +1,7 @@
 <?php /* Template Name: EmptyReactPageTemplate */
 
+if (!defined('ABSPATH')) exit; // Exit if accessed directly    
+
 use ReactPress\Admin\Utils;
 
 ?>
@@ -147,6 +149,8 @@ function repr_write_react_app_into_template() {
   <title><?php echo $post->post_title; ?></title>
 
   <?php repr_write_react_app_into_template() ?>
+
+  <?php repr_debug($post) ?>
 </head>
 
 <body>
@@ -163,6 +167,7 @@ function repr_write_react_app_into_template() {
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+  <?php repr_debug($post) ?>
 </body>
 
 </html>

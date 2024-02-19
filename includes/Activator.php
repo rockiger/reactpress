@@ -106,16 +106,21 @@ class Activator {
 	 */
 	public static function get_page_by_slug($page_slug, $post_type = 'page') {
 		global $wpdb;
+		$page = null;
 
 		if (is_array($post_type)) {
 			$post_type = esc_sql($post_type);
-			$post_type_in_string = "'" . implode("','", $post_type) . "'";
+			// This constriuct is needed to secure against SQL injections
+			// SQL "IN" keyword
+			$post_type_placeholders = implode(', ', array_fill(0, count($post_type), '%s'));
+			$prepare_values = array_merge([$page_slug], $post_type);
 			$sql = $wpdb->prepare("
 				SELECT ID
 				FROM $wpdb->posts
 				WHERE post_name = %s
-				AND post_type IN ($post_type_in_string)
-			", $page_slug);
+				AND post_type IN ($post_type_placeholders)
+			", $prepare_values);
+			$page = $wpdb->get_var($sql);
 		} else {
 			$sql = $wpdb->prepare("
 				SELECT ID
@@ -123,6 +128,7 @@ class Activator {
 				WHERE post_name = %s
 				AND post_type = %s
 			", $page_slug, $post_type);
+			$page = $wpdb->get_var($sql);
 		}
 
 		$page = $wpdb->get_var($sql);
