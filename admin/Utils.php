@@ -108,7 +108,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $search = "\"react-scripts start\"";
-    $replace = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
+    $replace = REPR_IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } elseif (stripos($package_json_contents, $replace)) {
@@ -141,7 +141,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $replace = "\"react-scripts start\"";
-    $search = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
+    $search = REPR_IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } else {
