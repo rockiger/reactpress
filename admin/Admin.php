@@ -89,7 +89,7 @@ class Admin {
 
 			// We need to load jquery and enable wp_localize_script.
 			// Please don't ask me why!
-			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
+			wp_enqueue_script($this->plugin_name, REPR_PLUGIN_URL . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
@@ -100,6 +100,7 @@ class Admin {
 				],
 				'apps' => Utils::get_apps(),
 				'appspath' => REPR_APPS_PATH,
+				'pluginDirUrl' => REPR_PLUGIN_URL
 			));
 
 			// React app

@@ -1,11 +1,14 @@
 import _ from 'lodash'
 import AddPageInput from './AddPageForm'
 import PageLink from './PageLink'
+import type { RP } from '../App'
 
-import cra from './cra.svg'
-import empty from './empty.svg'
-import orphan from './orphan.svg'
-import vite from './vite.svg'
+declare var rp: RP
+
+const cra = `${rp.pluginDirUrl}admin/js/reactpress-admin/build/cra.svg`
+const empty = `${rp.pluginDirUrl}admin/js/reactpress-admin/build/empty.svg`
+const orphan = `${rp.pluginDirUrl}admin/js/reactpress-admin/build/orphan.svg`
+const vite = `${rp.pluginDirUrl}admin/js/reactpress-admin/build/vite.svg`
 
 export interface Page {
   ID: number
