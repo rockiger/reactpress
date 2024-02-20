@@ -179,11 +179,11 @@ class User {
 						return false;
 					}
 					// We use array_values to reindex the array (because PHP)
-					$js_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_values(array_filter(
+					$js_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_values(array_filter(
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
 					)));
-					$css_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_filter(
+					$css_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_filter(
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
 					));
