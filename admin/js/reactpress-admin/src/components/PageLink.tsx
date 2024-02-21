@@ -1,4 +1,6 @@
 import type { Page, AppCardProps, AppDetails } from './AppCard'
+import type { RP } from '../App'
+declare var rp: RP
 
 export default function PageLink({
   app,
@@ -17,7 +19,7 @@ export default function PageLink({
       <strong>
         <a
           className="row-title"
-          href={`/wp-admin/post.php?post=${page.ID}&action=edit`}
+          href={`${rp.adminurl}post.php?post=${page.ID}&action=edit`}
           aria-label={`“${page.title}” (Edit)`}
         >
           {page.title}
@@ -26,7 +28,7 @@ export default function PageLink({
       <div className="fg-grey-light font-size-sm hide p0">
         <span className="edit">
           <a
-            href={`/wp-admin/post.php?post=${page.ID}&action=edit`}
+            href={`${rp.adminurl}post.php?post=${page.ID}&action=edit`}
             aria-label={`Edit “${page.title}”`}
           >
             Edit

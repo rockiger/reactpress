@@ -7,6 +7,7 @@ import type { AppDetails, Page } from './components/AppCard'
 
 export interface RP {
   ajaxurl: string
+  adminurl?: string
   api: {
     nonce: string
     rest_url: string
