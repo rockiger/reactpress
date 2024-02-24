@@ -89,10 +89,11 @@ class Admin {
 
 			// We need to load jquery and enable wp_localize_script.
 			// Please don't ask me why!
-			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
+			wp_enqueue_script($this->plugin_name, REPR_PLUGIN_URL . 'js/reactpress-admin.js', array('jquery'), $this->version, false);
 
 			wp_localize_script($this->plugin_name, "rp", array(
 				'ajaxurl' => admin_url('admin-ajax.php'),
+				'adminurl' => admin_url(),
 				'api' => [
 					'nonce' => wp_create_nonce('wp_rest'),
 					'rest_url' => esc_url_raw(rest_url()),
@@ -100,6 +101,7 @@ class Admin {
 				],
 				'apps' => Utils::get_apps(),
 				'appspath' => REPR_APPS_PATH,
+				'pluginDirUrl' => REPR_PLUGIN_URL
 			));
 
 			// React app
@@ -213,9 +215,9 @@ class Admin {
 		 * @since 1.0.0
 		 */
 		$appname = strtolower(sanitize_file_name($_POST['appname'] ?? ''));
-		$pageId = intval($_POST['pageId'] ?? '');
-		$page_title = $_POST['page_title'] ?? '';
-		$permalink = $_POST['permalink'] ?? '';
+		$pageId = intval(sanitize_key($_POST['pageId'] ?? ''));
+		$page_title = sanitize_title($_POST['page_title'] ?? '');
+		$permalink = sanitize_url($_POST['permalink'] ?? '');
 		$param = sanitize_file_name($_REQUEST['param'] ?? "");
 
 		try {
@@ -329,23 +331,6 @@ function repr_delete_directory(string $dirname): bool {
 	}
 	closedir($dir_handle);
 	return rmdir($dirname);
-}
-
-/**
- * Write error to a log file named debug.log in wp-content.
- * 
- * @param mixed $log The thing you want to log.
- * @since 1.0.0
- */
-function repr_log($log) {
-	if (true === WP_DEBUG) {
-		if (is_array($log) || is_object($log)) {
-			error_log(print_r($log, true));
-		} else {
-			error_log($log);
-		}
-	}
-	return $log;
 }
 
 

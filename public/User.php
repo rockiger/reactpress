@@ -156,7 +156,7 @@ class User {
 
 	function repr_load_react_app() {
 		// Only load react app scripts on pages that contain our apps
-		global $post;
+		global $post, $wp_scripts, $wp_styles;
 		$repr_apps = Utils::get_apps();
 		$pageIds = $repr_apps ? array_map(fn ($el) => $el['pageIds'], $repr_apps) : [];
 
@@ -179,11 +179,11 @@ class User {
 						return false;
 					}
 					// We use array_values to reindex the array (because PHP)
-					$js_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_values(array_filter(
+					$js_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_values(array_filter(
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
 					)));
-					$css_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_filter(
+					$css_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_filter(
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
 					));
@@ -236,6 +236,20 @@ class User {
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
 					));
+				}
+
+				// deque styles and scripts
+				if (basename(get_page_template_slug($post)) === 'empty-react-page-template.php') {
+					foreach ($wp_styles->queue as $handle) {
+						if (!(str_starts_with($handle, 'rp-react-app-asset-'))) {
+							wp_dequeue_style($handle);
+						}
+					};
+					foreach ($wp_scripts->queue as $handle) {
+						if (!(str_starts_with($handle, 'rp-react-app-asset-'))) {
+							wp_dequeue_script($handle);
+						}
+					}
 				}
 
 				// Load css files.

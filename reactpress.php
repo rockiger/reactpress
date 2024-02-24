@@ -16,7 +16,7 @@
  * Plugin Name:       ReactPress
  * Plugin URI:        https://rockiger.com/en/reactpress
  * Description:       Easily create, build and deploy React apps into your existing WordPress sites.
- * Version:           3.2.0
+ * Version:           3.2.1
  * Author:            Rockiger
  * Author URI:        https://rockiger.com/en/reactpress
  * License:           GPL-2.0+
@@ -52,13 +52,13 @@ use ReactPress\Includes\Deactivator;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('REPR_VERSION', '3.2.0');
-define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
+define('REPR_VERSION', '3.2.1');
+define('REPR_IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
-define('REPR_PLUGIN_URL', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
-define('REPR_PLUGIN_PATH', IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
+define('REPR_PLUGIN_URL', REPR_IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
+define('REPR_PLUGIN_PATH', REPR_IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
 /** @phpstan-ignore-next-line */
-define('REPR_APPS_PATH', IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
+define('REPR_APPS_PATH', REPR_IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
 define('REPR_APPS_URL', content_url() . '/reactpress/apps');
 
 /**
@@ -95,3 +95,34 @@ function run_reactpress() {
 	$plugin->run();
 }
 run_reactpress();
+
+
+/**
+ * @param ...$data
+ *
+ * @return void
+ */
+function repr_debug($data) {
+	if (WP_DEBUG !== true) return;
+	$json = json_encode($data);
+	add_action('shutdown', function () use ($json) {
+		echo "<script>console.log({$json})</script>";
+	});
+}
+
+/**
+ * Write error to a log file named debug.log in wp-content.
+ * 
+ * @param mixed $log The thing you want to log.
+ * @since 1.0.0
+ */
+function repr_log($log) {
+	if (true === WP_DEBUG) {
+		if (is_array($log) || is_object($log)) {
+			error_log(print_r($log, true));
+		} else {
+			error_log($log);
+		}
+	}
+	return $log;
+}

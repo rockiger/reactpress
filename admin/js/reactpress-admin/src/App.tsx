@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'lodash'
 import WPAPI from 'wpapi'
-import logo from './logo.svg'
 import './App.css'
 import AppCard from './components/AppCard'
 import type { AppDetails, Page } from './components/AppCard'
 
-interface RP {
+export interface RP {
   ajaxurl: string
+  adminurl?: string
   api: {
     nonce: string
     rest_url: string
   }
   apps: AppDetails[]
   appspath: string
+  pluginDirUrl: string
 }
 declare var rp: RP
 declare var jQuery: any
@@ -27,6 +28,8 @@ const wp = new WPAPI(
       }
     : { endpoint: rp.api.rest_url, nonce: rp.api.nonce }
 )
+
+const logo = `${rp.pluginDirUrl}admin/js/reactpress-admin/build/logo.svg`
 
 function App() {
   const [apps, setApps] = useState<RP['apps']>(rp.apps)

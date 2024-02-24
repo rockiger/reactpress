@@ -49,12 +49,24 @@ class Utils {
    */
   public static function app_path(string $appname, $relative_to_home_path = false): string {
     $apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
-    $document_root = rtrim(ABSPATH,  '/') ?? '';
+    $document_root = $_SERVER['DOCUMENT_ROOT'] ?? rtrim(ABSPATH,  '/') ?? '';
+
     if ($relative_to_home_path) {
       return explode($document_root, $apppath)[1];
     } else {
       return $apppath;
     }
+  }
+
+  /**
+   * Creates the url of the app
+   *
+   * @param string $appname
+   * @return string
+   * @since 1.0.0
+   */
+  public static function app_url(string $appname): string {
+    return escapeshellcmd(REPR_APPS_URL . "/{$appname}");
   }
 
   /**
@@ -108,7 +120,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $search = "\"react-scripts start\"";
-    $replace = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
+    $replace = REPR_IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } elseif (stripos($package_json_contents, $replace)) {
@@ -141,7 +153,7 @@ class Utils {
     $path_package_json = "{$apppath}/package.json";
     $package_json_contents = file_get_contents($path_package_json);
     $replace = "\"react-scripts start\"";
-    $search = IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
+    $search = REPR_IS_WINDOWS ? "\"set PUBLIC_URL={$relative_link}&&react-scripts build\"" : "\"PUBLIC_URL=/{$relative_link} react-scripts start\"";
     if (!$package_json_contents) {
       return 0;
     } else {
