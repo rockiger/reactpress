@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 6.2
+Tested up to: 6.4.3
 Requires PHP: 7.4
-Stable tag: 3.2.1
+Stable tag: 3.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,12 @@ Upgrades should be smoothless.
 4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 3.2.2 = 
+
+* Update the React dev environment even if the ReactPress app is on a private page. Thanks to @BlairCooper
+* Improve compatibility with non-standard WordPress configurations like Bedrock. Thanks to @dylanlawrence
+* Improve security
 
 = 3.2.1 =
 
