@@ -18,7 +18,7 @@ use ReactPress\Admin\Utils;
 
 class Controller {
 
-  // # Controller functions 
+  // # Controller functions
 
   public static function add_page(string $appname, int $pageId, string $page_title) {
     $app_options = Utils::get_app_options($appname);
@@ -194,26 +194,29 @@ class Controller {
    * @since 1.0.0
    */
   public static function get_index_html_content(string $permalink, $apptype = 'development_cra', $appname = '') {
-    $file_contents = wp_remote_retrieve_body(
-      wp_remote_get($permalink, ['timeout' => 1000])
-    );
-    $file_contents_arr = explode(PHP_EOL, $file_contents);
-    // filter all build assets out of the file, that they don't conflict
-    // with the dev assets.
-    $filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
-    $filtered_contents =  implode(PHP_EOL, $filtered_arr);
-    // re-add script tag for global reactPress variable
-    $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
+    $resp = wp_remote_get($permalink, ['timeout' => 1000, 'cookies' => $_COOKIE]);
+    $respCode = wp_remote_retrieve_response_code($resp);
 
-    if ($apptype === 'development_vite') {
-      $apppath = Utils::app_path($appname);
-      $file_ending = is_file("{$apppath}/src/main.jsx") ? 'jsx' : 'tsx';
-      // add script tag after root div that link to src/main.tsx
-      $readded_contents = str_replace(
-        '<div id="root"></div>',
-        "<div id=\"root\"></div><script type=\"module\" src=\"/src/main.{$file_ending}\"></script>",
-        $filtered_contents
-      );
+    if (200 == $respCode) {
+      $file_contents = wp_remote_retrieve_body($resp);
+      $file_contents_arr = explode(PHP_EOL, $file_contents);
+      // filter all build assets out of the file, that they don't conflict
+      // with the dev assets.
+      $filtered_arr = array_filter($file_contents_arr, fn ($el) => !strpos($el, "id='rp-react-app-asset-"));
+      $filtered_contents =  implode(PHP_EOL, $filtered_arr);
+      // re-add script tag for global reactPress variable
+      $readded_contents = str_replace('var reactPress', "<script>\nvar reactPress", $filtered_contents);
+
+      if ($apptype === 'development_vite') {
+        $apppath = Utils::app_path($appname);
+        $file_ending = is_file("{$apppath}/src/main.jsx") ? 'jsx' : 'tsx';
+        // add script tag after root div that link to src/main.tsx
+        $readded_contents = str_replace(
+          '<div id="root"></div>',
+          "<div id=\"root\"></div><script type=\"module\" src=\"/src/main.{$file_ending}\"></script>",
+          $filtered_contents
+        );
+      }
     }
 
     return $readded_contents;
