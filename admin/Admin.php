@@ -177,7 +177,7 @@ class Admin {
 			$pageIds = array_map(fn ($el) => $el['pageIds'], $fulc_apps);
 			$valid_pages = array_merge(...$pageIds);
 			if (in_array($post->ID, $valid_pages)) {
-				$states['reactpress'] = __('Fulcrum', 'text-domain');
+				$states['reactpress'] = __('Fulcrum', 'fulcrum');
 			}
 		}
 		return $states;
