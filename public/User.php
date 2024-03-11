@@ -181,6 +181,23 @@ class User {
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
 					)));
+
+					// Sort the js files to make sure the index.js file is loaded first and vendor.js second
+					usort($js_files, function ($a, $b) {
+						if (strpos($a, 'index')) {
+							return -1;
+						}
+						if (strpos($b, 'index')) {
+							return 1;
+						}
+						if (strpos($a, 'vendor')) {
+							return 1;
+						}
+						if (strpos($b, 'vendor')) {
+							return -1;
+						}
+						return 0;
+					});
 					$css_files = array_map(fn ($file_name) => Utils::app_path($appname, true) . '/dist/assets/' . $file_name, array_filter(
 						$assets_files,
 						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
