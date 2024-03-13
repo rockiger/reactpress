@@ -12,30 +12,23 @@ Capture knowledge. Find information faster. Share your ideas with others. Save p
 
 == Description ==
 
-=== Your knowledge management should make you look smart. Like an assistant that always has your back. ===
+**Disclaimer: Fulcrum is still early-stage software. Please don't expect fully finished software. If you have any issues or feature requests, please post them in the support forum.**
 
-Have you felt frustrated by your note-taking app?
-
-* Did you endlessly look for a note you have written?
-* Created time-consuming documents nobody looked at again?
-* Never came back to that great idea you wrote down?
-* Were you anxious for not hosting your notes on your own servers?
-
-=== Manage your knowledge. Have your records always ready. ===
+Fulcrum aims to be a wiki system similar to Confluence or Notion right in your WordPress installation.
 
 ==== Capture Knowledge ====
-Easily create pages with your knowledge. Projects, Meeting notes, marketing plans - everything saved in your WordPress installation.
+Easily create pages with your knowledge. Projects, meeting notes, marketing plans - everything saved in your WordPress installation.
 
 ==== Find information faster ====
-Organize your records like your personal Wikipedia. Link, group and tag your content or use the search to find all your records fast.
+Organize your records like your personal Wikipedia. Link, group and tag your content, or use the search to find all your records fast.
 
 ==== Share Your Work ====
-Did you create some awesome piece of content? Share it with others, that they can enjoy your hard work.
+Did you create some wonderful piece of content? Share it with others, that they can enjoy your hard work.
 
-=== Build great looking wiki pages ===
-Create pages with all content formats you need. Tables, Images, Lists - you name it. Write a new marketing plan, document your workflow for employee onboarding or write a memo for your co-workers.
+=== Build great-looking wiki pages ===
+Create pages with all content formats you need. Tables, Images, Lists - you name it. Write a new marketing plan, document your workflow for employee onboarding, or write a memo for your co-workers.
 
-The best is: Everything stays in your WordPress. Unlike other tools, we don\'t introduce a new SaaS infrastructure to your business. All the content you create is saved in your WordPress. Nothing is saved elsewhere.
+The best is: Everything stays in your WordPress. Unlike other tools, we don't introduce a new SaaS infrastructure to your business. All the content you create is saved in your WordPress. Nothing is saved elsewhere.
 
 ==== Easily find & navigate your work ====
 Always stay on top of your work. Organize your work in different wikis and create sub-pages of your work. Access your most recent and important work instantly.
@@ -48,14 +41,21 @@ Don\'t waste your time searching. Find what you are looking for with a powerful 
 2. Decide on which page to display your wiki
 3. Capture your knowledge
 
-
 == Installation ==
 1. Go to the WordPress Dashboard “Add New Plugin” section.
 2. Search For “Fulcrum Wiki”.
-3. Install, then Activate it.
+3. Install, then activate it.
 4. Go to the Fulcrum-Menu, decide on which page to add your wiki.
 
-=== Third-Party JavaScript Library ===
+== Screenshots ==
+
+1. Screenshot-1.png
+2. Screenshot-2.png
+3. Screenshot-3.png
+4. Screenshot-4.png
+5. Screenshot-5.png
+
+== Third-Party JavaScript Library ==
 
 This plugin makes extensive use of third-party open-source JavaScript libraries. To reduce download size this libraries are only included in minified form. Both the admin-interface and the frontend page are React single page applications. All libraries are available at https://www.npmjs.com/.
 
@@ -63,9 +63,9 @@ The whole list of libraries used in the admin interface can be found in it's `pa
 
 Respectively, the whole list of libraries used in the frontend can be found in it's `package.json` file  (see `apps/wiki/package.json` for more detailed information).
 
-The sources of this plugin are seperated into two plugins:
+The sources of this plugin are separated into two plugins:
 
-- The plugin itself including the admin-interface: [https://github.com/rockiger/reactpress/tree/fulcrum-plugin](https://github.com/rockiger/reactpress/tree/fulcrum-plugin)
+- The plugin itself, including the admin-interface: [https://github.com/rockiger/reactpress/tree/fulcrum-plugin](https://github.com/rockiger/reactpress/tree/fulcrum-plugin)
 - The wiki single page application: [https://github.com/rockiger/wp-wiki](https://github.com/rockiger/wp-wiki)
 
 ==== Build instructions ====
@@ -87,3 +87,8 @@ git clone https://github.com/rockiger/wp-wiki.git
 npm install
 npm build         # npm dev, if you want to start the dev server
 `
+== Changelog ==
+
+= 1.0.0 =
+
+* Initial Release
