@@ -117,45 +117,6 @@ function AppCard({
               </p>
             </td>
           </tr>
-          {app.type?.startsWith('development') && (
-            <>
-              <tr>
-                <th scope="row">Update Dev-Environtment</th>
-                <td>
-                  <button
-                    className="button button-update"
-                    disabled={
-                      _.isEmpty(app.pageIds) ||
-                      _.includes(updatingApps, app.appname)
-                    }
-                    onClick={() =>
-                      updateDevEnvironment(
-                        app.appname,
-                        _.get(_.last(app.pages), 'permalink', '')
-                      )
-                    }
-                  >
-                    Update Dev-Environment
-                  </button>
-                  <span
-                    className={`crpw-button-spinner spinner ${
-                      _.includes(updatingApps, app.appname) ? 'is-active' : ''
-                    }`}
-                  ></span>
-                  {_.includes(updatingApps, app.appname) && (
-                    <p className="fg-orange float-right">
-                      <b>This may take several minutes.</b>
-                    </p>
-                  )}
-                  <p className="description">
-                    Update the <code>index.html</code> of your local react dev
-                    environment, to match the styles of your WordPress
-                    installation.
-                  </p>
-                </td>
-              </tr>
-            </>
-          )}
         </tbody>
       </table>
     </div>
