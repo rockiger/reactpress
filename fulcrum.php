@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Fulcrum
  * Description:       Capture knowledge. Find information faster. Share your ideas with others. Save projects, meeting notes and marketing plans right in your WordPress installation.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Rockiger
  * Author URI:        https://rockiger.com/
  * License:           GPL-2.0+
