@@ -25,7 +25,7 @@ namespace ReactPress\User;
 
 use ReactPress\Admin\Utils;
 
-use function ReactPress\Admin\repr_log;
+use function \repr_log;
 
 class User {
 
@@ -94,7 +94,7 @@ class User {
 	}
 
 	/**
-	 * Add the type="module" attribute to the script tag, for 
+	 * Add the type="module" attribute to the script tag, for
 	 * ReactPress apps, to remove some errors with Vite.
 	 */
 	function add_type_module_to_scripts($tag, $handle, $src) {
@@ -149,7 +149,7 @@ class User {
 	/**
 	 * Load react app files im page should contain a react app.
 	 * (C) Ben Broide https://medium.com/swlh/wordpress-create-react-app-integration-30b41657b79e
-	 * 
+	 *
 	 * @return bool|void
 	 * @since 1.0.0
 	 */
@@ -282,7 +282,7 @@ class User {
 
 	/**
 	 * Add new rewrite rules for every app to make react router usable.
-	 * 
+	 *
 	 * @since 1.4.0
 	 */
 	public function add_repr_apps_rewrite_rules() {

@@ -16,6 +16,8 @@ namespace ReactPress\Admin;
 use LengthException;
 use ReactPress\Admin\Utils;
 
+use function \repr_log;
+
 class Controller {
 
   // # Controller functions
