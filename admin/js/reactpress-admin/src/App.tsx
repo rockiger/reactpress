@@ -277,16 +277,18 @@ function App() {
                 <code>{rp.appspath}</code> in your command line and enter:
               </p>
               <p className="pb1">
-                <code>npx create-react-app [appname]</code>
+                <code>npx create-vite contacts --template react</code>
               </p>
               <p className="pb1">
                 Add a page and start developing your app with{' '}
-                <code>yarn start</code>.
+                <code>cd [appname]</code>
+                <code>npm install</code>
+                <code>npm run dev</code>.
               </p>
               <p className="pb1">
                 To deploy your React app, install ReactPress on your live
-                system, build the app with <code>yarn build</code> and upload
-                only the build folder to{' '}
+                system, build the app with <code>npm run build</code> and upload
+                only the <code>dist</code> folder to{' '}
                 <code>wp-content/reactpress/[appname]</code> on your live
                 system.
               </p>
