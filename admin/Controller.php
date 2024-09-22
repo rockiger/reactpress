@@ -167,7 +167,7 @@ class Controller {
         );
         return 2;
       }
-    } else {
+    } elseif ($apptype === 'development_cra') {
       $homepage = "{$relative_apppath}/build";
       $path_package_json = "{$apppath}/package.json";
       $package_json_contents = file_get_contents($path_package_json);
@@ -317,11 +317,13 @@ class Controller {
    * @since 1.0.0
    */
   public static function write_index_html(string $appname, string $content, $apptype = 'development_cra') {
-    $index_html_path =
-      $apptype === 'development_vite'
-      ? sprintf("%s/%s/index.html", REPR_APPS_PATH, $appname)
-      : sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
-
-    return file_put_contents($index_html_path, $content);
+    if ($apptype === 'development_vite') {
+      $index_html_path = sprintf("%s/%s/index.html", REPR_APPS_PATH, $appname);
+      return file_put_contents($index_html_path, $content);
+    } elseif ($apptype === 'development_cra') {
+      $index_html_path = sprintf("%s/%s/public/index.html", REPR_APPS_PATH, $appname);
+      return file_put_contents($index_html_path, $content);
+    }
+    return true;
   }
 }

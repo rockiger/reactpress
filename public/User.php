@@ -25,8 +25,6 @@ namespace ReactPress\User;
 
 use ReactPress\Admin\Utils;
 
-use function \repr_log;
-
 class User {
 
 	/**
