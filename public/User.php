@@ -92,12 +92,17 @@ class User {
 	}
 
 	/**
-	 * Add the type="module" attribute to the script tag, for 
+	 * Add the type="module" attribute to the script tag, for
 	 * ReactPress apps, to remove some errors with Vite.
 	 */
 	function add_type_module_to_scripts($tag, $handle, $src) {
-		if (str_starts_with($handle, 'rp-react-app-asset')) {
-			$tag = '<script id="' . $handle . '" type="module" src="' . esc_url($src) . '"></script>';
+        if (str_starts_with($handle, 'rp-react-app-asset')) {
+          // Write the first JS as script and the rest (dependents) as modulepreload links
+		  if (str_ends_with($handle, '-0')) {
+            $tag = '<script id="' . $handle . '" type="module" crossorigin src="' . esc_url($src) . '"></script>';
+		  } else {
+            $tag = '<link id="' . $handle . '" rel="modulepreload" crossorigin href="' . esc_url($src) . '">';
+		  }
 		}
 
 		return $tag;
@@ -147,7 +152,7 @@ class User {
 	/**
 	 * Load react app files im page should contain a react app.
 	 * (C) Ben Broide https://medium.com/swlh/wordpress-create-react-app-integration-30b41657b79e
-	 * 
+	 *
 	 * @return bool|void
 	 * @since 1.0.0
 	 */
@@ -171,69 +176,15 @@ class User {
 				$js_files = [];
 				// setting up vite app
 				if ($apptype === 'development_vite' || $apptype === 'deployment_vite') {
-					$react_app_build = REPR_APPS_PATH . '/' . $appname . '/dist/assets';
-					$assets_files = scandir($react_app_build);
-					if (!$assets_files) {
-						return false;
-					}
-					// We use array_values to reindex the array (because PHP)
-					$js_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_values(array_filter(
-						$assets_files,
-						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
-					)));
-					$css_files = array_map(fn ($file_name) => Utils::app_url($appname) . '/dist/assets/' . $file_name, array_filter(
-						$assets_files,
-						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
-					));
+				    [$js_files, $css_files] = $this->setup_vite_application_files($appname);
 				}
-
 				// setting up cra app
 				else {
-					$react_app_build = $plugin_app_dir_url . 'build/';
-					$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
+				    [$js_files, $css_files] = $this->setup_cra_application_files($appname);
+				}
 
-					// Request manifest file.
-					set_error_handler(
-						// Needed to surpress pontential errors in file_get_contents and make try/catch
-						// usable for php errors - which are much older than exceptions.
-						function ($severity, $message, $file, $line) {
-							throw new \ErrorException($message, $severity, $severity, $file, $line);
-						}
-					);
-					$request = false;
-					try {
-						$request = file_get_contents($manifest_path);
-					} catch (\Exception $e) {
-						repr_log($e->getMessage());
-					}
-					// remove error handler again.
-					restore_error_handler();
-
-					// If the remote request fails, return.
-					if (!$request)
-						return false;
-
-					// Convert json to php array.
-					$files_data = json_decode(strval($request));
-					if ($files_data === null)
-						return;
-
-
-					if (!property_exists($files_data, 'entrypoints'))
-						return false;
-
-					// Get assets links.
-					$assets_files = $files_data->entrypoints;
-
-					// We use array_values to reindex the array (because PHP)
-					$js_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_values(array_filter(
-						$assets_files,
-						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
-					)));
-					$css_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_filter(
-						$assets_files,
-						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
-					));
+				if (empty($js_files)) {
+				    return false;
 				}
 
 				// deque styles and scripts
@@ -257,7 +208,7 @@ class User {
 
 				// Load js files.
 				foreach ($js_files as $index => $js_file) {
-					wp_enqueue_script('rp-react-app-asset-' . $app_index . '-' . $index, $js_file, array(), '1', true);
+					wp_enqueue_script('rp-react-app-asset-' . $app_index . '-' . $index, $js_file, array(), '1', false);
 				}
 			}
 			// Variables for app use
@@ -278,9 +229,109 @@ class User {
 		}
 	}
 
-	/**
+	private function setup_vite_application_files(string $appname): array
+	{
+		$js_files = [];
+		$css_files = [];
+
+		$react_app_build = REPR_APPS_PATH . '/' . $appname . '/dist/assets';
+		$assets_files = scandir($react_app_build);
+
+		if ($assets_files) {
+			$appAssetsUrl = Utils::app_url($appname) . '/dist/assets/';
+
+			// Filter down to the js files
+			$js_files = array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+				);
+
+			// Sort files so index*.js is first, followed by the other js files in sorted order
+			usort($js_files, function (string $a, string $b): int {
+				$result = 0;
+
+				if (0 === stripos($a, 'index')) {
+					$result = -1;
+				} elseif (0 === stripos($b, 'index')) {
+					$result = 1;
+				} elseif (0 === strpos($a, '@') && 0 === strpos($b, '@')) {
+					$result = strcmp($a, $b);
+				} elseif (0 === strpos($a, '@')) {
+					return 1;
+				} elseif (0 === strpos($b, '@')) {
+					return -1;
+				} else {
+					$result = strcmp($a, $b);
+				}
+
+				return $result;
+			});
+
+			// We use array_values to reindex the array (because PHP)
+			$js_files = array_map(fn ($file_name) => $appAssetsUrl . $file_name, array_values($js_files));
+
+			$css_files = array_map(fn ($file_name) => $appAssetsUrl . $file_name, array_filter(
+				$assets_files,
+				fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+				));
+		}
+
+		return [$js_files, $css_files];
+	}
+
+	private function setup_cra_application_files(string $appname): array
+	{
+		$js_files = [];
+		$css_files = [];
+
+		$react_app_build = escapeshellcmd(REPR_APPS_URL . "/{$appname}/") . 'build/';
+		$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
+
+		// Request manifest file.
+		set_error_handler(
+			// Needed to surpress pontential errors in file_get_contents and make try/catch
+			// usable for php errors - which are much older than exceptions.
+			function ($severity, $message, $file, $line) {
+				throw new \ErrorException($message, $severity, $severity, $file, $line);
+			}
+			);
+		$request = false;
+		try {
+			$request = file_get_contents($manifest_path);
+		} catch (\Exception $e) {
+			repr_log($e->getMessage());
+		}
+		// remove error handler again.
+		restore_error_handler();
+
+		// If the remote request fails, return.
+		if ($request) {
+			// Convert json to php array.
+			$files_data = json_decode(strval($request));
+			if ($files_data) {
+				if (property_exists($files_data, 'entrypoints')) {
+					// Get assets links.
+					$assets_files = $files_data->entrypoints;
+
+					// We use array_values to reindex the array (because PHP)
+					$js_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_values(array_filter(
+						$assets_files,
+						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'js'
+						)));
+					$css_files = array_map(fn ($file_name) => $react_app_build . $file_name, array_filter(
+						$assets_files,
+						fn ($file_string) => pathinfo($file_string, PATHINFO_EXTENSION) === 'css'
+						));
+				}
+			}
+		}
+
+		return [$js_files, $css_files];
+	}
+
+    /**
 	 * Add new rewrite rules for every app to make react router usable.
-	 * 
+	 *
 	 * @since 1.4.0
 	 */
 	public function add_repr_apps_rewrite_rules() {
