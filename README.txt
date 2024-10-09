@@ -2,9 +2,9 @@
 Contributors: rockiger
 Tags: react, embed, developer, javascript, js
 Requires at least: 5.0
-Tested up to: 6.4.3
+Tested up to: 6.6.2
 Requires PHP: 7.4
-Stable tag: 3.2.2
+Stable tag: 3.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,13 @@ Upgrades should be smoothless.
 4. The React app is deployed on the public server.
 
 == Changelog ==
+
+= 3.3.0 =
+
+* Recommend the user to use create-vite instead of create-react-app
+* Support chunking files for Vite applications (thanks to Blair Cooper)
+* Fix: Namespacing for repr_log() - function
+* Fix: Only write build path and index.html if in dev mode
 
 = 3.2.2 = 
 
