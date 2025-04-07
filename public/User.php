@@ -346,7 +346,7 @@ class User {
 		return [$js_files, $css_files];
 	}
 
-    /**
+	/**
 	 * Add new rewrite rules for every app to make react router usable.
 	 *
 	 * @since 1.4.0
@@ -366,10 +366,12 @@ class User {
 		foreach ($permalinks as $permalink) {
 			add_rewrite_rule(
 				'^' .
-					wp_make_link_relative($permalink) .
-					'/(.*)?',
+				// Trim leading and trailing slashes to get `^foo/bar/(.*)?` not `^/foo/bar//(.*)?`
+				trim(wp_make_link_relative($permalink), '/') .
+				'/(.*)?',
 				'index.php?pagename=' .
-					wp_make_link_relative($permalink),
+				// Trim leading and trailing slashes to get `index.php?pagename=foo/bar` not `index.php?pagename=/foo/bar/`
+				trim(wp_make_link_relative($permalink), '/'),
 				'top'
 			);
 		}
