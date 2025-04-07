@@ -141,7 +141,7 @@ class Controller {
    * @return int 0 if no success
    * @since 1.2.0
    */
-  public static function add_build_path($appname, $apptype = 'development_cra') {
+  public static function add_build_path(string $appname, string $apptype = 'development_cra'): int {
     $apppath = Utils::app_path($appname);
     // We need the relative path, that we can deploy our
     // built app to another server later.
@@ -184,6 +184,8 @@ class Controller {
         return 2;
       }
     }
+
+    return 0;
   }
 
   /**
@@ -195,7 +197,7 @@ class Controller {
    * @return string
    * @since 1.0.0
    */
-  public static function get_index_html_content(string $permalink, $apptype = 'development_cra', $appname = '') {
+  public static function get_index_html_content(string $permalink, string $apptype = 'development_cra', string $appname = ''): string {
     $resp = wp_remote_get($permalink, ['timeout' => 1000, 'cookies' => $_COOKIE]);
     $respCode = wp_remote_retrieve_response_code($resp);
 
@@ -223,6 +225,8 @@ class Controller {
           $filtered_contents
         );
       }
+    } else {
+      $readded_contents = '';
     }
 
     return $readded_contents;
@@ -320,7 +324,7 @@ class Controller {
    * @param string $content
    * @since 1.0.0
    */
-  public static function write_index_html(string $appname, string $content, $apptype = 'development_cra') {
+  public static function write_index_html(string $appname, string $content, string $apptype = 'development_cra') {
     if ($apptype === 'development_vite') {
       $index_html_path = sprintf("%s/%s/index.html", REPR_APPS_PATH, $appname);
       return file_put_contents($index_html_path, $content);

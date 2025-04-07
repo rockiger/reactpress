@@ -95,7 +95,7 @@ class User {
 	 * Add the type="module" attribute to the script tag, for
 	 * ReactPress apps, to remove some errors with Vite.
 	 */
-	function add_type_module_to_scripts($tag, $handle, $src) {
+	function add_type_module_to_scripts(string $tag, string $handle, string $src): string {
         if (str_starts_with($handle, 'rp-react-app-asset')) {
           // Write the first JS as script and the rest (dependents) as modulepreload links
 		  if (str_ends_with($handle, '-0')) {
@@ -188,7 +188,9 @@ class User {
 				}
 
 				// deque styles and scripts
-				if (basename(get_page_template_slug($post)) === 'empty-react-page-template.php') {
+				$slug = get_page_template_slug($post);
+
+				if ($slug && basename($slug) === 'empty-react-page-template.php') {
 					foreach ($wp_styles->queue as $handle) {
 						if (!(str_starts_with($handle, 'rp-react-app-asset-'))) {
 							wp_dequeue_style($handle);
@@ -229,6 +231,12 @@ class User {
 		}
 	}
 
+	/**
+	 *
+	 * @param string $appname
+	 *
+	 * @return array<string[]>
+	 */
 	private function setup_vite_application_files(string $appname): array
 	{
         $js_files = [];
@@ -268,8 +276,8 @@ class User {
                     return $result;
                 });
 
-                // We use array_values to reindex the array (because PHP)
-                $js_files = array_map(fn ($file_name) => $appAssetsUrl . $file_name, array_values($js_files));
+    			// We use array_values to reindex the array (because PHP)
+	       		$js_files = array_map(fn ($file_name) => $appAssetsUrl . $file_name, $js_files);
 
                 $css_files = array_map(fn ($file_name) => $appAssetsUrl . $file_name, array_filter(
                     $assets_files,
@@ -281,6 +289,13 @@ class User {
         return [$js_files, $css_files];
     }
 
+	/**
+	 *
+	 * @param string $appname
+	 * @throws \ErrorException
+	 *
+	 * @return array<string[]>
+	 */
 	private function setup_cra_application_files(string $appname): array
 	{
 		$js_files = [];

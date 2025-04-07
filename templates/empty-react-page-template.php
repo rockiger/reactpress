@@ -1,6 +1,6 @@
 <?php /* Template Name: EmptyReactPageTemplate */
 
-if (!defined('ABSPATH')) exit; // Exit if accessed directly    
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 ?>
 <!DOCTYPE html>
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
 
-  <link rel="manifest" href="/<?php echo esc_html($post->post_name); ?>/manifest.json" />
+  <link rel="manifest" href="/<?php global $post; echo esc_html($post->post_name); ?>/manifest.json" />
   <?php wp_head() ?>
 
 </head>

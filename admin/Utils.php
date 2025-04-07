@@ -49,7 +49,7 @@ class Utils {
    */
   public static function app_path(string $appname, $relative_to_home_path = false): string {
     $apppath = escapeshellcmd(REPR_APPS_PATH . "/{$appname}");
-    $document_root = $_SERVER['DOCUMENT_ROOT'] ?? rtrim(ABSPATH,  '/') ?? '';
+    $document_root = $_SERVER['DOCUMENT_ROOT'] ?? rtrim(ABSPATH,  '/');
 
     if ($relative_to_home_path) {
       return explode($document_root, $apppath)[1];
@@ -103,8 +103,8 @@ class Utils {
   }
 
   /**
-   * Add the PUBLIC_URL to start command of package.json of React app. 
-   * This is neccessary that the dev server is working as exspected if 
+   * Add the PUBLIC_URL to start command of package.json of React app.
+   * This is neccessary that the dev server is working as exspected if
    * client-side routing
    * is used.
    * @param string $appname
@@ -137,7 +137,7 @@ class Utils {
 
 
   /**
-   * Remove the PUBLIC_URL to start command of package.json of React app. * This is neccessary that the dev server is working as exspected if 
+   * Remove the PUBLIC_URL to start command of package.json of React app. * This is neccessary that the dev server is working as exspected if
    * client-side routing
    * is used.
    * @param string $appname
@@ -168,8 +168,8 @@ class Utils {
   /**
    * Delete an app slug from an app. Returns the new options list
    * @param mixed[] $app_options_list
-   * @param string $appname 
-   * @param int $pageId 
+   * @param string $appname
+   * @param int $pageId
    * @since 2.0.0
    */
   public static function delete_page($app_options_list, $appname, $pageId) {
@@ -180,8 +180,8 @@ class Utils {
   /**
    * delete_page helper
    * @param mixed[] $app_options_list
-   * @param string $appname 
-   * @param int $pageId 
+   * @param string $appname
+   * @param int $pageId
    */
   public static function  __delete_page($app_options_list, $appname, $pageId) {
     $new_app_options_list = array_map(function ($app_options) use ($appname, $pageId) {
@@ -218,7 +218,7 @@ class Utils {
 
   /**
    * Return all apps as an array, enriched with the meta data for pages.
-   * 
+   *
    * [['allowsRouting' => false,
    *   'appname' => $appname,
    *   'pageIds' => [100]
@@ -234,9 +234,9 @@ class Utils {
   }
   /**
    * Helper for get_apps
-   * @param mixed[] $app_options 
-   * @param string[] $appnames_from_dir 
-   * @return array<array-key, mixed> 
+   * @param mixed[] $app_options
+   * @param string[] $appnames_from_dir
+   * @return array<array-key, mixed>
    */
   public static function __get_apps($app_options, $appnames_from_dir) {
     // combine apps from directory and from settings to get a complete list
@@ -278,15 +278,18 @@ class Utils {
   }
 
   /**
-   * @param string $appname 
+   * @param string $appname
    * @return 'development_cra' | 'development_vite' | 'deployment_cra' | 'deployment_vite' | 'empty' | 'orphan'
    */
-  public static function get_app_type($appname) {
+  public static function get_app_type(string $appname): string {
     if (is_file(REPR_APPS_PATH . '/' . $appname . '/package.json')) {
-      $packageJson = json_decode(
-        file_get_contents(REPR_APPS_PATH . '/' . $appname . '/package.json')
-      );
-      $type = (isset($packageJson->devDependencies->vite)) ? 'development_vite' : 'development_cra';
+        $contents = file_get_contents(REPR_APPS_PATH . '/' . $appname . '/package.json');
+        if ($contents) {
+            $packageJson = json_decode($contents);
+            $type = (isset($packageJson->devDependencies->vite)) ? 'development_vite' : 'development_cra';
+        } else {
+            $type = 'development_cra';
+        }
     } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/build')) {
       $type = 'deployment_cra';
     } elseif (is_dir(REPR_APPS_PATH . '/' . $appname . '/dist')) {
@@ -301,9 +304,9 @@ class Utils {
 
   /**
    * Retrieves the repr_apps option from WordPress if nothing can retrieved,
-   * produces an empty array. 
+   * produces an empty array.
    * Usually you should prefer Utils::get_apps().
-   * 
+   *
    * @return mixed[]
    */
   public static function get_app_options_list() {
@@ -313,7 +316,7 @@ class Utils {
   /**
    * Removes a rewrite rule from $wp_rewrite->extra_rules_top
    *
-   * @param $regex the regex given to add_rewrite_rule
+   * @param $regex string the regex given to add_rewrite_rule
    * @since 2.0.0
    */
   public static function remove_rewrite_rule(string $regex) {
@@ -324,7 +327,7 @@ class Utils {
   /**
    * Consumes an app list, filters unneccessary information (pages) and
    * saves it as options.
-   * @param mixed[] $app_list 
+   * @param mixed[] $app_list
    */
   public static function write_apps_option($app_list) {
     $app_list_option = array_map(fn ($el) => [

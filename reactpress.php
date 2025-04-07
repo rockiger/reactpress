@@ -57,7 +57,6 @@ define('REPR_IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
 
 define('REPR_PLUGIN_URL', REPR_IS_WINDOWS ? str_replace('\\', '/', plugin_dir_url(__FILE__)) : plugin_dir_url(__FILE__));
 define('REPR_PLUGIN_PATH', REPR_IS_WINDOWS ? str_replace('\\', '/', plugin_dir_path(__FILE__)) : plugin_dir_path(__FILE__));
-/** @phpstan-ignore-next-line */
 define('REPR_APPS_PATH', REPR_IS_WINDOWS ? str_replace('\\', '/', WP_CONTENT_DIR . '/reactpress/apps') : WP_CONTENT_DIR . '/reactpress/apps');
 define('REPR_APPS_URL', content_url() . '/reactpress/apps');
 
@@ -65,7 +64,7 @@ define('REPR_APPS_URL', content_url() . '/reactpress/apps');
  * The code that runs during plugin activation.
  * This action is documented in includes/class-reactpress-activator.php
  */
-function activate_reactpress() {
+function activate_reactpress(): void {
 	Activator::activate();
 }
 
@@ -73,8 +72,8 @@ function activate_reactpress() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-reactpress-deactivator.php
  */
-function deactivate_reactpress() {
-	Deactivator::deactivate();
+function deactivate_reactpress(): void {
+    Deactivator::deactivate(); // @phpstan-ignore staticMethod.resultUnused
 }
 
 register_activation_hook(__FILE__, 'activate_reactpress');
@@ -89,7 +88,7 @@ register_deactivation_hook(__FILE__, 'deactivate_reactpress');
  *
  * @since    1.0.0
  */
-function run_reactpress() {
+function run_reactpress(): void {
 
 	$plugin = new Core();
 	$plugin->run();
@@ -98,11 +97,11 @@ run_reactpress();
 
 
 /**
- * @param ...$data
+ * @param array<mixed> ...$data
  *
  * @return void
  */
-function repr_debug($data) {
+function repr_debug(array ...$data): void {
 	if (WP_DEBUG !== true) return;
 	$json = json_encode($data);
 	add_action('shutdown', function () use ($json) {
@@ -112,11 +111,11 @@ function repr_debug($data) {
 
 /**
  * Write error to a log file named debug.log in wp-content.
- * 
+ *
  * @param mixed $log The thing you want to log.
  * @since 1.0.0
  */
-function repr_log($log) {
+function repr_log( $log): void {
 	if (true === WP_DEBUG) {
 		if (is_array($log) || is_object($log)) {
 			error_log(print_r($log, true));
@@ -124,5 +123,4 @@ function repr_log($log) {
 			error_log($log);
 		}
 	}
-	return $log;
 }
