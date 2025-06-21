@@ -215,12 +215,23 @@ class User {
 			}
 			// Variables for app use
 			$current_user = wp_get_current_user();
+
+			$graphql_general_settings = get_option('graphql_general_settings', false);
+
+			// Set default GraphQL endpoint URL as fallback in case no custom setting exists.
+			// This matches WPGraphQL’s default endpoint URL.
+			$graphql_endpoint = 'graphql';
+
+			if (is_array($graphql_general_settings) && !empty($graphql_general_settings['graphql_endpoint'])) {
+    			$graphql_endpoint = $graphql_general_settings['graphql_endpoint'];
+			}
+
 			unset($current_user->user_pass); // Don't show encypted password for security reasons.
 			wp_localize_script('rp-react-app-asset-0-0', 'reactPress', array(
 				'api' => [
 					'nonce' => wp_create_nonce('wp_rest'),
 					'rest_url' => esc_url_raw(rest_url()),
-					'graphql_url' => esc_url_raw(site_url(get_option('graphql_general_settings', ["graphql_endpoint" => 'graphql'])['graphql_endpoint'])),
+					'graphql_url' => esc_url_raw(site_url($graphql_endpoint)),
 				],
 				'post' => $post,
 				'user' => $current_user,
