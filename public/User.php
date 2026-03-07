@@ -169,8 +169,8 @@ class User {
 			foreach ($suitable_apps as $app_index => $current_app) {
 
 				// Setting path variables.
-				$appname = $current_app['appname'];
-				$plugin_app_dir_url = escapeshellcmd(REPR_APPS_URL . "/{$appname}/");
+				$appname = sanitize_file_name($current_app['appname']);
+				$plugin_app_dir_url = REPR_APPS_URL . "/{$appname}/";
 				$apptype = Utils::get_app_type($appname);
 				$css_files = [];
 				$js_files = [];
@@ -312,8 +312,8 @@ class User {
 		$js_files = [];
 		$css_files = [];
 
-		$react_app_build = escapeshellcmd(REPR_APPS_URL . "/{$appname}/") . 'build/';
-		$manifest_path = escapeshellcmd(REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json");
+		$react_app_build = REPR_APPS_URL . "/{$appname}/build/";
+		$manifest_path = REPR_APPS_PATH . "/{$appname}/build/asset-manifest.json";
 
 		// Request manifest file.
 		set_error_handler(
